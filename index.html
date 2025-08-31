@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>📅 AI Dali Emploi en CEM</title>
+  <style>
+    body { font-family: Tahoma, Arial, sans-serif; background: #f4f6fa; direction: rtl; text-align: center; }
+    h1 { color: #333; }
+    .container { margin: 20px auto; max-width: 900px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    label { display: block; margin: 10px 0 5px; font-weight: bold; }
+    textarea, input { padding: 8px; border: 1px solid #ccc; border-radius: 8px; width: 100%; margin-bottom: 10px; }
+    button { background: #4caf50; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 14px; }
+    table, th, td { border: 1px solid #aaa; }
+    th, td { padding: 6px; text-align: center; }
+    th { background: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📘 AI Dali Emploi en CEM</h1>
+
+    <label>عدد الأقسام:</label>
+    <input type="number" id="sections" value="4">
+
+    <label>عدد الأساتذة لكل مادة (مثال: رياضيات = 2):</label>
+    <textarea id="teachers" rows="5">رياضيات=2
+عربية=3
+فرنسية=2
+إنجليزية=2
+علوم طبيعية=2
+فيزياء=2
+تكنولوجيا=1
+تاريخ=1
+جغرافيا=1
+إسلامية=1
+مدنية=1
+رياضة=2
+إعلام آلي=1</textarea>
+
+    <label>عدد الساعات الأسبوعية لكل مادة:</label>
+    <textarea id="hours" rows="5">رياضيات=5
+عربية=5
+فرنسية=3
+إنجليزية=3
+علوم طبيعية=2
+فيزياء=2
+تكنولوجيا=1
+تاريخ=2
+جغرافيا=2
+إسلامية=2
+مدنية=1
+رياضة=2
+إعلام آلي=1</textarea>
+
+    <button onclick="generate()">إنشاء الجداول</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const days = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"];
+
+    function parseInput(text){
+      let map = {};
+      text.trim().split("\n").forEach(line=>{
+        let [k,v] = line.split("=");
+        if(k && v) map[k.trim()] = parseInt(v.trim());
+      });
+      return map;
+    }
+
+    function generate(){
+      const sections = parseInt(document.getElementById('sections').value);
+      const teachers = parseInput(document.getElementById('teachers').value);
+      const hours = parseInput(document.getElementById('hours').value);
+
+      let output = "<h2>📘 جداول التلاميذ</h2>";
+      for(let s=1; s<=sections; s++){
+        output += `<h3>قسم ${s}</h3><table><tr>`;
+        days.forEach(d=> output += `<th>${d}</th>`);
+        output += "</tr><tr>";
+        days.forEach((d, i)=>{
+          // توزيع أولي: نأخذ بعض المواد عشوائيا
+          let today = Object.keys(hours).slice(i%Object.keys(hours).length, (i%Object.keys(hours).length)+3);
+          output += `<td>${today.join("<br>")}</td>`;
+        });
+        output += "</tr></table>`;
+      }
+
+      output += "<h2>👨‍🏫 جداول الأساتذة</h2>";
+      Object.keys(teachers).forEach(subj=>{
+        for(let t=1; t<=teachers[subj]; t++){
+          output += `<h3>${subj} - أستاذ ${t}</h3>`;
+          output += "<table><tr>";
+          days.forEach(d=> output += `<th>${d}</th>`);
+          output += "</tr><tr>";
+          days.forEach((d,i)=>{
+            if(d==="الخميس"){ output += "<td>📌 يوم بيداغوجي</td>"; }
+            else { output += `<td>${subj} في قسم ${(i%s)+1}</td>`; }
+          });
+          output += "</tr></table>";
+        }
+      });
+
+      document.getElementById('output').innerHTML = output;
+    }
+  </script>
+</body>
+</html>
