@@ -1,110 +1,1760 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>📅 AI Dali Emploi en CEM</title>
-  <style>
-    body { font-family: Tahoma, Arial, sans-serif; background: #f4f6fa; direction: rtl; text-align: center; }
-    h1 { color: #333; }
-    .container { margin: 20px auto; max-width: 900px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    label { display: block; margin: 10px 0 5px; font-weight: bold; }
-    textarea, input { padding: 8px; border: 1px solid #ccc; border-radius: 8px; width: 100%; margin-bottom: 10px; }
-    button { background: #4caf50; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
-    button:hover { background: #45a049; }
-    table { border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 14px; }
-    table, th, td { border: 1px solid #aaa; }
-    th, td { padding: 6px; text-align: center; }
-    th { background: #f2f2f2; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>📘 AI Dali Emploi en CEM</h1>
-
-    <label>عدد الأقسام:</label>
-    <input type="number" id="sections" value="4">
-
-    <label>عدد الأساتذة لكل مادة (مثال: رياضيات = 2):</label>
-    <textarea id="teachers" rows="5">رياضيات=2
-عربية=3
-فرنسية=2
-إنجليزية=2
-علوم طبيعية=2
-فيزياء=2
-تكنولوجيا=1
-تاريخ=1
-جغرافيا=1
-إسلامية=1
-مدنية=1
-رياضة=2
-إعلام آلي=1</textarea>
-
-    <label>عدد الساعات الأسبوعية لكل مادة:</label>
-    <textarea id="hours" rows="5">رياضيات=5
-عربية=5
-فرنسية=3
-إنجليزية=3
-علوم طبيعية=2
-فيزياء=2
-تكنولوجيا=1
-تاريخ=2
-جغرافيا=2
-إسلامية=2
-مدنية=1
-رياضة=2
-إعلام آلي=1</textarea>
-
-    <button onclick="generate()">إنشاء الجداول</button>
-    <div id="output"></div>
-  </div>
-
-  <script>
-    const days = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"];
-
-    function parseInput(text){
-      let map = {};
-      text.trim().split("\n").forEach(line=>{
-        let [k,v] = line.split("=");
-        if(k && v) map[k.trim()] = parseInt(v.trim());
-      });
-      return map;
-    }
-
-    function generate(){
-      const sections = parseInt(document.getElementById('sections').value);
-      const teachers = parseInput(document.getElementById('teachers').value);
-      const hours = parseInput(document.getElementById('hours').value);
-
-      let output = "<h2>📘 جداول التلاميذ</h2>";
-      for(let s=1; s<=sections; s++){
-        output += `<h3>قسم ${s}</h3><table><tr>`;
-        days.forEach(d=> output += `<th>${d}</th>`);
-        output += "</tr><tr>";
-        days.forEach((d, i)=>{
-          // توزيع أولي: نأخذ بعض المواد عشوائيا
-          let today = Object.keys(hours).slice(i%Object.keys(hours).length, (i%Object.keys(hours).length)+3);
-          output += `<td>${today.join("<br>")}</td>`;
-        });
-        output += "</tr></table>`;
-      }
-
-      output += "<h2>👨‍🏫 جداول الأساتذة</h2>";
-      Object.keys(teachers).forEach(subj=>{
-        for(let t=1; t<=teachers[subj]; t++){
-          output += `<h3>${subj} - أستاذ ${t}</h3>`;
-          output += "<table><tr>";
-          days.forEach(d=> output += `<th>${d}</th>`);
-          output += "</tr><tr>";
-          days.forEach((d,i)=>{
-            if(d==="الخميس"){ output += "<td>📌 يوم بيداغوجي</td>"; }
-            else { output += `<td>${subj} في قسم ${(i%s)+1}</td>`; }
-          });
-          output += "</tr></table>";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dali Emploi en CEM - مولد جداول الاستعمال الزمن</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .schedule-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
         }
-      });
+        .schedule-table th, .schedule-table td {
+            border: 2px solid #333;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 40px;
+            color: black;
+        }
+        .schedule-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            color: black;
+        }
+        .subject-slot {
+            background-color: #90EE90;
+            color: black;
+            font-size: 12px;
+        }
+        .remedial-slot {
+            background-color: #FFFF99;
+            color: black;
+            font-size: 12px;
+        }
+        .empty-slot {
+            background-color: white;
+            color: black;
+        }
+        .pedagogical-slot {
+            background-color: #FFE4B5;
+            color: black;
+            font-size: 12px;
+        }
+        .break-slot {
+            background-color: #E0E0E0;
+            color: black;
+        }
+        @media print {
+            .no-print { display: none; }
+            .schedule-table { page-break-inside: avoid; }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE'
+                    }
+                }
+            }
+        }
+        
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-primary mb-2">AI Dali Emploi en CEM</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">مولد جداول الاستعمال الزمن للمؤسسات المتوسطة</p>
+        </div>
 
-      document.getElementById('output').innerHTML = output;
-    }
-  </script>
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center mb-8 space-x-2 space-x-reverse">
+            <button onclick="showTab('setup')" id="setupTab" class="px-6 py-3 bg-primary text-white rounded-lg mx-1 mb-2 hover:bg-primary/90 transition-colors">
+                إعداد البيانات
+            </button>
+            <button onclick="showTab('institution')" id="institutionTab" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg mx-1 mb-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                جدول المؤسسة
+            </button>
+            <button onclick="showTab('students')" id="studentsTab" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg mx-1 mb-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                جداول التلاميذ
+            </button>
+            <button onclick="showTab('teachers')" id="teachersTab" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg mx-1 mb-2 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                جداول الأساتذة
+            </button>
+        </div>
+
+        <!-- Setup Tab -->
+        <div id="setupContent" class="tab-content">
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">إعداد البيانات الأساسية</h2>
+                
+                <!-- Institution Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">اسم المؤسسة</label>
+                        <input type="text" id="institutionName" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="متوسطة الشهيد...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">العام الدراسي</label>
+                        <input type="text" id="academicYear" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="2024-2025" value="2024-2025">
+                    </div>
+                </div>
+
+                <!-- Levels and Classes -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-4">المستويات وعدد الأقسام</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">السنة الأولى متوسط</label>
+                            <input type="number" id="level1Classes" min="0" max="10" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="عدد الأقسام" onchange="updateTotalClasses()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">السنة الثانية متوسط</label>
+                            <input type="number" id="level2Classes" min="0" max="10" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="عدد الأقسام" onchange="updateTotalClasses()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">السنة الثالثة متوسط</label>
+                            <input type="number" id="level3Classes" min="0" max="10" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="عدد الأقسام" onchange="updateTotalClasses()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">السنة الرابعة متوسط</label>
+                            <input type="number" id="level4Classes" min="0" max="10" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="عدد الأقسام" onchange="updateTotalClasses()">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-lg font-bold">العدد الكلي للأقسام: <span id="totalClasses" class="text-primary">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Teachers Setup -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-4">إضافة الأساتذة والمواد</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                        <div>
+                            <input type="text" id="teacherName" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="اسم الأستاذ">
+                        </div>
+                        <div>
+                            <select id="teacherSubject" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">اختر المادة</option>
+                                <option value="رياضيات">رياضيات</option>
+                                <option value="عربية">لغة عربية</option>
+                                <option value="فرنسية">لغة فرنسية</option>
+                                <option value="انجليزية">لغة إنجليزية</option>
+                                <option value="علوم طبيعية">علوم طبيعية</option>
+                                <option value="فيزياء">فيزياء</option>
+                                <option value="تاريخ وجغرافيا">تاريخ وجغرافيا</option>
+                                <option value="تربية مدنية">تربية مدنية</option>
+                                <option value="تربية إسلامية">تربية إسلامية</option>
+                                <option value="رياضة">تربية بدنية</option>
+                                <option value="إعلام آلي">إعلام آلي</option>
+                                <option value="تربية فنية">تربية فنية</option>
+                                <option value="تربية موسيقية">تربية موسيقية</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="text" id="teacherClasses" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="الأقسام (مثل: 1م1,1م2,2م1)">
+                        </div>
+                        <div>
+                            <input type="number" id="weeklyHours" min="1" max="25" class="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="ساعات أسبوعية">
+                        </div>
+                        <div>
+                            <button onclick="addTeacher()" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                                إضافة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Teachers Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-700">
+                                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2">الأستاذ</th>
+                                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2">المادة</th>
+                                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2">الأقسام</th>
+                                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2">ساعات أسبوعية</th>
+                                    <th class="border border-gray-300 dark:border-gray-600 px-4 py-2">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersTableBody">
+                                <!-- Teachers will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Generate Buttons -->
+                <div class="text-center space-y-4">
+                    <div>
+                        <button onclick="loadMyInstitution()" class="px-6 py-3 bg-green-600 text-white rounded-lg text-lg font-bold hover:bg-green-700 transition-colors mx-2">
+                            🏫 تحميل بيانات مؤسستي
+                        </button>
+                        <button onclick="resetData()" class="px-6 py-3 bg-gray-500 text-white rounded-lg text-lg font-bold hover:bg-gray-600 transition-colors mx-2">
+                            🔄 إعادة تعيين
+                        </button>
+                    </div>
+                    <div>
+                        <button onclick="generateSchedules()" class="px-8 py-3 bg-primary text-white rounded-lg text-lg font-bold hover:bg-primary/90 transition-colors">
+                            ⚡ توليد جميع الجداول
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Institution Schedule Tab -->
+        <div id="institutionContent" class="tab-content hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold mb-4">جدول استعمال الزمن العام للمؤسسة</h2>
+                <div class="space-x-4 space-x-reverse no-print">
+                    <button onclick="copyTable('institutionSchedule')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">نسخ الجدول</button>
+                    <button onclick="exportToPDF('institutionSchedule')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">تصدير PDF</button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">طباعة</button>
+                </div>
+            </div>
+            <div id="institutionSchedule" class="overflow-x-auto">
+                <!-- Institution schedule will be generated here -->
+            </div>
+        </div>
+
+        <!-- Students Schedule Tab -->
+        <div id="studentsContent" class="tab-content hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold mb-4">جداول استعمال الزمن للتلاميذ</h2>
+                <div class="mb-4">
+                    <select id="classSelector" onchange="showClassSchedule()" class="px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">اختر القسم</option>
+                    </select>
+                </div>
+                <div class="space-x-4 space-x-reverse no-print">
+                    <button onclick="copyTable('studentsSchedule')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">نسخ الجدول</button>
+                    <button onclick="exportToPDF('studentsSchedule')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">تصدير PDF</button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">طباعة</button>
+                </div>
+            </div>
+            <div id="studentsSchedule" class="overflow-x-auto">
+                <!-- Student schedules will be generated here -->
+            </div>
+        </div>
+
+        <!-- Teachers Schedule Tab -->
+        <div id="teachersContent" class="tab-content hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold mb-4">جداول استعمال الزمن للأساتذة</h2>
+                <div class="mb-4">
+                    <select id="teacherSelector" onchange="showTeacherSchedule()" class="px-4 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">اختر الأستاذ</option>
+                    </select>
+                </div>
+                <div class="space-x-4 space-x-reverse no-print">
+                    <button onclick="copyTable('teachersSchedule')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">نسخ الجدول</button>
+                    <button onclick="exportToPDF('teachersSchedule')" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">تصدير PDF</button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">طباعة</button>
+                </div>
+            </div>
+            <div id="teachersSchedule" class="overflow-x-auto">
+                <!-- Teacher schedules will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let teachers = [];
+        let institutionData = {};
+        let schedules = {
+            institution: {},
+            students: {},
+            teachers: {}
+        };
+
+        // Time slots according to Algerian middle school schedule
+        const timeSlots = [
+            '08:00-09:00',
+            '09:00-10:00',
+            '10:00-11:00',
+            '11:00-12:00',
+            '13:00-14:00',
+            '14:00-15:00',
+            '15:00-16:00'  // Remedial classes time
+        ];
+
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+        
+        // Updated pedagogical days configuration (teacher free days)
+        const pedagogicalDays = {
+            'الأحد': ['تاريخ وجغرافيا', 'تربية مدنية'],
+            'الاثنين': ['انجليزية', 'تربية إسلامية'],
+            'الثلاثاء': ['فرنسية', 'فيزياء'],
+            'الأربعاء': ['عربية', 'علوم طبيعية', 'إعلام آلي'],
+            'الخميس': ['رياضيات', 'تربية فنية']
+        };
+
+        // Updated subject hours per week for each class (according to Algerian curriculum)
+        const subjectHours = {
+            'رياضيات': { '1': 4, '2': 4, '3': 5, '4': 5 },
+            'عربية': { '1': 4, '2': 4, '3': 4, '4': 4 },
+            'فرنسية': { '1': 3, '2': 3, '3': 3, '4': 3 },
+            'انجليزية': { '1': 3, '2': 3, '3': 3, '4': 3 },
+            'علوم طبيعية': { '1': 3, '2': 3, '3': 3, '4': 3 },
+            'فيزياء': { '1': 2, '2': 2, '3': 2, '4': 2 },
+            'تاريخ وجغرافيا': { '1': 2, '2': 2, '3': 2, '4': 2 },
+            'تربية مدنية': { '1': 1, '2': 1, '3': 1, '4': 1 },
+            'تربية إسلامية': { '1': 2, '2': 2, '3': 2, '4': 2 },
+            'رياضة': { '1': 2, '2': 2, '3': 2, '4': 2 },
+            'إعلام آلي': { '1': 1, '2': 1, '3': 1, '4': 1 },
+            'تربية فنية': { '1': 1, '2': 1, '3': 1, '4': 1 }
+        };
+
+        // Maximum weekly hours per teacher (new regulation)
+        const MAX_TEACHER_HOURS = 20;
+
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Reset all tab buttons
+            document.querySelectorAll('[id$="Tab"]').forEach(tab => {
+                tab.className = tab.className.replace('bg-primary text-white', 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
+            // Activate selected tab button
+            const activeTab = document.getElementById(tabName + 'Tab');
+            activeTab.className = activeTab.className.replace('bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300', 'bg-primary text-white');
+        }
+
+        // Update total classes
+        function updateTotalClasses() {
+            const level1 = parseInt(document.getElementById('level1Classes').value) || 0;
+            const level2 = parseInt(document.getElementById('level2Classes').value) || 0;
+            const level3 = parseInt(document.getElementById('level3Classes').value) || 0;
+            const level4 = parseInt(document.getElementById('level4Classes').value) || 0;
+            
+            const total = level1 + level2 + level3 + level4;
+            document.getElementById('totalClasses').textContent = total;
+        }
+
+        // Add teacher
+        function addTeacher() {
+            const name = document.getElementById('teacherName').value.trim();
+            const subject = document.getElementById('teacherSubject').value;
+            const classes = document.getElementById('teacherClasses').value.trim();
+            const hours = parseInt(document.getElementById('weeklyHours').value);
+
+            if (!name || !subject || !classes || !hours) {
+                showAlert('يرجى ملء جميع الحقول');
+                return;
+            }
+
+            const teacher = {
+                id: Date.now(),
+                name,
+                subject,
+                classes: classes.split(',').map(c => c.trim()),
+                weeklyHours: hours
+            };
+
+            teachers.push(teacher);
+            updateTeachersTable();
+            clearTeacherForm();
+        }
+
+        // Update teachers table
+        function updateTeachersTable() {
+            const tbody = document.getElementById('teachersTableBody');
+            tbody.innerHTML = '';
+
+            teachers.forEach(teacher => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">${teacher.name}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">${teacher.subject}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">${teacher.classes.join(', ')}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">${teacher.weeklyHours}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                        <button onclick="removeTeacher(${teacher.id})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors">حذف</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSelectors();
+        }
+
+        // Remove teacher
+        function removeTeacher(id) {
+            showConfirmDialog('هل أنت متأكد من حذف هذا الأستاذ؟', () => {
+                teachers = teachers.filter(t => t.id !== id);
+                updateTeachersTable();
+            });
+        }
+
+        // Clear teacher form
+        function clearTeacherForm() {
+            document.getElementById('teacherName').value = '';
+            document.getElementById('teacherSubject').value = '';
+            document.getElementById('teacherClasses').value = '';
+            document.getElementById('weeklyHours').value = '';
+        }
+
+        // Generate all schedules with intelligent algorithm
+        function generateSchedules() {
+            if (teachers.length === 0) {
+                showAlert('يرجى إضافة أساتذة أولاً');
+                return;
+            }
+
+            // Collect institution data
+            institutionData = {
+                name: document.getElementById('institutionName').value || 'متوسطة غير محددة',
+                year: document.getElementById('academicYear').value || '2024-2025',
+                levels: {
+                    1: parseInt(document.getElementById('level1Classes').value) || 0,
+                    2: parseInt(document.getElementById('level2Classes').value) || 0,
+                    3: parseInt(document.getElementById('level3Classes').value) || 0,
+                    4: parseInt(document.getElementById('level4Classes').value) || 0
+                }
+            };
+
+            // Generate all class names
+            const allClasses = [];
+            for (let level = 1; level <= 4; level++) {
+                for (let classNum = 1; classNum <= institutionData.levels[level]; classNum++) {
+                    allClasses.push(`${level}م${classNum}`);
+                }
+            }
+
+            // Use intelligent scheduling algorithm
+            try {
+                const scheduleResult = generateIntelligentSchedules(allClasses);
+                if (scheduleResult.success) {
+                    schedules = scheduleResult.schedules;
+                    generateInstitutionSchedule();
+                    updateSelectors();
+                    showAlert('تم توليد جميع الجداول بنجاح! 🎉');
+                } else {
+                    showAlert('حدث خطأ في توليد الجداول: ' + scheduleResult.error);
+                }
+            } catch (error) {
+                console.error('Schedule generation error:', error);
+                showAlert('حدث خطأ في توليد الجداول. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // Completely new synchronized scheduling algorithm
+        function generateIntelligentSchedules(allClasses) {
+            try {
+                // Initialize master schedule (single source of truth)
+                const masterSchedule = createMasterSchedule(allClasses);
+                
+                // Schedule all classes systematically
+                const result = scheduleMasterTimetable(masterSchedule, allClasses);
+                
+                if (result.success) {
+                    // Generate individual schedules from master schedule
+                    const newSchedules = {
+                        institution: generateInstitutionFromMaster(masterSchedule),
+                        students: generateStudentSchedulesFromMaster(masterSchedule, allClasses),
+                        teachers: generateTeacherSchedulesFromMaster(masterSchedule)
+                    };
+                    
+                    return { success: true, schedules: newSchedules };
+                } else {
+                    return { success: false, error: result.error };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Create master schedule structure
+        function createMasterSchedule(allClasses) {
+            const masterSchedule = {};
+            
+            days.forEach(day => {
+                masterSchedule[day] = {};
+                timeSlots.forEach(slot => {
+                    masterSchedule[day][slot] = {
+                        classes: {},
+                        teachers: {}
+                    };
+                    
+                    // Initialize each class slot
+                    allClasses.forEach(className => {
+                        masterSchedule[day][slot].classes[className] = {
+                            subject: '',
+                            teacher: '',
+                            type: 'empty'
+                        };
+                    });
+                });
+            });
+            
+            return masterSchedule;
+        }
+
+        // Schedule master timetable
+        function scheduleMasterTimetable(masterSchedule, allClasses) {
+            try {
+                // Mark pedagogical days first
+                markPedagogicalDaysInMaster(masterSchedule);
+                
+                // Schedule each class's subjects across the week
+                for (const className of allClasses) {
+                    const level = parseInt(className.charAt(0));
+                    
+                    // Get all required subjects for this class
+                    const requiredSubjects = Object.keys(subjectHours).filter(subject => 
+                        subjectHours[subject][level.toString()] > 0
+                    );
+                    
+                    // Schedule each subject for this class
+                    for (const subject of requiredSubjects) {
+                        const requiredHours = subjectHours[subject][level.toString()];
+                        if (!requiredHours) continue;
+                        
+                        const teacher = findTeacherForClass(subject, className);
+                        if (!teacher) continue;
+                        
+                        // Schedule required hours across the week
+                        const result = scheduleSubjectForClass(
+                            masterSchedule, 
+                            className, 
+                            subject, 
+                            teacher, 
+                            requiredHours
+                        );
+                        
+                        if (!result.success) {
+                            console.warn(`Failed to schedule ${subject} for ${className}: ${result.error}`);
+                        }
+                    }
+                }
+                
+                // Add remedial classes
+                addRemedialClassesToMaster(masterSchedule, allClasses);
+                
+                return { success: true };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Mark pedagogical days in master schedule
+        function markPedagogicalDaysInMaster(masterSchedule) {
+            days.forEach(day => {
+                const freeDaySubjects = pedagogicalDays[day] || [];
+                
+                freeDaySubjects.forEach(subject => {
+                    timeSlots.forEach(slot => {
+                        if (slot !== '15:00-16:00') { // Keep remedial time available
+                            masterSchedule[day][slot].teachers[subject] = 'pedagogical';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Find teacher for a specific class and subject
+        function findTeacherForClass(subject, className) {
+            return teachers.find(t => 
+                t.subject === subject && 
+                t.classes.includes(className)
+            );
+        }
+
+        // Schedule subject for specific class
+        function scheduleSubjectForClass(masterSchedule, className, subject, teacher, requiredHours) {
+            let hoursScheduled = 0;
+            const dailyHours = {};
+            
+            // Shuffle days for randomization
+            const shuffledDays = [...days].sort(() => Math.random() - 0.5);
+            
+            for (const day of shuffledDays) {
+                if (hoursScheduled >= requiredHours) break;
+                
+                // Check if teacher has pedagogical day
+                const freeDaySubjects = pedagogicalDays[day] || [];
+                if (freeDaySubjects.includes(subject)) continue;
+                
+                // Limit hours per day (max 2 for non-core subjects, 3 for core)
+                const maxDaily = ['رياضيات', 'عربية', 'فرنسية'].includes(subject) ? 3 : 2;
+                if ((dailyHours[day] || 0) >= maxDaily) continue;
+                
+                // Get available slots for this day
+                let availableSlots = timeSlots.filter(slot => slot !== '15:00-16:00');
+                
+                // Prefer morning for mathematics
+                if (subject === 'رياضيات') {
+                    availableSlots = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00'];
+                }
+                
+                for (const slot of availableSlots) {
+                    if (hoursScheduled >= requiredHours) break;
+                    if ((dailyHours[day] || 0) >= maxDaily) break;
+                    
+                    // Check if slot is available
+                    if (canScheduleInMaster(masterSchedule, className, subject, teacher.name, day, slot)) {
+                        // Schedule the class
+                        masterSchedule[day][slot].classes[className] = {
+                            subject: subject,
+                            teacher: teacher.name,
+                            type: 'subject'
+                        };
+                        
+                        masterSchedule[day][slot].teachers[teacher.name] = className;
+                        
+                        hoursScheduled++;
+                        dailyHours[day] = (dailyHours[day] || 0) + 1;
+                    }
+                }
+            }
+            
+            return { 
+                success: hoursScheduled >= Math.max(1, requiredHours - 1), // Allow 1 hour tolerance
+                hoursScheduled 
+            };
+        }
+
+        // Enhanced scheduling check to prevent consecutive classes and long gaps
+        function canScheduleInMaster(masterSchedule, className, subject, teacherName, day, slot) {
+            // Check if class slot is empty
+            const classSlot = masterSchedule[day][slot].classes[className];
+            if (classSlot.type !== 'empty') return false;
+            
+            // Check if teacher is available
+            const teacherSlot = masterSchedule[day][slot].teachers[teacherName];
+            if (teacherSlot && teacherSlot !== 'pedagogical') return false;
+            
+            // Check if teacher has pedagogical day
+            if (teacherSlot === 'pedagogical') return false;
+            
+            // Check if same subject already scheduled today for this class
+            const daySchedule = masterSchedule[day];
+            const subjectAlreadyToday = Object.keys(daySchedule).some(timeSlot => {
+                const classData = daySchedule[timeSlot].classes[className];
+                return classData.subject === subject && classData.type === 'subject';
+            });
+            
+            // Prevent repetition unless absolutely necessary for core subjects
+            if (subjectAlreadyToday && !['رياضيات', 'عربية'].includes(subject)) {
+                return false;
+            }
+            
+            // PREVENT CONSECUTIVE CLASSES: Check if teacher already teaching this class in adjacent slots
+            const currentSlotIndex = timeSlots.indexOf(slot);
+            if (currentSlotIndex > 0) {
+                const previousSlot = timeSlots[currentSlotIndex - 1];
+                const prevClassData = daySchedule[previousSlot].classes[className];
+                if (prevClassData.teacher === teacherName && prevClassData.type === 'subject') {
+                    return false; // Prevent consecutive classes
+                }
+            }
+            if (currentSlotIndex < timeSlots.length - 1) {
+                const nextSlot = timeSlots[currentSlotIndex + 1];
+                const nextClassData = daySchedule[nextSlot].classes[className];
+                if (nextClassData.teacher === teacherName && nextClassData.type === 'subject') {
+                    return false; // Prevent consecutive classes
+                }
+            }
+            
+            // MINIMIZE GAPS: Check if this creates a long gap in teacher's schedule
+            if (wouldCreateLongGap(masterSchedule, teacherName, day, slot)) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Check if scheduling would create a long gap in teacher's schedule
+        function wouldCreateLongGap(masterSchedule, teacherName, day, slot) {
+            const currentSlotIndex = timeSlots.indexOf(slot);
+            const daySchedule = masterSchedule[day];
+            
+            // Find teacher's other classes on this day
+            const teacherSlots = [];
+            timeSlots.forEach((timeSlot, index) => {
+                const assignment = daySchedule[timeSlot].teachers[teacherName];
+                if (assignment && assignment !== 'pedagogical') {
+                    teacherSlots.push(index);
+                }
+            });
+            
+            // If this would be the only class, no gap issue
+            if (teacherSlots.length === 0) return false;
+            
+            // Add current slot to check gaps
+            const allSlots = [...teacherSlots, currentSlotIndex].sort((a, b) => a - b);
+            
+            // Check for gaps larger than 1 slot (especially afternoon gaps)
+            for (let i = 0; i < allSlots.length - 1; i++) {
+                const gap = allSlots[i + 1] - allSlots[i] - 1;
+                
+                // If gap is 2+ slots AND crosses lunch break (slots 4,5,6), it's problematic
+                if (gap >= 2) {
+                    const gapStart = allSlots[i];
+                    const gapEnd = allSlots[i + 1];
+                    
+                    // Particularly avoid afternoon gaps (after slot 4)
+                    if (gapStart >= 4 && gap >= 2) {
+                        return true; // This would create a long afternoon gap
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        // Add remedial classes to master schedule
+        function addRemedialClassesToMaster(masterSchedule, allClasses) {
+            const remedialSubjects = ['رياضيات', 'عربية', 'فرنسية'];
+            const remedialSlot = '15:00-16:00';
+            
+            allClasses.forEach(className => {
+                remedialSubjects.forEach(subject => {
+                    const teacher = findTeacherForClass(subject, className);
+                    if (!teacher) return;
+                    
+                    // Find available day for remedial
+                    for (const day of days) {
+                        const freeDaySubjects = pedagogicalDays[day] || [];
+                        if (freeDaySubjects.includes(subject)) continue;
+                        
+                        const classSlot = masterSchedule[day][remedialSlot].classes[className];
+                        const teacherSlot = masterSchedule[day][remedialSlot].teachers[teacher.name];
+                        
+                        if (classSlot.type === 'empty' && !teacherSlot) {
+                            masterSchedule[day][remedialSlot].classes[className] = {
+                                subject: subject,
+                                teacher: teacher.name,
+                                type: 'remedial'
+                            };
+                            masterSchedule[day][remedialSlot].teachers[teacher.name] = className;
+                            break; // Only one remedial per subject per class
+                        }
+                    }
+                });
+            });
+        }
+
+        // Mark pedagogical days (free days for teachers)
+        function markPedagogicalDays(schedules) {
+            days.forEach(day => {
+                const freeDaySubjects = pedagogicalDays[day] || [];
+                
+                freeDaySubjects.forEach(subject => {
+                    const subjectTeachers = teachers.filter(t => t.subject === subject);
+                    
+                    subjectTeachers.forEach(teacher => {
+                        timeSlots.forEach(slot => {
+                            if (slot !== '15:00-16:00') { // Keep remedial time available
+                                schedules.teachers[teacher.name][day][slot] = {
+                                    type: 'pedagogical',
+                                    content: 'يوم بيداغوجي'
+                                };
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        // Schedule all subjects across the week with smart distribution
+        function scheduleAllSubjects(schedules, allClasses) {
+            allClasses.forEach(className => {
+                const level = parseInt(className.charAt(0));
+                
+                // Get all subjects for this level
+                Object.keys(subjectHours).forEach(subject => {
+                    const requiredHours = subjectHours[subject][level.toString()];
+                    if (!requiredHours) return;
+
+                    const subjectTeachers = teachers.filter(t => 
+                        t.subject === subject && 
+                        t.classes.includes(className)
+                    );
+
+                    if (subjectTeachers.length === 0) return;
+
+                    const teacher = subjectTeachers[0]; // Pick first available teacher
+                    
+                    // Schedule the required hours for this subject
+                    scheduleSubjectHours(schedules, className, subject, teacher, requiredHours, level);
+                });
+            });
+        }
+
+        // Schedule specific subject hours with conflict prevention
+        function scheduleSubjectHours(schedules, className, subject, teacher, requiredHours, level) {
+            let hoursScheduled = 0;
+            const scheduledSlots = [];
+
+            // Shuffle days to randomize scheduling
+            const shuffledDays = [...days].sort(() => Math.random() - 0.5);
+
+            for (const day of shuffledDays) {
+                if (hoursScheduled >= requiredHours) break;
+
+                // Skip if teacher has pedagogical day
+                const freeDaySubjects = pedagogicalDays[day] || [];
+                if (freeDaySubjects.includes(subject)) continue;
+
+                // Available slots for this day (prefer morning for math)
+                let daySlots = timeSlots.filter(slot => slot !== '15:00-16:00'); // Exclude remedial time
+                
+                // Prefer morning slots for mathematics
+                if (subject === 'رياضيات') {
+                    daySlots = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '13:00-14:00', '14:00-15:00'];
+                }
+
+                for (const slot of daySlots) {
+                    if (hoursScheduled >= requiredHours) break;
+
+                    // Check availability and prevent same subject repetition on same day
+                    if (canScheduleSubject(schedules, className, subject, teacher.name, day, slot)) {
+                        // Schedule the class
+                        const content = `${subject} - ${teacher.name}`;
+                        
+                        schedules.students[className][day][slot] = {
+                            type: 'subject',
+                            content,
+                            teacher: teacher.name,
+                            subject
+                        };
+                        
+                        schedules.teachers[teacher.name][day][slot] = {
+                            type: 'subject',
+                            content: `${subject} - ${className}`,
+                            class: className,
+                            subject
+                        };
+                        
+                        hoursScheduled++;
+                        scheduledSlots.push({ day, slot });
+                        
+                        // Limit to 1-2 hours per day for same subject (except core subjects)
+                        const dailyHours = scheduledSlots.filter(s => s.day === day).length;
+                        if (dailyHours >= 2 && !['رياضيات', 'عربية', 'فرنسية'].includes(subject)) {
+                            break; // Move to next day
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check if a subject can be scheduled at a specific time
+        function canScheduleSubject(schedules, className, subject, teacherName, day, slot) {
+            // Check if student slot is available
+            const studentSlot = schedules.students[className][day][slot];
+            if (studentSlot.type !== 'empty') return false;
+
+            // Check if teacher slot is available
+            const teacherSlot = schedules.teachers[teacherName][day][slot];
+            if (teacherSlot.type !== 'empty') return false;
+
+            // Check if same subject is already scheduled today (prevent repetition)
+            const daySchedule = schedules.students[className][day];
+            const subjectAlreadyToday = Object.values(daySchedule).some(cell => 
+                cell.subject === subject && cell.type === 'subject'
+            );
+            
+            // Allow only if it's a core subject and needed
+            if (subjectAlreadyToday && !['رياضيات', 'عربية'].includes(subject)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Create empty schedule structure
+        function createEmptySchedule() {
+            const schedule = {};
+            days.forEach(day => {
+                schedule[day] = {};
+                timeSlots.forEach(slot => {
+                    const isBreak = slot === '10:15-10:30' || slot === '12:45-13:00';
+                    if (isBreak) {
+                        schedule[day][slot] = { type: 'break', content: 'استراحة' };
+                    } else {
+                        schedule[day][slot] = { type: 'empty', content: '' };
+                    }
+                });
+            });
+            return schedule;
+        }
+
+        // Schedule subjects for a specific day
+        function scheduleSubjectsForDay(schedules, day, subjects, allClasses, availableSlots) {
+            const workingSlots = availableSlots.filter(slot => 
+                slot !== '10:15-10:30' && slot !== '12:45-13:00'
+            );
+
+            subjects.forEach(subject => {
+                const subjectTeachers = teachers.filter(t => t.subject === subject);
+                
+                subjectTeachers.forEach(teacher => {
+                    teacher.classes.forEach(className => {
+                        if (!allClasses.includes(className)) return;
+
+                        const level = parseInt(className.charAt(0));
+                        const requiredHours = subjectHours[subject] && subjectHours[subject][level.toString()] || 1;
+                        
+                        // Schedule required hours for this class and subject
+                        let hoursScheduled = 0;
+                        for (const slot of workingSlots) {
+                            if (hoursScheduled >= requiredHours) break;
+                            
+                            // Check if slot is available for both student and teacher
+                            const studentSlot = schedules.students[className][day][slot];
+                            const teacherSlot = schedules.teachers[teacher.name][day][slot];
+                            
+                            if (studentSlot.type === 'empty' && teacherSlot.type === 'empty') {
+                                // Schedule the class
+                                const content = `${subject} - ${teacher.name}`;
+                                const cellData = { type: 'subject', content, teacher: teacher.name, subject };
+                                
+                                schedules.students[className][day][slot] = cellData;
+                                schedules.teachers[teacher.name][day][slot] = {
+                                    type: 'subject', 
+                                    content: `${subject} - ${className}`,
+                                    class: className,
+                                    subject
+                                };
+                                
+                                hoursScheduled++;
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        // Schedule regular subjects on non-pedagogical days
+        function scheduleRegularSubjectsForDay(schedules, day, allClasses, availableSlots) {
+            const workingSlots = availableSlots.filter(slot => 
+                slot !== '10:15-10:30' && slot !== '12:45-13:00'
+            );
+
+            // Get subjects that are not scheduled on this day
+            const daySubjects = pedagogicalDays[day] || [];
+            const otherSubjects = Object.keys(subjectHours).filter(subject => 
+                !daySubjects.includes(subject)
+            );
+
+            // Randomly schedule some other subjects (for variety)
+            const shuffledSubjects = otherSubjects.sort(() => Math.random() - 0.5);
+            const selectedSubjects = shuffledSubjects.slice(0, Math.min(3, shuffledSubjects.length));
+
+            selectedSubjects.forEach(subject => {
+                const subjectTeachers = teachers.filter(t => t.subject === subject);
+                
+                subjectTeachers.forEach(teacher => {
+                    teacher.classes.forEach(className => {
+                        if (!allClasses.includes(className)) return;
+
+                        // Schedule 1-2 hours randomly
+                        const hoursToSchedule = Math.floor(Math.random() * 2) + 1;
+                        let hoursScheduled = 0;
+
+                        for (const slot of workingSlots) {
+                            if (hoursScheduled >= hoursToSchedule) break;
+                            
+                            const studentSlot = schedules.students[className][day][slot];
+                            const teacherSlot = schedules.teachers[teacher.name][day][slot];
+                            
+                            if (studentSlot.type === 'empty' && teacherSlot.type === 'empty') {
+                                const content = `${subject} - ${teacher.name}`;
+                                const cellData = { type: 'subject', content, teacher: teacher.name, subject };
+                                
+                                schedules.students[className][day][slot] = cellData;
+                                schedules.teachers[teacher.name][day][slot] = {
+                                    type: 'subject', 
+                                    content: `${subject} - ${className}`,
+                                    class: className,
+                                    subject
+                                };
+                                
+                                hoursScheduled++;
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        // Add remedial classes (15:00-16:00 for core subjects)
+        function addRemedialClasses(schedules, allClasses) {
+            const remedialSubjects = ['رياضيات', 'عربية', 'فرنسية'];
+            const remedialSlot = '15:00-16:00';
+
+            allClasses.forEach(className => {
+                const level = parseInt(className.charAt(0));
+                
+                remedialSubjects.forEach(subject => {
+                    const teacher = teachers.find(t => 
+                        t.subject === subject && t.classes.includes(className)
+                    );
+                    
+                    if (teacher) {
+                        // Find an available remedial slot
+                        for (const day of days) {
+                            // Skip pedagogical days for the teacher
+                            const freeDaySubjects = pedagogicalDays[day] || [];
+                            if (freeDaySubjects.includes(subject)) continue;
+
+                            const studentSlot = schedules.students[className][day][remedialSlot];
+                            const teacherSlot = schedules.teachers[teacher.name][day][remedialSlot];
+                            
+                            if (studentSlot.type === 'empty' && teacherSlot.type === 'empty') {
+                                const content = `استدراك ${subject} - ${teacher.name}`;
+                                
+                                schedules.students[className][day][remedialSlot] = {
+                                    type: 'remedial', 
+                                    content,
+                                    teacher: teacher.name,
+                                    subject
+                                };
+                                schedules.teachers[teacher.name][day][remedialSlot] = {
+                                    type: 'remedial', 
+                                    content: `استدراك ${subject} - ${className}`,
+                                    class: className,
+                                    subject
+                                };
+                                break; // Only schedule one remedial per subject per class
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // Generate unified institution schedule - single large table showing all classes
+        function generateInstitutionSchedule() {
+            const container = document.getElementById('institutionSchedule');
+            
+            // Get all classes sorted by level
+            const allClasses = Object.keys(schedules.students || {}).sort();
+            
+            if (allClasses.length === 0) {
+                container.innerHTML = '<p class="text-center">لم يتم إنشاء جداول بعد</p>';
+                return;
+            }
+
+            let html = `
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold">${institutionData.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400">خريطة العمل الشاملة - جدول استعمال الزمن العام - ${institutionData.year}</p>
+                    <p class="text-sm text-gray-500 mb-4">جميع الأقسام والأساتذة في جدول واحد متكامل</p>
+                </div>
+                
+                <!-- Master Institution Schedule Table -->
+                <table class="schedule-table" style="font-size: 10px;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="background-color: #f0f0f0; color: black; width: 80px;">التوقيت</th>
+                            ${days.map(day => `<th colspan="${allClasses.length}" style="background-color: #f0f0f0; color: black; border: 2px solid #000;">${day}</th>`).join('')}
+                        </tr>
+                        <tr>
+                            ${days.map(() => 
+                                allClasses.map(className => 
+                                    `<th style="background-color: #e0e0e0; color: black; font-size: 10px; padding: 4px; min-width: 120px;">${className}</th>`
+                                ).join('')
+                            ).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Generate each time slot row
+            timeSlots.forEach(slot => {
+                html += `<tr>`;
+                html += `<td style="background-color: #f0f0f0; color: black; font-weight: bold; font-size: 12px; writing-mode: vertical-lr; text-orientation: mixed;">${slot}</td>`;
+                
+                // For each day, show all classes
+                days.forEach(day => {
+                    allClasses.forEach(className => {
+                        const classSchedule = schedules.students[className];
+                        const cell = classSchedule && classSchedule[day] && classSchedule[day][slot];
+                        
+                        let cssClass = 'empty-slot';
+                        let content = '';
+                        
+                        if (cell) {
+                            content = cell.content || '';
+                            
+                            if (cell.type === 'subject') {
+                                cssClass = 'subject-slot';
+                                // Extract subject and teacher
+                                if (cell.subject && cell.teacher) {
+                                    content = `${cell.subject}<br>${cell.teacher}`;
+                                }
+                            } else if (cell.type === 'remedial') {
+                                cssClass = 'remedial-slot';
+                                if (cell.subject && cell.teacher) {
+                                    content = `استدراك ${cell.subject}<br>${cell.teacher}`;
+                                }
+                            } else if (cell.type === 'pedagogical') {
+                                cssClass = 'pedagogical-slot';
+                                content = 'يوم بيداغوجي';
+                            }
+                        } else {
+                            // Check if this should be pedagogical day
+                            const daySubjects = pedagogicalDays[day] || [];
+                            if (daySubjects.length > 0) {
+                                // Check if any teacher for this class has pedagogical day
+                                let hasPedagogicalSubject = false;
+                                for (const subject of daySubjects) {
+                                    const teacher = teachers.find(t => 
+                                        t.subject === subject && 
+                                        t.classes.includes(className)
+                                    );
+                                    if (teacher) {
+                                        cssClass = 'pedagogical-slot';
+                                        content = `${subject}<br>يوم بيداغوجي`;
+                                        hasPedagogicalSubject = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        html += `<td class="${cssClass}" style="font-size: 9px; padding: 2px; text-align: center; vertical-align: middle; line-height: 1.2;">${content}</td>`;
+                    });
+                });
+                
+                html += '</tr>';
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                
+                <!-- Legend and Summary -->
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Color Legend -->
+                    <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <h4 class="text-lg font-bold mb-4 text-center">دليل الألوان</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-300 border border-black mr-2"></div>
+                                <span>حصص رسمية وأعمال موجهة</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-yellow-200 border border-black mr-2"></div>
+                                <span>حصص الاستدراك</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-orange-200 border border-black mr-2"></div>
+                                <span>الأيام البيداغوجية</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-white border border-black mr-2"></div>
+                                <span>فراغات</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pedagogical Days Summary -->
+                    <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <h4 class="text-lg font-bold mb-4 text-center">الأيام البيداغوجية</h4>
+                        <div class="space-y-2 text-sm">
+            `;
+            
+            days.forEach(day => {
+                const subjects = pedagogicalDays[day] || [];
+                html += `
+                    <div class="flex justify-between">
+                        <span class="font-bold">${day}:</span>
+                        <span class="text-gray-600 dark:text-gray-400">
+                            ${subjects.length > 0 ? subjects.join(', ') : 'حصص عادية'}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <h4 class="text-lg font-bold mb-4 text-center">إحصائيات المؤسسة</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                        <div>
+                            <div class="font-bold text-lg">${allClasses.length}</div>
+                            <div>إجمالي الأقسام</div>
+                        </div>
+                        <div>
+                            <div class="font-bold text-lg">${teachers.length}</div>
+                            <div>إجمالي الأساتذة</div>
+                        </div>
+                        <div>
+                            <div class="font-bold text-lg">${timeSlots.length}</div>
+                            <div>ساعات يومية</div>
+                        </div>
+                        <div>
+                            <div class="font-bold text-lg">${days.length}</div>
+                            <div>أيام أسبوعية</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Generate student schedules
+        function generateStudentSchedules(allClasses) {
+            allClasses.forEach(className => {
+                schedules.students[className] = generateStudentSchedule(className);
+            });
+        }
+
+        // Generate single student schedule
+        function generateStudentSchedule(className) {
+            const level = className.charAt(0);
+            const schedule = {};
+            
+            days.forEach(day => {
+                schedule[day] = {};
+                timeSlots.forEach(slot => {
+                    const isBreak = slot === '10:15-10:30' || slot === '12:45-13:00';
+                    if (isBreak) {
+                        schedule[day][slot] = { type: 'break', content: 'استراحة' };
+                        return;
+                    }
+
+                    // Check pedagogical days
+                    const pedagogicalSubjects = pedagogicalDays[day] || [];
+                    if (pedagogicalSubjects.length > 0) {
+                        // Find teacher for this class and subject
+                        const availableSubjects = pedagogicalSubjects.filter(subject => {
+                            return teachers.some(teacher => 
+                                teacher.subject === subject && 
+                                teacher.classes.includes(className)
+                            );
+                        });
+
+                        if (availableSubjects.length > 0) {
+                            const subject = availableSubjects[0];
+                            const teacher = teachers.find(t => 
+                                t.subject === subject && 
+                                t.classes.includes(className)
+                            );
+                            
+                            schedule[day][slot] = {
+                                type: 'subject',
+                                content: `${subject}${teacher ? ` - ${teacher.name}` : ''}`
+                            };
+                        } else {
+                            schedule[day][slot] = { type: 'empty', content: '' };
+                        }
+                    } else {
+                        // Regular subjects
+                        schedule[day][slot] = { type: 'subject', content: 'حصة عادية' };
+                    }
+                });
+            });
+
+            return schedule;
+        }
+
+        // Generate teacher schedules
+        function generateTeacherSchedules() {
+            teachers.forEach(teacher => {
+                schedules.teachers[teacher.name] = generateTeacherSchedule(teacher);
+            });
+        }
+
+        // Generate single teacher schedule
+        function generateTeacherSchedule(teacher) {
+            const schedule = {};
+            
+            days.forEach(day => {
+                schedule[day] = {};
+                timeSlots.forEach(slot => {
+                    const isBreak = slot === '10:15-10:30' || slot === '12:45-13:00';
+                    if (isBreak) {
+                        schedule[day][slot] = { type: 'break', content: 'استراحة' };
+                        return;
+                    }
+
+                    // Check if teacher has pedagogical day
+                    const pedagogicalSubjects = pedagogicalDays[day] || [];
+                    const hasPedagogicalDay = pedagogicalSubjects.includes(teacher.subject);
+
+                    if (hasPedagogicalDay) {
+                        // Find which class to teach
+                        if (teacher.classes.length > 0) {
+                            const className = teacher.classes[0]; // Simplified assignment
+                            schedule[day][slot] = {
+                                type: 'subject',
+                                content: `${teacher.subject} - ${className}`
+                            };
+                        } else {
+                            schedule[day][slot] = { type: 'empty', content: '' };
+                        }
+                    } else {
+                        schedule[day][slot] = { type: 'empty', content: '' };
+                    }
+                });
+            });
+
+            return schedule;
+        }
+
+        // Update selectors
+        function updateSelectors() {
+            // Update class selector
+            const classSelector = document.getElementById('classSelector');
+            classSelector.innerHTML = '<option value="">اختر القسم</option>';
+            
+            Object.keys(schedules.students || {}).forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                classSelector.appendChild(option);
+            });
+
+            // Update teacher selector
+            const teacherSelector = document.getElementById('teacherSelector');
+            teacherSelector.innerHTML = '<option value="">اختر الأستاذ</option>';
+            
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.name;
+                option.textContent = `${teacher.name} - ${teacher.subject}`;
+                teacherSelector.appendChild(option);
+            });
+        }
+
+        // Show class schedule
+        function showClassSchedule() {
+            const className = document.getElementById('classSelector').value;
+            if (!className) return;
+
+            const container = document.getElementById('studentsSchedule');
+            const schedule = schedules.students[className];
+
+            if (!schedule) {
+                container.innerHTML = '<p class="text-center">لم يتم إنشاء جدول لهذا القسم بعد</p>';
+                return;
+            }
+
+            let html = `
+                <div class="text-center mb-4">
+                    <h3 class="text-xl font-bold">${institutionData.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400">جدول استعمال الزمن - القسم: ${className} - ${institutionData.year}</p>
+                </div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>التوقيت</th>
+                            ${days.map(day => `<th>${day}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            timeSlots.forEach(slot => {
+                html += `<tr><td>${slot}</td>`;
+                days.forEach(day => {
+                    const cell = schedule[day] && schedule[day][slot];
+                    if (cell) {
+                        const cssClass = cell.type === 'break' ? 'empty-slot' : 
+                                        cell.type === 'remedial' ? 'remedial-slot' :
+                                        cell.type === 'subject' ? 'subject-slot' : 'empty-slot';
+                        html += `<td class="${cssClass}">${cell.content}</td>`;
+                    } else {
+                        html += `<td class="empty-slot"></td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Show teacher schedule
+        function showTeacherSchedule() {
+            const teacherName = document.getElementById('teacherSelector').value;
+            if (!teacherName) return;
+
+            const container = document.getElementById('teachersSchedule');
+            const schedule = schedules.teachers[teacherName];
+            const teacher = teachers.find(t => t.name === teacherName);
+
+            if (!schedule) {
+                container.innerHTML = '<p class="text-center">لم يتم إنشاء جدول لهذا الأستاذ بعد</p>';
+                return;
+            }
+
+            let html = `
+                <div class="text-center mb-4">
+                    <h3 class="text-xl font-bold">${institutionData.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400">جدول استعمال الزمن - الأستاذ: ${teacherName} - ${teacher ? teacher.subject : ''}</p>
+                    <p class="text-gray-600 dark:text-gray-400">الأقسام المسندة: ${teacher ? teacher.classes.join(', ') : ''} - ${institutionData.year}</p>
+                </div>
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>التوقيت</th>
+                            ${days.map(day => `<th>${day}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            timeSlots.forEach(slot => {
+                html += `<tr><td>${slot}</td>`;
+                days.forEach(day => {
+                    const cell = schedule[day] && schedule[day][slot];
+                    if (cell) {
+                        const cssClass = cell.type === 'break' ? 'empty-slot' : 
+                                        cell.type === 'remedial' ? 'remedial-slot' :
+                                        cell.type === 'subject' ? 'subject-slot' : 'empty-slot';
+                        html += `<td class="${cssClass}">${cell.content}</td>`;
+                    } else {
+                        html += `<td class="empty-slot"></td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Copy table to clipboard
+        function copyTable(containerId) {
+            const container = document.getElementById(containerId);
+            const table = container.querySelector('table');
+            
+            if (!table) {
+                showAlert('لا يوجد جدول للنسخ');
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                showAlert('تم نسخ الجدول بنجاح');
+            } catch (err) {
+                showAlert('فشل في نسخ الجدول');
+            }
+            
+            window.getSelection().removeAllRanges();
+        }
+
+        // Export to PDF
+        function exportToPDF(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container.innerHTML.trim()) {
+                showAlert('لا يوجد محتوى للتصدير');
+                return;
+            }
+
+            html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('l', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save(`جدول-استعمال-الزمن-${Date.now()}.pdf`);
+                
+                showAlert('تم تصدير الجدول كملف PDF');
+            }).catch(err => {
+                console.error('Error generating PDF:', err);
+                showAlert('حدث خطأ في تصدير PDF');
+            });
+        }
+
+        // Custom modal functions
+        function showAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 text-center">${message}</p>
+                    <div class="flex justify-center">
+                        <button class="px-6 py-2 bg-primary text-white hover:bg-primary/90 rounded" onclick="this.closest('.fixed').remove()">موافق</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showConfirmDialog(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 mb-4 text-center">${message}</p>
+                    <div class="flex justify-center space-x-3 space-x-reverse">
+                        <button class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="this.closest('.fixed').remove()">إلغاء</button>
+                        <button class="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded" onclick="this.closest('.fixed').remove(); (${onConfirm})()">تأكيد</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Load My Institution Data
+        function loadMyInstitution() {
+            // Clear existing data
+            teachers = [];
+            
+            // Set institution info
+            document.getElementById('institutionName').value = 'متوسطة نموذجية';
+            document.getElementById('academicYear').value = '2024-2025';
+            
+            // Set classes count
+            document.getElementById('level1Classes').value = '5';
+            document.getElementById('level2Classes').value = '3';
+            document.getElementById('level3Classes').value = '4';
+            document.getElementById('level4Classes').value = '2';
+            updateTotalClasses();
+
+            // Sample teacher names
+            const teacherNames = {
+                'رياضيات': ['أحمد بن علي', 'فاطمة بن سالم', 'محمد الطاهر', 'خديجة بن عمر'],
+                'عربية': ['عبد الرحمن الصديق', 'عائشة بن محمد', 'يوسف الهادي', 'زينب الطاهرة', 'سليم بن عيسى'],
+                'فرنسية': ['نادية بوسعادة', 'كريم بن صالح', 'سارة العلوي'],
+                'انجليزية': ['رشيد بن عمار', 'أمينة بن يوسف', 'طارق الزهراني'],
+                'تاريخ وجغرافيا': ['مصطفى الجزائري', 'فريدة بن عبدالله', 'عمار بن سليم'],
+                'تربية إسلامية': ['الشيخ عبدالله'],
+                'فيزياء': ['نور الدين العلمي', 'هدى بن إبراهيم'],
+                'رياضة': ['كمال الرياضي', 'سميرة بن أحمد'],
+                'تربية فنية': ['ياسمين الفنانة'],
+                'علوم طبيعية': ['د. حكيم العلوم', 'مريم الطبيعة'],
+                'إعلام آلي': ['تقي الدين التكنولوجي']
+            };
+
+            // Generate all class combinations
+            const allClasses = [];
+            for (let level = 1; level <= 4; level++) {
+                const classCount = parseInt(document.getElementById(`level${level}Classes`).value) || 0;
+                for (let classNum = 1; classNum <= classCount; classNum++) {
+                    allClasses.push(`${level}م${classNum}`);
+                }
+            }
+
+            // Add teachers with smart class distribution
+            Object.entries(teacherNames).forEach(([subject, names]) => {
+                names.forEach((name, index) => {
+                    // Distribute classes among teachers of the same subject
+                    const teacherClasses = distributeClasses(allClasses, names.length, index, subject);
+                    const weeklyHours = calculateWeeklyHours(subject, teacherClasses);
+                    
+                    const teacher = {
+                        id: Date.now() + Math.random(),
+                        name,
+                        subject,
+                        classes: teacherClasses,
+                        weeklyHours
+                    };
+                    teachers.push(teacher);
+                });
+            });
+
+            // Add history teachers to teach civics as well
+            const historyTeachers = teachers.filter(t => t.subject === 'تاريخ وجغرافيا');
+            historyTeachers.forEach(teacher => {
+                const civicsTeacher = {
+                    id: Date.now() + Math.random(),
+                    name: teacher.name,
+                    subject: 'تربية مدنية',
+                    classes: teacher.classes,
+                    weeklyHours: teacher.classes.length * 1 // 1 hour per class for civics
+                };
+                teachers.push(civicsTeacher);
+            });
+
+            updateTeachersTable();
+            showAlert('تم تحميل بيانات المؤسسة النموذجية بنجاح! يمكنك الآن توليد الجداول أو تعديل البيانات حسب الحاجة.');
+        }
+
+        // Reset all data
+        function resetData() {
+            showConfirmDialog('هل أنت متأكد من إعادة تعيين جميع البيانات؟', () => {
+                teachers = [];
+                schedules = { institution: {}, students: {}, teachers: {} };
+                
+                // Clear form fields
+                document.getElementById('institutionName').value = '';
+                document.getElementById('academicYear').value = '2024-2025';
+                document.getElementById('level1Classes').value = '';
+                document.getElementById('level2Classes').value = '';
+                document.getElementById('level3Classes').value = '';
+                document.getElementById('level4Classes').value = '';
+                updateTotalClasses();
+                
+                clearTeacherForm();
+                updateTeachersTable();
+                
+                // Clear schedule displays
+                document.getElementById('institutionSchedule').innerHTML = '';
+                document.getElementById('studentsSchedule').innerHTML = '';
+                document.getElementById('teachersSchedule').innerHTML = '';
+                
+                showAlert('تم إعادة تعيين جميع البيانات');
+            });
+        }
+
+        // Smart class distribution function
+        function distributeClasses(allClasses, teacherCount, teacherIndex, subject) {
+            const relevantClasses = allClasses.filter(className => {
+                const level = parseInt(className.charAt(0));
+                return subjectHours[subject] && subjectHours[subject][level.toString()];
+            });
+            
+            const classesPerTeacher = Math.ceil(relevantClasses.length / teacherCount);
+            const startIndex = teacherIndex * classesPerTeacher;
+            const endIndex = Math.min(startIndex + classesPerTeacher, relevantClasses.length);
+            
+            return relevantClasses.slice(startIndex, endIndex);
+        }
+
+        // Calculate weekly hours based on subject and classes
+        function calculateWeeklyHours(subject, teacherClasses) {
+            let totalHours = 0;
+            teacherClasses.forEach(className => {
+                const level = className.charAt(0);
+                if (subjectHours[subject] && subjectHours[subject][level]) {
+                    totalHours += subjectHours[subject][level];
+                }
+            });
+            return totalHours;
+        }
+
+        // Generate schedules from master schedule
+        function generateInstitutionFromMaster(masterSchedule) {
+            // Institution overview showing all activities
+            return masterSchedule;
+        }
+
+        function generateStudentSchedulesFromMaster(masterSchedule, allClasses) {
+            const studentSchedules = {};
+            
+            allClasses.forEach(className => {
+                studentSchedules[className] = {};
+                
+                days.forEach(day => {
+                    studentSchedules[className][day] = {};
+                    
+                    timeSlots.forEach(slot => {
+                        const classData = masterSchedule[day][slot].classes[className];
+                        
+                        if (classData.type === 'empty') {
+                            studentSchedules[className][day][slot] = {
+                                type: 'empty',
+                                content: ''
+                            };
+                        } else {
+                            studentSchedules[className][day][slot] = {
+                                type: classData.type,
+                                content: `${classData.subject} - ${classData.teacher}`,
+                                subject: classData.subject,
+                                teacher: classData.teacher
+                            };
+                        }
+                    });
+                });
+            });
+            
+            return studentSchedules;
+        }
+
+        function generateTeacherSchedulesFromMaster(masterSchedule) {
+            const teacherSchedules = {};
+            
+            teachers.forEach(teacher => {
+                teacherSchedules[teacher.name] = {};
+                
+                days.forEach(day => {
+                    teacherSchedules[teacher.name][day] = {};
+                    
+                    timeSlots.forEach(slot => {
+                        const teacherAssignment = masterSchedule[day][slot].teachers[teacher.name];
+                        const freeDaySubjects = pedagogicalDays[day] || [];
+                        
+                        if (freeDaySubjects.includes(teacher.subject) && slot !== '15:00-16:00') {
+                            teacherSchedules[teacher.name][day][slot] = {
+                                type: 'pedagogical',
+                                content: 'يوم بيداغوجي'
+                            };
+                        } else if (teacherAssignment && teacherAssignment !== 'pedagogical') {
+                            // Find the class data for this teacher
+                            const classData = masterSchedule[day][slot].classes[teacherAssignment];
+                            if (classData && classData.teacher === teacher.name) {
+                                teacherSchedules[teacher.name][day][slot] = {
+                                    type: classData.type,
+                                    content: `${classData.subject} - ${teacherAssignment}`,
+                                    class: teacherAssignment,
+                                    subject: classData.subject
+                                };
+                            } else {
+                                teacherSchedules[teacher.name][day][slot] = {
+                                    type: 'empty',
+                                    content: ''
+                                };
+                            }
+                        } else {
+                            teacherSchedules[teacher.name][day][slot] = {
+                                type: 'empty',
+                                content: ''
+                            };
+                        }
+                    });
+                });
+            });
+            
+            return teacherSchedules;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('setup');
+        });
+    </script>
 </body>
 </html>
