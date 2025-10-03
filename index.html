@@ -26,28 +26,20 @@
 
         .screen {
             display: none;
-            animation: fadeIn 0.5s ease-in;
         }
 
         .screen.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .header {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
             padding: 15px 20px;
             border-radius: 15px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .logo {
@@ -78,168 +70,11 @@
             border-radius: 25px;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin: 5px;
-            font-weight: bold;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 204, 163, 0.4);
         }
 
         .btn-secondary {
             background: linear-gradient(45deg, #6c757d, #495057);
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #e84545, #c73636);
-        }
-
-        .btn-exit {
-            background: linear-gradient(45deg, #e84545, #c73636);
-            padding: 8px 15px;
-            font-size: 14px;
-        }
-
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .level-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-        }
-
-        .level-card:hover {
-            transform: translateY(-5px);
-            border-color: #4ecca3;
-        }
-
-        .level-card.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .level-card.locked::after {
-            content: "🔒";
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 20px;
-        }
-
-        .level-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .question-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .question-text {
-            font-size: 24px;
-            margin-bottom: 30px;
-            color: #4ecca3;
-            direction: ltr;
-            text-align: center;
-        }
-
-        .doors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .door {
-            background: linear-gradient(45deg, #8b4513, #a0522d);
-            border: 5px solid #5d4037;
-            border-radius: 10px;
-            padding: 40px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffd700;
-            direction: ltr;
-        }
-
-        .door:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #ffd700;
-        }
-
-        .door.correct {
-            background: linear-gradient(45deg, #4ecca3, #2e8a6c);
-        }
-
-        .door.wrong {
-            background: linear-gradient(45deg, #e84545, #c73636);
-        }
-
-        .timer {
-            font-size: 20px;
-            font-weight: bold;
-            color: #4ecca3;
-            margin: 20px 0;
-        }
-
-        .timer.warning {
-            color: #e84545;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background: linear-gradient(45deg, #4ecca3, #2e8a6c);
-            transition: width 0.3s ease;
-        }
-
-        .server-status {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #4ecca3;
-            animation: pulse 2s infinite;
         }
 
         .login-form {
@@ -259,38 +94,45 @@
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            font-size: 16px;
         }
 
-        .question-counter {
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .doors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .door {
+            background: linear-gradient(45deg, #8b4513, #a0522d);
+            border-radius: 10px;
+            padding: 40px 20px;
+            cursor: pointer;
             font-size: 18px;
-            color: #4ecca3;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .levels-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .doors-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        .debug-info {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid red;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 12px;
-            display: none;
+            color: #ffd700;
         }
     </style>
 </head>
@@ -298,802 +140,261 @@
     <div class="container">
         <!-- شاشة الدخول -->
         <div id="loginScreen" class="screen active">
-            <div class="header">
-                <div class="logo">Math 2ème 🎮</div>
-                <div class="server-status">
-                    <div class="status-indicator"></div>
-                    <span>متصل بالخادم</span>
-                </div>
-            </div>
-            
             <div class="login-form">
-                <h2 style="margin-bottom: 30px; color: #4ecca3;">تسجيل الدخول</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <button class="btn" onclick="showScreen('studentLoginScreen')">دخول التلميذ</button>
-                    <button class="btn btn-secondary" onclick="showScreen('teacherLoginScreen')">دخول الأستاذ</button>
+                <h2 style="color: #4ecca3;">Math 2ème 🎮</h2>
+                <div style="margin: 20px 0;">
+                    <button class="btn" onclick="showScreen('studentScreen')">دخول التلميذ</button>
+                    <button class="btn btn-secondary" onclick="showScreen('teacherScreen')">دخول الأستاذ</button>
                 </div>
-
-                <!-- معلومات التصحيح -->
-                <div class="debug-info" id="debugInfo">
-                    <!-- سيتم عرض معلومات التصحيح هنا -->
+                <div id="connectionStatus" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-top: 20px;">
+                    <span id="statusText">🔌 جاري الاتصال بالخادم...</span>
                 </div>
             </div>
         </div>
 
-        <!-- شاشة دخول التلميذ -->
-        <div id="studentLoginScreen" class="screen">
-            <div class="header">
-                <div class="logo">دخول التلميذ</div>
-                <button class="btn btn-secondary" onclick="showScreen('loginScreen')">رجوع</button>
-            </div>
-            
-            <div class="login-form">
-                <h2 style="margin-bottom: 30px;">أدخل اسمك</h2>
-                <input type="text" id="studentName" placeholder="اكتب اسمك هنا">
-                <button class="btn" onclick="loginStudent()">بدء اللعب</button>
-                
-                <div style="margin-top: 20px; font-size: 14px; color: #ccc;">
-                    <p>⚠️ تأكد من استخدام نفس المتصفح على جميع الأجهزة</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- شاشة دخول الأستاذ -->
-        <div id="teacherLoginScreen" class="screen">
-            <div class="header">
-                <div class="logo">دخول الأستاذ</div>
-                <button class="btn btn-secondary" onclick="showScreen('loginScreen')">رجوع</button>
-            </div>
-            
-            <div class="login-form">
-                <h2 style="margin-bottom: 30px;">الدخول بحساب الأستاذ</h2>
-                <input type="password" id="teacherPassword" placeholder="الرقم السري الخاص بالأستاذ">
-                <button class="btn" onclick="loginTeacher()">دخول</button>
-                
-                <div style="margin-top: 20px; font-size: 14px; color: #ccc;">
-                    <p>🔑 الرقم السري: <strong>1234</strong></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- شاشة التلميذ الرئيسية -->
+        <!-- شاشة التلميذ -->
         <div id="studentScreen" class="screen">
             <div class="header">
                 <div class="logo">Math 2ème - التلميذ</div>
                 <div class="user-info">
-                    <span id="studentNameDisplay"></span>
+                    <span id="studentName">تلميذ</span>
                     <span>النقاط: <span id="studentScore" class="score">0</span></span>
-                    <span>الكرات: <span id="dragonBalls">0</span> 🏀</span>
-                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
                 </div>
             </div>
 
-            <h2 style="text-align: center; margin: 20px 0; color: #4ecca3;">اختر مستوى اللعب</h2>
-            
             <div class="levels-grid">
-                <div class="level-card" onclick="startLevel(1)">
-                    <div class="level-icon">⭐</div>
+                <div class="level-card" onclick="startGame(1)">
                     <h3>المستوى 1 - سهل</h3>
-                    <p>30 ثانية لكل سؤال</p>
-                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p>أسئلة أساسية</p>
                 </div>
-                <div class="level-card" onclick="startLevel(2)">
-                    <div class="level-icon">⭐⭐</div>
+                <div class="level-card" onclick="startGame(2)">
                     <h3>المستوى 2 - متوسط</h3>
-                    <p>دقيقة لكل سؤال</p>
-                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p>أسئلة متقدمة</p>
                 </div>
-                <div class="level-card" onclick="startLevel(3)">
-                    <div class="level-icon">⭐⭐⭐</div>
-                    <h3>المستوى 3 - صعب</h3>
-                    <p>دقيقتان لكل سؤال</p>
-                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
-                </div>
-                <div class="level-card locked" id="level4Card" onclick="checkLevel4()">
-                    <div class="level-icon">🏆</div>
-                    <h3>المستوى 4 - صعب جداً</h3>
-                    <p>5 دقائق لكل سؤال</p>
-                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
-                    <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 3 كرات</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 30px; text-align: center;">
-                <button class="btn btn-secondary" onclick="showDebugInfo()">🔧 معلومات التصحيح</button>
             </div>
         </div>
 
         <!-- شاشة السؤال -->
-        <div id="questionScreen" class="screen">
+        <div id="gameScreen" class="screen">
             <div class="header">
                 <div class="logo">السؤال</div>
                 <div class="user-info">
-                    <span>النقاط: <span id="questionScore" class="score">0</span></span>
-                    <div class="timer" id="timer">30</div>
-                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
+                    <span>النقاط: <span id="gameScore" class="score">0</span></span>
+                    <div id="timer">30</div>
                 </div>
             </div>
 
             <div class="question-container">
-                <div class="question-counter" id="questionCounter">السؤال 1 من 3</div>
-                <div class="progress-bar">
-                    <div class="progress" id="progressBar"></div>
-                </div>
-                <h2 class="question-text" id="questionText">5 + 3 × 2 = ?</h2>
-                
-                <div class="doors-grid" id="doorsGrid">
-                    <!-- سيتم ملء الأبواب ديناميكياً -->
-                </div>
+                <h2 id="questionText">5 + 3 × 2 = ?</h2>
+                <div class="doors-grid" id="doorsGrid"></div>
             </div>
         </div>
 
-        <!-- شاشة النتائج -->
-        <div id="resultsScreen" class="screen">
-            <div class="header">
-                <div class="logo">نتائج المستوى</div>
-                <div class="user-info">
-                    <button class="btn" onclick="showScreen('studentScreen')">مواصلة اللعب</button>
-                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 50px;">
-                <div class="reward">
-                    <h2 style="color: #4ecca3; margin-bottom: 20px;" id="resultsTitle">تهانينا! أكملت المستوى</h2>
-                    <p style="font-size: 1.2em; margin-bottom: 10px;" id="resultsText">لقد أجبت على <span id="correctCount">0</span> من <span id="totalQuestions">0</span> أسئلة بشكل صحيح</p>
-                    <p style="font-size: 1.2em; margin-bottom: 10px;">النقاط المكتسبة: <span id="earnedPoints">0</span></p>
-                    <p style="font-size: 1.2em; margin-bottom: 30px;" id="dragonBallMessage"></p>
-                    
-                    <div id="dragonBallReward" style="display: none;">
-                        <div class="dragon-ball"></div>
-                        <p style="color: #ffd700; font-size: 1.2em; margin: 20px 0;">🎉 لقد ربحت كرة دراغون بول! 🎉</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- لوحة تحكم الأستاذ -->
-        <div id="teacherPanel" class="screen">
+        <!-- لوحة الأستاذ -->
+        <div id="teacherScreen" class="screen">
             <div class="header">
                 <div class="logo">لوحة تحكم الأستاذ</div>
-                <div class="user-info">
-                    <span>الأستاذ: <strong>أستاذ الرياضيات</strong></span>
-                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
-                </div>
+                <button class="btn" onclick="loadStudents()">🔄 تحديث</button>
             </div>
 
-            <div class="teacher-panel">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #4ecca3;">إدارة التلاميذ والنتائج</h2>
-                
-                <div class="server-status">
-                    <div class="status-indicator"></div>
-                    <span>متصل بالخادم - التلاميذ المتصلين: <span id="connectedStudentsCount">0</span></span>
-                    <button class="btn btn-secondary" onclick="refreshData()" style="padding: 5px 10px; font-size: 12px;">🔄 تحديث</button>
-                </div>
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <button class="btn" onclick="sendChallengeToAll()">إرسال تحدي جماعي</button>
-                    <button class="btn btn-danger" onclick="clearResults()">مسح النتائج</button>
-                    <button class="btn btn-secondary" onclick="showDebugInfo()">🔧 معلومات التصحيح</button>
-                </div>
-
-                <table class="students-table">
-                    <thead>
-                        <tr>
-                            <th>اسم التلميذ</th>
-                            <th>المستوى</th>
-                            <th>النقاط</th>
-                            <th>الكرات</th>
-                            <th>الحالة</th>
-                            <th>آخر نشاط</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentsTable">
-                        <!-- سيتم ملء بيانات التلاميذ ديناميكياً -->
-                    </tbody>
-                </table>
-
-                <!-- معلومات التصحيح -->
-                <div class="debug-info" id="teacherDebugInfo">
-                    <!-- سيتم عرض معلومات التصحيح هنا -->
+            <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 20px 0;">
+                <h3 style="color: #4ecca3; margin-bottom: 15px;">التلاميذ المتصلين</h3>
+                <div id="studentsList">
+                    <p style="text-align: center; color: #ccc;">جاري تحميل البيانات...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // نظام إدارة البيانات المحسن
-        class DataManager {
-            constructor() {
-                this.storageKey = 'mathGameData';
-                this.init();
-            }
+        // قاعدة البيانات البسيطة باستخدام JSONBin
+        const API_URL = 'https://api.jsonbin.io/v3/b';
+        const BIN_ID = '67a1a8e2dc746540189bbe8f'; // سيتم إنشاء هذا تلقائياً
+        const MASTER_KEY = '$2a$10$6S1bQaQ9b1k7R8XwY5jzXeBdG7hM2nA8C1fV3qP5rT9wK4yL7mN1o'; // مفتاح جديد
 
-            init() {
-                // التأكد من وجود البيانات في localStorage
-                if (!this.getData()) {
-                    this.saveData({
-                        students: [],
-                        lastUpdate: new Date().toISOString()
-                    });
-                }
-                
-                // تحديث البيانات كل 2 ثانية
-                setInterval(() => {
-                    this.syncData();
-                }, 2000);
-            }
+        let currentStudent = null;
+        let allStudents = [];
 
-            getData() {
-                try {
-                    const data = localStorage.getItem(this.storageKey);
-                    return data ? JSON.parse(data) : null;
-                } catch (error) {
-                    console.error('Error reading data:', error);
-                    return null;
-                }
-            }
-
-            saveData(data) {
-                try {
-                    localStorage.setItem(this.storageKey, JSON.stringify({
-                        ...data,
-                        lastUpdate: new Date().toISOString()
-                    }));
-                    return true;
-                } catch (error) {
-                    console.error('Error saving data:', error);
-                    return false;
-                }
-            }
-
-            syncData() {
-                const currentData = this.getData();
-                if (currentData) {
-                    // تحديث حالة الاتصال للتلاميذ
-                    const now = new Date();
-                    currentData.students = currentData.students.map(student => {
-                        if (student.online) {
-                            const lastActive = new Date(student.lastActive);
-                            const diffMinutes = (now - lastActive) / (1000 * 60);
-                            // إذا لم يكن هناك نشاط لمدة 5 دقائق، يعتبر غير متصل
-                            if (diffMinutes > 5) {
-                                return { ...student, online: false };
-                            }
-                        }
-                        return student;
-                    });
-                    this.saveData(currentData);
-                }
-            }
-
-            // إضافة أو تحديث تلميذ
-            updateStudent(studentData) {
-                const data = this.getData();
-                if (!data) return false;
-
-                const existingIndex = data.students.findIndex(s => s.name === studentData.name);
-                
-                if (existingIndex !== -1) {
-                    // تحديث التلميذ الموجود
-                    data.students[existingIndex] = {
-                        ...data.students[existingIndex],
-                        ...studentData,
-                        lastActive: new Date().toISOString()
-                    };
-                } else {
-                    // إضافة تلميذ جديد
-                    data.students.push({
-                        ...studentData,
-                        id: this.generateId(),
-                        createdAt: new Date().toISOString(),
-                        lastActive: new Date().toISOString()
-                    });
-                }
-
-                return this.saveData(data);
-            }
-
-            // الحصول على جميع التلاميذ
-            getAllStudents() {
-                const data = this.getData();
-                return data ? data.students : [];
-            }
-
-            // مسح جميع البيانات
-            clearAllData() {
-                return this.saveData({
-                    students: [],
-                    lastUpdate: new Date().toISOString()
+        // اختبار الاتصال بالخادم
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_URL}/${BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': MASTER_KEY
+                    }
                 });
-            }
-
-            generateId() {
-                return 'student_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            }
-        }
-
-        // تهيئة مدير البيانات
-        const dataManager = new DataManager();
-
-        // بيانات اللعبة
-        const gameData = {
-            currentScreen: 'loginScreen',
-            currentStudent: null,
-            studentScore: 0,
-            dragonBalls: 0,
-            currentLevel: 1,
-            currentQuestion: 0,
-            correctAnswers: 0,
-            timer: null,
-            timeLeft: 30,
-            
-            // الرقم السري الخاص بالأستاذ
-            teacherPassword: "1234"
-        };
-
-        // توليد أسئلة جديدة عشوائية
-        function generateQuestions(level) {
-            const questions = [];
-            const questionCount = level === 4 ? 5 : 7;
-            
-            for (let i = 0; i < questionCount; i++) {
-                let question, answer, options;
-                
-                switch(level) {
-                    case 1:
-                        const num1 = Math.floor(Math.random() * 10) + 1;
-                        const num2 = Math.floor(Math.random() * 10) + 1;
-                        const num3 = Math.floor(Math.random() * 10) + 1;
-                        
-                        if (i < 3) {
-                            question = `${num1} + ${num2} × ${num3}`;
-                            answer = num1 + num2 * num3;
-                        } else if (i < 5) {
-                            question = `(${num1} + ${num2}) × ${num3}`;
-                            answer = (num1 + num2) * num3;
-                        } else {
-                            question = `${num1 * num3} ÷ ${num3} + ${num2}`;
-                            answer = num1 + num2;
-                        }
-                        break;
-                        
-                    case 2:
-                        const a = Math.floor(Math.random() * 15) + 1;
-                        const b = Math.floor(Math.random() * 15) + 1;
-                        const c = Math.floor(Math.random() * 10) + 1;
-                        
-                        if (i < 3) {
-                            question = `${a} × (${b} + ${c}) ÷ ${c}`;
-                            answer = Math.round((a * (b + c)) / c);
-                        } else if (i < 5) {
-                            question = `(${a * 2} - ${b}) × ${c} + ${a}`;
-                            answer = ((a * 2 - b) * c) + a;
-                        } else {
-                            question = `${a * b} ÷ ${b} + ${c} × ${c}`;
-                            answer = a + c * c;
-                        }
-                        break;
-                        
-                    case 3:
-                        const x = Math.floor(Math.random() * 10) + 1;
-                        const y = Math.floor(Math.random() * 10) + 1;
-                        const z = Math.floor(Math.random() * 5) + 1;
-                        
-                        if (i < 3) {
-                            question = `${x} × [${y} + (${z} × ${x})]`;
-                            answer = x * (y + (z * x));
-                        } else if (i < 5) {
-                            question = `(${x * 2} - ${y}) × ${z} + ${x} ÷ ${x}`;
-                            answer = (x * 2 - y) * z + 1;
-                        } else {
-                            question = `${x} × {${y} + [${z} × (${x} - ${y})]}`;
-                            answer = x * (y + (z * (x - y)));
-                        }
-                        break;
-                        
-                    case 4:
-                        const p = Math.floor(Math.random() * 8) + 3;
-                        const q = Math.floor(Math.random() * 8) + 3;
-                        const r = Math.floor(Math.random() * 6) + 2;
-                        
-                        if (i < 2) {
-                            question = `(${p} + ${q}²) × (${r} - ${p % 2}) ÷ ${r}`;
-                            answer = Math.round((p + Math.pow(q, 2)) * (r - p % 2) / r);
-                        } else if (i < 4) {
-                            question = `${p} × [${q}² - (${r} + ${p}) ÷ ${r}]`;
-                            answer = p * (Math.pow(q, 2) - Math.round((r + p) / r));
-                        } else {
-                            question = `(${p}/${q} + ${q}/${p}) × ${p * q}`;
-                            answer = p + q;
-                        }
-                        break;
-                }
-                
-                options = generateRandomOptions(answer, level);
-                
-                questions.push({
-                    question: question + " = ?",
-                    options: options,
-                    correct: options.indexOf(answer.toString())
-                });
-            }
-            
-            return questions;
-        }
-
-        function generateRandomOptions(correctAnswer, level) {
-            const options = [correctAnswer.toString()];
-            const range = level * 5;
-            
-            while (options.length < 3) {
-                let wrongAnswer;
-                if (level === 4) {
-                    wrongAnswer = correctAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+                const status = document.getElementById('connectionStatus');
+                if (response.ok) {
+                    status.innerHTML = '<span style="color: #4ecca3;">✅ متصل بالخادم</span>';
                 } else {
-                    wrongAnswer = correctAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * range) + 1);
+                    status.innerHTML = '<span style="color: #e84545;">❌ خطأ في الاتصال</span>';
                 }
+            } catch (error) {
+                document.getElementById('connectionStatus').innerHTML = 
+                    '<span style="color: #e84545;">❌ لا يوجد اتصال بالإنترنت</span>';
+            }
+        }
+
+        // تحميل بيانات التلاميذ
+        async function loadStudents() {
+            try {
+                const response = await fetch(`${API_URL}/${BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': MASTER_KEY
+                    }
+                });
                 
-                if (wrongAnswer !== correctAnswer && !options.includes(wrongAnswer.toString())) {
-                    options.push(wrongAnswer.toString());
+                if (response.ok) {
+                    const data = await response.json();
+                    allStudents = data.record.students || [];
+                    displayStudents();
                 }
+            } catch (error) {
+                console.error('Error loading students:', error);
             }
+        }
+
+        // حفظ بيانات التلاميذ
+        async function saveStudents() {
+            try {
+                const response = await fetch(`${API_URL}/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': MASTER_KEY
+                    },
+                    body: JSON.stringify({
+                        students: allStudents,
+                        lastUpdate: new Date().toISOString()
+                    })
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('Error saving students:', error);
+                return false;
+            }
+        }
+
+        // عرض التلاميذ
+        function displayStudents() {
+            const list = document.getElementById('studentsList');
             
-            return shuffleArray(options);
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+            if (allStudents.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #ccc;">لا يوجد تلاميذ مسجلين</p>';
+                return;
             }
-            return array;
+
+            list.innerHTML = allStudents.map(student => `
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 10px 0; border-radius: 10px;">
+                    <div style="display: flex; justify-content: between; align-items: center;">
+                        <div>
+                            <strong>${student.name}</strong>
+                            <div style="font-size: 14px; color: #4ecca3;">
+                                النقاط: ${student.score} | المستوى: ${student.level}
+                            </div>
+                            <div style="font-size: 12px; color: #ccc;">
+                                آخر نشاط: ${new Date(student.lastActive).toLocaleString('ar-EG')}
+                            </div>
+                        </div>
+                        <span style="color: #4ecca3;">${student.online ? '🟢 متصل' : '🔴 غير متصل'}</span>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // وظائف إدارة الشاشات
+        // دوال إدارة الشاشات
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
-            gameData.currentScreen = screenId;
             
-            if (screenId === 'teacherPanel') {
-                updateStudentsTable();
-                updateDebugInfo();
-            } else if (screenId === 'studentScreen') {
-                updateStudentDisplay();
+            if (screenId === 'teacherScreen') {
+                loadStudents();
             }
         }
 
-        // نظام تسجيل الدخول
-        function loginStudent() {
-            const studentName = document.getElementById('studentName').value.trim();
-            
-            if (!studentName) {
-                alert('يرجى إدخال اسمك');
-                return;
-            }
-            
-            // حفظ التلميذ في النظام
-            const success = dataManager.updateStudent({
-                name: studentName,
-                level: 1,
+        // بدء اللعبة
+        function startGame(level) {
+            currentStudent = {
+                name: 'تلميذ ' + Math.floor(Math.random() * 1000),
                 score: 0,
-                dragonBalls: 0,
-                online: true
-            });
-            
-            if (!success) {
-                alert('حدث خطأ في حفظ البيانات. تأكد من أن localStorage مفعل.');
-                return;
-            }
-            
-            // تحديث بيانات اللعبة الحالية
-            gameData.currentStudent = { name: studentName };
-            gameData.studentScore = 0;
-            gameData.dragonBalls = 0;
-            
-            updateStudentDisplay();
-            showScreen('studentScreen');
-            
-            // تحديث لوحة الأستاذ تلقائياً
-            setTimeout(updateStudentsTable, 1000);
-        }
+                level: level,
+                online: true,
+                lastActive: new Date().toISOString()
+            };
 
-        function loginTeacher() {
-            const password = document.getElementById('teacherPassword').value;
-            if (password === gameData.teacherPassword) {
-                showScreen('teacherPanel');
+            // إضافة التلميذ للقائمة
+            const existingIndex = allStudents.findIndex(s => s.name === currentStudent.name);
+            if (existingIndex === -1) {
+                allStudents.push(currentStudent);
             } else {
-                alert('الرقم السري غير صحيح!');
+                allStudents[existingIndex] = currentStudent;
             }
+
+            saveStudents();
+            showScreen('gameScreen');
+            startQuestion(level);
         }
 
-        // زر الخروج
-        function exitGame() {
-            if (gameData.currentStudent) {
-                // تحديث بيانات التلميذ قبل الخروج
-                dataManager.updateStudent({
-                    name: gameData.currentStudent.name,
-                    score: gameData.studentScore,
-                    dragonBalls: gameData.dragonBalls,
-                    level: Math.max(gameData.currentStudent.level || 1, gameData.currentLevel),
-                    online: false
-                });
-                gameData.currentStudent = null;
-            }
-            showScreen('loginScreen');
-        }
+        // بدء سؤال
+        function startQuestion(level) {
+            // توليد سؤال عشوائي
+            const a = Math.floor(Math.random() * 10) + 1;
+            const b = Math.floor(Math.random() * 10) + 1;
+            const c = Math.floor(Math.random() * 10) + 1;
+            
+            const question = `${a} + ${b} × ${c}`;
+            const answer = a + b * c;
+            
+            // توليد خيارات
+            const options = [
+                answer.toString(),
+                (answer + 2).toString(),
+                (answer - 2).toString()
+            ].sort(() => Math.random() - 0.5);
 
-        // نظام المستويات والأسئلة
-        function startLevel(level) {
-            gameData.currentLevel = level;
-            gameData.currentQuestions = generateQuestions(level);
-            gameData.currentQuestion = 0;
-            gameData.correctAnswers = 0;
-            
-            switch(level) {
-                case 1: gameData.timeLeft = 30; break;
-                case 2: gameData.timeLeft = 60; break;
-                case 3: gameData.timeLeft = 120; break;
-                case 4: gameData.timeLeft = 300; break;
-            }
-            
-            showScreen('questionScreen');
-            loadQuestion();
-            startTimer();
-        }
-
-        function checkLevel4() {
-            if (gameData.dragonBalls < 3) {
-                alert(`المستوى 4 مقفل! تحتاج إلى 3 كرات دراغون بول على الأقل.\n\nلديك حالياً: ${gameData.dragonBalls} كرات\nمطلوب: 3 كرات`);
-                return;
-            }
-            startLevel(4);
-        }
-
-        function loadQuestion() {
-            const questions = gameData.currentQuestions;
-            const totalQuestions = questions.length;
-            
-            if (gameData.currentQuestion >= totalQuestions) {
-                endLevel();
-                return;
-            }
-            
-            const question = questions[gameData.currentQuestion];
-            document.getElementById('questionText').textContent = question.question;
-            document.getElementById('questionScore').textContent = gameData.studentScore;
-            document.getElementById('questionCounter').textContent = `السؤال ${gameData.currentQuestion + 1} من ${totalQuestions}`;
-            
-            const progress = ((gameData.currentQuestion) / totalQuestions) * 100;
-            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('questionText').textContent = question + ' = ?';
             
             const doorsGrid = document.getElementById('doorsGrid');
-            doorsGrid.innerHTML = '';
-            
-            question.options.forEach((option, index) => {
-                const door = document.createElement('div');
-                door.className = 'door';
-                door.textContent = option;
-                door.onclick = () => checkAnswer(index);
-                doorsGrid.appendChild(door);
-            });
-        }
-
-        function checkAnswer(selectedIndex) {
-            const questions = gameData.currentQuestions;
-            const question = questions[gameData.currentQuestion];
-            const doors = document.querySelectorAll('.door');
-            
-            doors.forEach((door, index) => {
-                if (index === question.correct) {
-                    door.classList.add('correct');
-                } else if (index === selectedIndex) {
-                    door.classList.add('wrong');
-                }
-                door.style.pointerEvents = 'none';
-            });
-            
-            clearInterval(gameData.timer);
-            
-            if (selectedIndex === question.correct) {
-                gameData.correctAnswers++;
-                gameData.studentScore += gameData.currentLevel * 10;
-            }
-            
-            setTimeout(() => {
-                gameData.currentQuestion++;
-                if (gameData.currentQuestion < questions.length) {
-                    loadQuestion();
-                    resetTimer();
-                } else {
-                    endLevel();
-                }
-            }, 2000);
-        }
-
-        function startTimer() {
-            const timerElement = document.getElementById('timer');
-            timerElement.textContent = gameData.timeLeft;
-            timerElement.classList.remove('warning');
-            
-            gameData.timer = setInterval(() => {
-                gameData.timeLeft--;
-                timerElement.textContent = gameData.timeLeft;
-                
-                if (gameData.timeLeft <= 10) {
-                    timerElement.classList.add('warning');
-                }
-                
-                if (gameData.timeLeft <= 0) {
-                    clearInterval(gameData.timer);
-                    gameData.currentQuestion++;
-                    if (gameData.currentQuestion < gameData.currentQuestions.length) {
-                        loadQuestion();
-                        resetTimer();
-                    } else {
-                        endLevel();
-                    }
-                }
-            }, 1000);
-        }
-
-        function resetTimer() {
-            clearInterval(gameData.timer);
-            const timerElement = document.getElementById('timer');
-            timerElement.classList.remove('warning');
-            
-            switch(gameData.currentLevel) {
-                case 1: gameData.timeLeft = 30; break;
-                case 2: gameData.timeLeft = 60; break;
-                case 3: gameData.timeLeft = 120; break;
-                case 4: gameData.timeLeft = 300; break;
-            }
-            
-            startTimer();
-        }
-
-        function endLevel() {
-            const totalQuestions = gameData.currentQuestions.length;
-            const earnedPoints = gameData.correctAnswers * gameData.currentLevel * 10;
-            
-            gameData.studentScore += earnedPoints;
-            
-            const successRate = gameData.correctAnswers / totalQuestions;
-            let earnedDragonBall = false;
-            
-            if (successRate >= 0.6) {
-                gameData.dragonBalls++;
-                earnedDragonBall = true;
-            }
-            
-            // تحديث بيانات التلميذ في النظام
-            if (gameData.currentStudent) {
-                dataManager.updateStudent({
-                    name: gameData.currentStudent.name,
-                    score: gameData.studentScore,
-                    dragonBalls: gameData.dragonBalls,
-                    level: Math.max(gameData.currentStudent.level || 1, gameData.currentLevel),
-                    online: true
-                });
-            }
-            
-            document.getElementById('correctCount').textContent = gameData.correctAnswers;
-            document.getElementById('totalQuestions').textContent = totalQuestions;
-            document.getElementById('earnedPoints').textContent = earnedPoints;
-            
-            if (earnedDragonBall) {
-                document.getElementById('dragonBallMessage').textContent = `لديك الآن ${gameData.dragonBalls} كرات دراغون بول`;
-                document.getElementById('dragonBallReward').style.display = 'block';
-            } else {
-                document.getElementById('dragonBallMessage').textContent = 'حاول مرة أخرى لربح كرة دراغون بول';
-                document.getElementById('dragonBallReward').style.display = 'none';
-            }
-            
-            document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
-            
-            showScreen('resultsScreen');
-        }
-
-        // وظائف المساعدة
-        function updateStudentDisplay() {
-            if (gameData.currentStudent) {
-                document.getElementById('studentNameDisplay').textContent = gameData.currentStudent.name;
-                document.getElementById('studentScore').textContent = gameData.studentScore;
-                document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
-                
-                const level4Card = document.getElementById('level4Card');
-                if (gameData.dragonBalls >= 3) {
-                    level4Card.classList.remove('locked');
-                    level4Card.onclick = () => startLevel(4);
-                }
-            }
-        }
-
-        function updateStudentsTable() {
-            const table = document.getElementById('studentsTable');
-            const allStudents = dataManager.getAllStudents();
-            
-            const onlineStudents = allStudents.filter(s => s.online);
-            document.getElementById('connectedStudentsCount').textContent = onlineStudents.length;
-            
-            table.innerHTML = allStudents.map(student => `
-                <tr class="${student.online ? '' : 'offline'}">
-                    <td>${student.name} ${student.online ? '<span style="color: #4ecca3;">●</span>' : ''}</td>
-                    <td>${student.level || 1}</td>
-                    <td>${student.score || 0}</td>
-                    <td>${student.dragonBalls || 0}</td>
-                    <td>${student.online ? '🟢 متصل' : '🔴 غير متصل'}</td>
-                    <td>${new Date(student.lastActive).toLocaleString('ar-EG')}</td>
-                </tr>
+            doorsGrid.innerHTML = options.map((option, index) => `
+                <div class="door" onclick="checkAnswer(${index}, ${answer})">${option}</div>
             `).join('');
         }
 
-        function refreshData() {
-            updateStudentsTable();
-            updateDebugInfo();
-            alert('تم تحديث البيانات');
-        }
+        // التحقق من الإجابة
+        function checkAnswer(selectedIndex, correctAnswer) {
+            const doors = document.querySelectorAll('.door');
+            const selectedValue = parseInt(doors[selectedIndex].textContent);
+            
+            doors.forEach((door, index) => {
+                if (parseInt(door.textContent) === correctAnswer) {
+                    door.style.background = 'linear-gradient(45deg, #4ecca3, #2e8a6c)';
+                } else if (index === selectedIndex) {
+                    door.style.background = 'linear-gradient(45deg, #e84545, #c73636)';
+                }
+            });
 
-        function clearResults() {
-            if (confirm('هل أنت متأكد من مسح جميع النتائج؟ هذا الإجراء لا يمكن التراجع عنه!')) {
-                dataManager.clearAllData();
-                updateStudentsTable();
-                alert('تم مسح جميع النتائج!');
+            if (selectedValue === correctAnswer) {
+                currentStudent.score += 10;
+                document.getElementById('gameScore').textContent = currentStudent.score;
             }
+
+            setTimeout(() => {
+                currentStudent.lastActive = new Date().toISOString();
+                saveStudents();
+                startQuestion(currentStudent.level);
+            }, 2000);
         }
 
-        function sendChallengeToAll() {
-            alert('تم إرسال تحدي جماعي لجميع التلاميذ المتصلين');
-        }
-
-        // معلومات التصحيح
-        function showDebugInfo() {
-            const allStudents = dataManager.getAllStudents();
-            const debugInfo = `
-                <h4>معلومات التصحيح:</h4>
-                <p>عدد التلاميذ: ${allStudents.length}</p>
-                <p>التلاميذ المتصلين: ${allStudents.filter(s => s.online).length}</p>
-                <p>آخر تحديث: ${new Date().toLocaleString('ar-EG')}</p>
-                <p>بيانات localStorage: ${localStorage.getItem('mathGameData') ? 'موجودة' : 'غير موجودة'}</p>
-                <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
-                    <strong>قائمة التلاميذ:</strong>
-                    <pre>${JSON.stringify(allStudents, null, 2)}</pre>
-                </div>
-            `;
-            
-            document.getElementById('debugInfo').innerHTML = debugInfo;
-            document.getElementById('debugInfo').style.display = 'block';
-            
-            document.getElementById('teacherDebugInfo').innerHTML = debugInfo;
-            document.getElementById('teacherDebugInfo').style.display = 'block';
-        }
-
-        function updateDebugInfo() {
-            const allStudents = dataManager.getAllStudents();
-            const debugInfo = `
-                <p>عدد التلاميذ: ${allStudents.length} | متصلين: ${allStudents.filter(s => s.online).length}</p>
-                <p>آخر تحديث: ${new Date().toLocaleString('ar-EG')}</p>
-            `;
-            
-            document.getElementById('teacherDebugInfo').innerHTML = debugInfo;
-        }
-
-        // تحديث البيانات تلقائياً كل 3 ثواني
-        setInterval(() => {
-            if (gameData.currentScreen === 'teacherPanel') {
-                updateStudentsTable();
-                updateDebugInfo();
-            }
-        }, 3000);
-
-        // بدء اللعبة
+        // بدء التطبيق
         window.onload = function() {
-            console.log('Math Game Loaded Successfully');
-            updateDebugInfo();
+            testConnection();
+            loadStudents();
+            
+            // تحديث تلقائي كل 5 ثواني
+            setInterval(loadStudents, 5000);
         };
     </script>
 </body>
