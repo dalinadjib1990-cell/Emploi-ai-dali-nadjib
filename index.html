@@ -40,6 +40,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .logo {
@@ -71,10 +72,146 @@
             font-size: 16px;
             cursor: pointer;
             margin: 5px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
             background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e84545, #c73636);
+        }
+
+        .btn-exit {
+            background: linear-gradient(45deg, #e84545, #c73636);
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            border-color: #4ecca3;
+        }
+
+        .level-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .level-card.locked::after {
+            content: "🔒";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+        }
+
+        .level-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #4ecca3;
+            direction: ltr;
+            text-align: center;
+        }
+
+        .doors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .door {
+            background: linear-gradient(45deg, #8b4513, #a0522d);
+            border: 5px solid #5d4037;
+            border-radius: 10px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+            direction: ltr;
+        }
+
+        .door:hover {
+            transform: scale(1.05);
+        }
+
+        .door.correct {
+            background: linear-gradient(45deg, #4ecca3, #2e8a6c);
+        }
+
+        .door.wrong {
+            background: linear-gradient(45deg, #e84545, #c73636);
+        }
+
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4ecca3;
+            margin: 20px 0;
+        }
+
+        .timer.warning {
+            color: #e84545;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecca3, #2e8a6c);
+            transition: width 0.3s ease;
         }
 
         .login-form {
@@ -94,45 +231,44 @@
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
+            font-size: 16px;
         }
 
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .level-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .question-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .doors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .door {
-            background: linear-gradient(45deg, #8b4513, #a0522d);
-            border-radius: 10px;
-            padding: 40px 20px;
-            cursor: pointer;
+        .question-counter {
             font-size: 18px;
-            color: #ffd700;
+            color: #4ecca3;
+            margin-bottom: 10px;
+        }
+
+        .server-status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .status-connected {
+            color: #4ecca3;
+        }
+
+        .status-error {
+            color: #e84545;
+        }
+
+        @media (max-width: 768px) {
+            .levels-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .doors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -140,168 +276,290 @@
     <div class="container">
         <!-- شاشة الدخول -->
         <div id="loginScreen" class="screen active">
+            <div class="header">
+                <div class="logo">Math 2ème 🎮</div>
+            </div>
+            
             <div class="login-form">
-                <h2 style="color: #4ecca3;">Math 2ème 🎮</h2>
-                <div style="margin: 20px 0;">
-                    <button class="btn" onclick="showScreen('studentScreen')">دخول التلميذ</button>
-                    <button class="btn btn-secondary" onclick="showScreen('teacherScreen')">دخول الأستاذ</button>
+                <h2 style="margin-bottom: 30px; color: #4ecca3;">تسجيل الدخول</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="showScreen('studentLoginScreen')">دخول التلميذ</button>
+                    <button class="btn btn-secondary" onclick="showScreen('teacherLoginScreen')">دخول الأستاذ</button>
                 </div>
-                <div id="connectionStatus" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-top: 20px;">
-                    <span id="statusText">🔌 جاري الاتصال بالخادم...</span>
+
+                <div class="server-status">
+                    <span id="connectionStatus">🔌 جاري الاتصال...</span>
                 </div>
             </div>
         </div>
 
-        <!-- شاشة التلميذ -->
+        <!-- شاشة دخول التلميذ -->
+        <div id="studentLoginScreen" class="screen">
+            <div class="header">
+                <div class="logo">دخول التلميذ</div>
+                <button class="btn btn-secondary" onclick="showScreen('loginScreen')">رجوع</button>
+            </div>
+            
+            <div class="login-form">
+                <h2 style="margin-bottom: 30px;">أدخل اسمك</h2>
+                <input type="text" id="studentNameInput" placeholder="اكتب اسمك هنا">
+                <button class="btn" onclick="loginStudent()">بدء اللعب</button>
+            </div>
+        </div>
+
+        <!-- شاشة دخول الأستاذ -->
+        <div id="teacherLoginScreen" class="screen">
+            <div class="header">
+                <div class="logo">دخول الأستاذ</div>
+                <button class="btn btn-secondary" onclick="showScreen('loginScreen')">رجوع</button>
+            </div>
+            
+            <div class="login-form">
+                <h2 style="margin-bottom: 30px;">الدخول بحساب الأستاذ</h2>
+                <input type="password" id="teacherPasswordInput" placeholder="الرقم السري">
+                <button class="btn" onclick="loginTeacher()">دخول</button>
+                <div style="margin-top: 15px; font-size: 14px; color: #ccc;">
+                    <p>🔑 الرقم السري: <strong>1234</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة التلميذ الرئيسية -->
         <div id="studentScreen" class="screen">
             <div class="header">
                 <div class="logo">Math 2ème - التلميذ</div>
                 <div class="user-info">
-                    <span id="studentName">تلميذ</span>
+                    <span id="studentNameDisplay"></span>
                     <span>النقاط: <span id="studentScore" class="score">0</span></span>
+                    <span>الكرات: <span id="dragonBalls">0</span> 🏀</span>
+                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
                 </div>
             </div>
 
+            <h2 style="text-align: center; margin: 20px 0; color: #4ecca3;">اختر مستوى اللعب</h2>
+            
             <div class="levels-grid">
-                <div class="level-card" onclick="startGame(1)">
+                <div class="level-card" onclick="startLevel(1)">
+                    <div class="level-icon">⭐</div>
                     <h3>المستوى 1 - سهل</h3>
-                    <p>أسئلة أساسية</p>
+                    <p>30 ثانية لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
                 </div>
-                <div class="level-card" onclick="startGame(2)">
+                <div class="level-card" onclick="startLevel(2)">
+                    <div class="level-icon">⭐⭐</div>
                     <h3>المستوى 2 - متوسط</h3>
-                    <p>أسئلة متقدمة</p>
+                    <p>دقيقة لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                </div>
+                <div class="level-card" onclick="startLevel(3)">
+                    <div class="level-icon">⭐⭐⭐</div>
+                    <h3>المستوى 3 - صعب</h3>
+                    <p>دقيقتان لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                </div>
+                <div class="level-card locked" id="level4Card" onclick="checkLevel4()">
+                    <div class="level-icon">🏆</div>
+                    <h3>المستوى 4 - صعب جداً</h3>
+                    <p>5 دقائق لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 3 كرات</p>
                 </div>
             </div>
         </div>
 
         <!-- شاشة السؤال -->
-        <div id="gameScreen" class="screen">
+        <div id="questionScreen" class="screen">
             <div class="header">
                 <div class="logo">السؤال</div>
                 <div class="user-info">
-                    <span>النقاط: <span id="gameScore" class="score">0</span></span>
-                    <div id="timer">30</div>
+                    <span>النقاط: <span id="questionScore" class="score">0</span></span>
+                    <div class="timer" id="timer">30</div>
+                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
                 </div>
             </div>
 
             <div class="question-container">
-                <h2 id="questionText">5 + 3 × 2 = ?</h2>
-                <div class="doors-grid" id="doorsGrid"></div>
+                <div class="question-counter" id="questionCounter">السؤال 1 من 5</div>
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <h2 class="question-text" id="questionText">5 + 3 × 2 = ?</h2>
+                
+                <div class="doors-grid" id="doorsGrid">
+                    <!-- سيتم ملء الأبواب ديناميكياً -->
+                </div>
             </div>
         </div>
 
-        <!-- لوحة الأستاذ -->
-        <div id="teacherScreen" class="screen">
+        <!-- شاشة النتائج -->
+        <div id="resultsScreen" class="screen">
             <div class="header">
-                <div class="logo">لوحة تحكم الأستاذ</div>
-                <button class="btn" onclick="loadStudents()">🔄 تحديث</button>
+                <div class="logo">نتائج المستوى</div>
+                <div class="user-info">
+                    <button class="btn" onclick="showScreen('studentScreen')">مواصلة اللعب</button>
+                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
+                </div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 20px 0;">
-                <h3 style="color: #4ecca3; margin-bottom: 15px;">التلاميذ المتصلين</h3>
-                <div id="studentsList">
-                    <p style="text-align: center; color: #ccc;">جاري تحميل البيانات...</p>
+            <div style="text-align: center; margin-top: 50px;">
+                <div>
+                    <h2 style="color: #4ecca3; margin-bottom: 20px;" id="resultsTitle">تهانينا! أكملت المستوى</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">لقد أجبت على <span id="correctCount">0</span> من <span id="totalQuestions">0</span> أسئلة بشكل صحيح</p>
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">النقاط المكتسبة: <span id="earnedPoints">0</span></p>
+                    <p style="font-size: 1.2em; margin-bottom: 30px;" id="dragonBallMessage"></p>
+                    
+                    <div id="dragonBallReward" style="display: none;">
+                        <div style="width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff0000); border-radius: 50%; margin: 0 auto 20px; position: relative;">
+                            <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 24px;">★</span>
+                        </div>
+                        <p style="color: #ffd700; font-size: 1.2em; margin: 20px 0;">🎉 لقد ربحت كرة دراغون بول! 🎉</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- لوحة تحكم الأستاذ -->
+        <div id="teacherPanel" class="screen">
+            <div class="header">
+                <div class="logo">لوحة تحكم الأستاذ</div>
+                <div class="user-info">
+                    <span>الأستاذ: <strong>أستاذ الرياضيات</strong></span>
+                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
+                </div>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin: 20px 0;">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #4ecca3;">إدارة التلاميذ والنتائج</h2>
+                
+                <div class="server-status">
+                    <span id="teacherConnectionStatus">جاري التحميل...</span>
+                    <button class="btn" onclick="loadStudentsData()" style="padding: 5px 10px; margin-left: 10px;">🔄 تحديث</button>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn" onclick="addSampleStudents()">إضافة تلاميذ تجريبيين</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">مسح الكل</button>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px;">
+                    <h3 style="color: #4ecca3; margin-bottom: 15px;">قائمة التلاميذ</h3>
+                    <div id="studentsList">
+                        <p style="text-align: center; color: #ccc;">جاري تحميل البيانات...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // قاعدة البيانات البسيطة باستخدام JSONBin
-        const API_URL = 'https://api.jsonbin.io/v3/b';
-        const BIN_ID = '67a1a8e2dc746540189bbe8f'; // سيتم إنشاء هذا تلقائياً
-        const MASTER_KEY = '$2a$10$6S1bQaQ9b1k7R8XwY5jzXeBdG7hM2nA8C1fV3qP5rT9wK4yL7mN1o'; // مفتاح جديد
-
-        let currentStudent = null;
-        let allStudents = [];
-
-        // اختبار الاتصال بالخادم
-        async function testConnection() {
-            try {
-                const response = await fetch(`${API_URL}/${BIN_ID}/latest`, {
-                    headers: {
-                        'X-Master-Key': MASTER_KEY
-                    }
-                });
-                const status = document.getElementById('connectionStatus');
-                if (response.ok) {
-                    status.innerHTML = '<span style="color: #4ecca3;">✅ متصل بالخادم</span>';
-                } else {
-                    status.innerHTML = '<span style="color: #e84545;">❌ خطأ في الاتصال</span>';
-                }
-            } catch (error) {
-                document.getElementById('connectionStatus').innerHTML = 
-                    '<span style="color: #e84545;">❌ لا يوجد اتصال بالإنترنت</span>';
+        // نظام بيانات محلي (بدون خادم خارجي)
+        class GameDataManager {
+            constructor() {
+                this.storageKey = 'mathGameData';
+                this.init();
             }
-        }
 
-        // تحميل بيانات التلاميذ
-        async function loadStudents() {
-            try {
-                const response = await fetch(`${API_URL}/${BIN_ID}/latest`, {
-                    headers: {
-                        'X-Master-Key': MASTER_KEY
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    allStudents = data.record.students || [];
-                    displayStudents();
-                }
-            } catch (error) {
-                console.error('Error loading students:', error);
-            }
-        }
-
-        // حفظ بيانات التلاميذ
-        async function saveStudents() {
-            try {
-                const response = await fetch(`${API_URL}/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': MASTER_KEY
-                    },
-                    body: JSON.stringify({
-                        students: allStudents,
+            init() {
+                if (!this.loadData()) {
+                    this.saveData({
+                        students: [],
                         lastUpdate: new Date().toISOString()
-                    })
-                });
+                    });
+                }
+                this.updateConnectionStatus();
+            }
+
+            loadData() {
+                try {
+                    const data = localStorage.getItem(this.storageKey);
+                    return data ? JSON.parse(data) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            saveData(data) {
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify({
+                        ...data,
+                        lastUpdate: new Date().toISOString()
+                    }));
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            getAllStudents() {
+                const data = this.loadData();
+                return data ? data.students : [];
+            }
+
+            updateStudent(student) {
+                const data = this.loadData();
+                if (!data) return false;
+
+                const index = data.students.findIndex(s => s.name === student.name);
                 
-                return response.ok;
-            } catch (error) {
-                console.error('Error saving students:', error);
-                return false;
+                if (index !== -1) {
+                    data.students[index] = {
+                        ...data.students[index],
+                        ...student,
+                        lastActive: new Date().toISOString()
+                    };
+                } else {
+                    data.students.push({
+                        ...student,
+                        id: Date.now(),
+                        createdAt: new Date().toISOString(),
+                        lastActive: new Date().toISOString()
+                    });
+                }
+
+                return this.saveData(data);
+            }
+
+            clearAllData() {
+                return this.saveData({
+                    students: [],
+                    lastUpdate: new Date().toISOString()
+                });
+            }
+
+            updateConnectionStatus() {
+                const status = document.getElementById('connectionStatus');
+                const teacherStatus = document.getElementById('teacherConnectionStatus');
+                
+                if (this.loadData()) {
+                    status.innerHTML = '<span class="status-connected">✅ متصل - النظام المحلي</span>';
+                    if (teacherStatus) {
+                        teacherStatus.innerHTML = '<span class="status-connected">✅ متصل - النظام المحلي</span>';
+                    }
+                } else {
+                    status.innerHTML = '<span class="status-error">❌ خطأ في التخزين المحلي</span>';
+                    if (teacherStatus) {
+                        teacherStatus.innerHTML = '<span class="status-error">❌ خطأ في التخزين المحلي</span>';
+                    }
+                }
             }
         }
 
-        // عرض التلاميذ
-        function displayStudents() {
-            const list = document.getElementById('studentsList');
-            
-            if (allStudents.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: #ccc;">لا يوجد تلاميذ مسجلين</p>';
-                return;
-            }
+        // تهيئة مدير البيانات
+        const dataManager = new GameDataManager();
 
-            list.innerHTML = allStudents.map(student => `
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 10px 0; border-radius: 10px;">
-                    <div style="display: flex; justify-content: between; align-items: center;">
-                        <div>
-                            <strong>${student.name}</strong>
-                            <div style="font-size: 14px; color: #4ecca3;">
-                                النقاط: ${student.score} | المستوى: ${student.level}
-                            </div>
-                            <div style="font-size: 12px; color: #ccc;">
-                                آخر نشاط: ${new Date(student.lastActive).toLocaleString('ar-EG')}
-                            </div>
-                        </div>
-                        <span style="color: #4ecca3;">${student.online ? '🟢 متصل' : '🔴 غير متصل'}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // بيانات اللعبة الحالية
+        const gameData = {
+            currentStudent: null,
+            studentScore: 0,
+            dragonBalls: 0,
+            currentLevel: 1,
+            currentQuestion: 0,
+            correctAnswers: 0,
+            timer: null,
+            timeLeft: 30,
+            currentQuestions: []
+        };
 
         // دوال إدارة الشاشات
         function showScreen(screenId) {
@@ -310,91 +568,347 @@
             });
             document.getElementById(screenId).classList.add('active');
             
-            if (screenId === 'teacherScreen') {
-                loadStudents();
+            if (screenId === 'teacherPanel') {
+                loadStudentsData();
             }
         }
 
-        // بدء اللعبة
-        function startGame(level) {
-            currentStudent = {
-                name: 'تلميذ ' + Math.floor(Math.random() * 1000),
+        // دخول التلميذ
+        function loginStudent() {
+            const studentName = document.getElementById('studentNameInput').value.trim();
+            
+            if (!studentName) {
+                alert('يرجى إدخال اسم التلميذ');
+                return;
+            }
+
+            gameData.currentStudent = { name: studentName };
+            gameData.studentScore = 0;
+            gameData.dragonBalls = 0;
+
+            // حفظ التلميذ
+            dataManager.updateStudent({
+                name: studentName,
                 score: 0,
-                level: level,
-                online: true,
-                lastActive: new Date().toISOString()
-            };
+                dragonBalls: 0,
+                level: 1,
+                online: true
+            });
 
-            // إضافة التلميذ للقائمة
-            const existingIndex = allStudents.findIndex(s => s.name === currentStudent.name);
-            if (existingIndex === -1) {
-                allStudents.push(currentStudent);
-            } else {
-                allStudents[existingIndex] = currentStudent;
-            }
-
-            saveStudents();
-            showScreen('gameScreen');
-            startQuestion(level);
+            updateStudentDisplay();
+            showScreen('studentScreen');
         }
 
-        // بدء سؤال
-        function startQuestion(level) {
-            // توليد سؤال عشوائي
-            const a = Math.floor(Math.random() * 10) + 1;
-            const b = Math.floor(Math.random() * 10) + 1;
-            const c = Math.floor(Math.random() * 10) + 1;
-            
-            const question = `${a} + ${b} × ${c}`;
-            const answer = a + b * c;
-            
-            // توليد خيارات
-            const options = [
-                answer.toString(),
-                (answer + 2).toString(),
-                (answer - 2).toString()
-            ].sort(() => Math.random() - 0.5);
+        // دخول الأستاذ
+        function loginTeacher() {
+            const password = document.getElementById('teacherPasswordInput').value;
+            if (password === '1234') {
+                showScreen('teacherPanel');
+            } else {
+                alert('الرقم السري غير صحيح!');
+            }
+        }
 
-            document.getElementById('questionText').textContent = question + ' = ?';
+        // خروج من اللعبة
+        function exitGame() {
+            if (gameData.currentStudent) {
+                dataManager.updateStudent({
+                    name: gameData.currentStudent.name,
+                    score: gameData.studentScore,
+                    dragonBalls: gameData.dragonBalls,
+                    level: Math.max(1, gameData.currentLevel),
+                    online: false
+                });
+                gameData.currentStudent = null;
+            }
+            showScreen('loginScreen');
+        }
+
+        // تحديث عرض التلميذ
+        function updateStudentDisplay() {
+            if (gameData.currentStudent) {
+                document.getElementById('studentNameDisplay').textContent = gameData.currentStudent.name;
+                document.getElementById('studentScore').textContent = gameData.studentScore;
+                document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
+
+                // فتح المستوى 4 إذا كان مقفولاً
+                const level4Card = document.getElementById('level4Card');
+                if (gameData.dragonBalls >= 3) {
+                    level4Card.classList.remove('locked');
+                }
+            }
+        }
+
+        // تحميل بيانات التلاميذ
+        function loadStudentsData() {
+            const students = dataManager.getAllStudents();
+            const list = document.getElementById('studentsList');
             
-            const doorsGrid = document.getElementById('doorsGrid');
-            doorsGrid.innerHTML = options.map((option, index) => `
-                <div class="door" onclick="checkAnswer(${index}, ${answer})">${option}</div>
+            if (students.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #ccc;">لا يوجد تلاميذ مسجلين</p>';
+                return;
+            }
+
+            list.innerHTML = students.map(student => `
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; margin: 10px 0; border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${student.name}</strong>
+                            <div style="font-size: 14px; color: #4ecca3;">
+                                النقاط: ${student.score} | الكرات: ${student.dragonBalls} | المستوى: ${student.level}
+                            </div>
+                            <div style="font-size: 12px; color: #ccc;">
+                                آخر نشاط: ${new Date(student.lastActive).toLocaleString('ar-EG')}
+                            </div>
+                        </div>
+                        <span style="color: ${student.online ? '#4ecca3' : '#e84545'};">
+                            ${student.online ? '🟢 متصل' : '🔴 غير متصل'}
+                        </span>
+                    </div>
+                </div>
             `).join('');
         }
 
-        // التحقق من الإجابة
-        function checkAnswer(selectedIndex, correctAnswer) {
-            const doors = document.querySelectorAll('.door');
-            const selectedValue = parseInt(doors[selectedIndex].textContent);
+        // إضافة تلاميذ تجريبيين
+        function addSampleStudents() {
+            const sampleStudents = [
+                { name: 'أحمد', score: 150, dragonBalls: 2, level: 2, online: true },
+                { name: 'فاطمة', score: 230, dragonBalls: 3, level: 3, online: true },
+                { name: 'محمد', score: 80, dragonBalls: 1, level: 1, online: false }
+            ];
+
+            sampleStudents.forEach(student => {
+                dataManager.updateStudent(student);
+            });
+
+            loadStudentsData();
+            alert('تم إضافة التلاميذ التجريبيين بنجاح!');
+        }
+
+        // مسح جميع البيانات
+        function clearAllData() {
+            if (confirm('هل تريد مسح جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                dataManager.clearAllData();
+                loadStudentsData();
+                alert('تم مسح جميع البيانات');
+            }
+        }
+
+        // توليد الأسئلة
+        function generateQuestions(level) {
+            const questions = [];
+            const questionCount = 5;
+
+            for (let i = 0; i < questionCount; i++) {
+                let question, answer;
+
+                switch(level) {
+                    case 1:
+                        const a = Math.floor(Math.random() * 10) + 1;
+                        const b = Math.floor(Math.random() * 10) + 1;
+                        const c = Math.floor(Math.random() * 10) + 1;
+                        question = `${a} + ${b} × ${c}`;
+                        answer = a + b * c;
+                        break;
+
+                    case 2:
+                        const x = Math.floor(Math.random() * 15) + 1;
+                        const y = Math.floor(Math.random() * 15) + 1;
+                        const z = Math.floor(Math.random() * 10) + 1;
+                        question = `(${x} + ${y}) × ${z} ÷ ${z}`;
+                        answer = x + y;
+                        break;
+
+                    case 3:
+                        const p = Math.floor(Math.random() * 10) + 1;
+                        const q = Math.floor(Math.random() * 10) + 1;
+                        const r = Math.floor(Math.random() * 5) + 1;
+                        question = `${p} × [${q} + (${r} × ${p})]`;
+                        answer = p * (q + (r * p));
+                        break;
+
+                    case 4:
+                        const m = Math.floor(Math.random() * 8) + 3;
+                        const n = Math.floor(Math.random() * 8) + 3;
+                        question = `(${m} + ${n}²) × (${m} - ${n}) ÷ ${m}`;
+                        answer = Math.round((m + Math.pow(n, 2)) * (m - n) / m);
+                        break;
+                }
+
+                const options = generateOptions(answer, level);
+                questions.push({
+                    question: question + " = ?",
+                    options: options,
+                    correct: options.indexOf(answer.toString())
+                });
+            }
+
+            return questions;
+        }
+
+        function generateOptions(correctAnswer, level) {
+            const options = [correctAnswer.toString()];
+            const range = level * 3;
+
+            while (options.length < 3) {
+                const wrongAnswer = correctAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * range) + 1);
+                if (wrongAnswer !== correctAnswer && !options.includes(wrongAnswer.toString())) {
+                    options.push(wrongAnswer.toString());
+                }
+            }
+
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        // بدء مستوى
+        function startLevel(level) {
+            gameData.currentLevel = level;
+            gameData.currentQuestions = generateQuestions(level);
+            gameData.currentQuestion = 0;
+            gameData.correctAnswers = 0;
+
+            gameData.timeLeft = level === 1 ? 30 : level === 2 ? 60 : level === 3 ? 120 : 300;
+
+            showScreen('questionScreen');
+            loadQuestion();
+            startTimer();
+        }
+
+        function checkLevel4() {
+            if (gameData.dragonBalls < 3) {
+                alert('المستوى 4 مقفل! تحتاج إلى 3 كرات دراغون بول على الأقل.');
+                return;
+            }
+            startLevel(4);
+        }
+
+        function loadQuestion() {
+            const questions = gameData.currentQuestions;
+            const totalQuestions = questions.length;
             
+            if (gameData.currentQuestion >= totalQuestions) {
+                endLevel();
+                return;
+            }
+
+            const question = questions[gameData.currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionScore').textContent = gameData.studentScore;
+            document.getElementById('questionCounter').textContent = `السؤال ${gameData.currentQuestion + 1} من ${totalQuestions}`;
+
+            const progress = ((gameData.currentQuestion) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            const doorsGrid = document.getElementById('doorsGrid');
+            doorsGrid.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const door = document.createElement('div');
+                door.className = 'door';
+                door.textContent = option;
+                door.onclick = () => checkAnswer(index);
+                doorsGrid.appendChild(door);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            const questions = gameData.currentQuestions;
+            const question = questions[gameData.currentQuestion];
+            const doors = document.querySelectorAll('.door');
+
             doors.forEach((door, index) => {
-                if (parseInt(door.textContent) === correctAnswer) {
-                    door.style.background = 'linear-gradient(45deg, #4ecca3, #2e8a6c)';
+                if (index === question.correct) {
+                    door.classList.add('correct');
                 } else if (index === selectedIndex) {
-                    door.style.background = 'linear-gradient(45deg, #e84545, #c73636)';
+                    door.classList.add('wrong');
                 }
             });
 
-            if (selectedValue === correctAnswer) {
-                currentStudent.score += 10;
-                document.getElementById('gameScore').textContent = currentStudent.score;
+            clearInterval(gameData.timer);
+
+            if (selectedIndex === question.correct) {
+                gameData.correctAnswers++;
+                gameData.studentScore += gameData.currentLevel * 10;
             }
 
             setTimeout(() => {
-                currentStudent.lastActive = new Date().toISOString();
-                saveStudents();
-                startQuestion(currentStudent.level);
+                gameData.currentQuestion++;
+                if (gameData.currentQuestion < questions.length) {
+                    loadQuestion();
+                    resetTimer();
+                } else {
+                    endLevel();
+                }
             }, 2000);
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = gameData.timeLeft;
+            timerElement.classList.remove('warning');
+
+            gameData.timer = setInterval(() => {
+                gameData.timeLeft--;
+                timerElement.textContent = gameData.timeLeft;
+
+                if (gameData.timeLeft <= 10) {
+                    timerElement.classList.add('warning');
+                }
+
+                if (gameData.timeLeft <= 0) {
+                    clearInterval(gameData.timer);
+                    gameData.currentQuestion++;
+                    if (gameData.currentQuestion < gameData.currentQuestions.length) {
+                        loadQuestion();
+                        resetTimer();
+                    } else {
+                        endLevel();
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(gameData.timer);
+            gameData.timeLeft = gameData.currentLevel === 1 ? 30 : 
+                               gameData.currentLevel === 2 ? 60 : 
+                               gameData.currentLevel === 3 ? 120 : 300;
+            startTimer();
+        }
+
+        function endLevel() {
+            const totalQuestions = gameData.currentQuestions.length;
+            const earnedPoints = gameData.correctAnswers * gameData.currentLevel * 10;
+
+            gameData.studentScore += earnedPoints;
+
+            const successRate = gameData.correctAnswers / totalQuestions;
+            if (successRate >= 0.6) {
+                gameData.dragonBalls++;
+                document.getElementById('dragonBallReward').style.display = 'block';
+            }
+
+            document.getElementById('correctCount').textContent = gameData.correctAnswers;
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            document.getElementById('earnedPoints').textContent = earnedPoints;
+            document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
+
+            if (gameData.currentStudent) {
+                dataManager.updateStudent({
+                    name: gameData.currentStudent.name,
+                    score: gameData.studentScore,
+                    dragonBalls: gameData.dragonBalls,
+                    level: Math.max(1, gameData.currentLevel),
+                    online: true
+                });
+            }
+
+            showScreen('resultsScreen');
         }
 
         // بدء التطبيق
         window.onload = function() {
-            testConnection();
-            loadStudents();
-            
-            // تحديث تلقائي كل 5 ثواني
-            setInterval(loadStudents, 5000);
+            dataManager.updateConnectionStatus();
         };
     </script>
 </body>
