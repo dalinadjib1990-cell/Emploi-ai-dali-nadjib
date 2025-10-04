@@ -93,6 +93,14 @@
             font-size: 14px;
         }
 
+        .btn-challenge {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-challenge.active {
+            background: linear-gradient(45deg, #4ecca3, #2e8a6c);
+        }
+
         .levels-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -256,6 +264,86 @@
             color: #e84545;
         }
 
+        .challenge-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .student-challenge {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .student-challenge.ready {
+            background: rgba(78, 204, 163, 0.3);
+            border: 2px solid #4ecca3;
+        }
+
+        .challenge-notification {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .challenge-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .player-result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .dragon-ball {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff0000);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .dragon-ball::before {
+            content: "★";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+        }
+
+        .dragon-ball.lost {
+            opacity: 0.3;
+            background: radial-gradient(circle at 30% 30%, #666, #333);
+        }
+
         @media (max-width: 768px) {
             .levels-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -268,6 +356,10 @@
             .header {
                 flex-direction: column;
                 gap: 10px;
+            }
+            
+            .challenge-results {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -332,7 +424,7 @@
                 <div class="user-info">
                     <span id="studentNameDisplay"></span>
                     <span>النقاط: <span id="studentScore" class="score">0</span></span>
-                    <span>الكرات: <span id="dragonBalls">0</span> 🏀</span>
+                    <span>الكرات: <span id="dragonBalls">0</span>/7 🏀</span>
                     <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
                 </div>
             </div>
@@ -365,13 +457,57 @@
                     <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
                     <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 3 كرات</p>
                 </div>
+                <div class="level-card locked" id="level5Card" onclick="checkLevel5()">
+                    <div class="level-icon">🔥</div>
+                    <h3>المستوى 5 - متقدم</h3>
+                    <p>7 دقائق لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 4 كرات</p>
+                </div>
+                <div class="level-card locked" id="level6Card" onclick="checkLevel6()">
+                    <div class="level-icon">💎</div>
+                    <h3>المستوى 6 - خبير</h3>
+                    <p>10 دقائق لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 5 كرات</p>
+                </div>
+                <div class="level-card locked" id="level7Card" onclick="checkLevel7()">
+                    <div class="level-icon">👑</div>
+                    <h3>المستوى 7 - أسطوري</h3>
+                    <p>15 دقيقة لكل سؤال</p>
+                    <p style="color: #ffd700; margin-top: 10px;">🎁 كرة دراغون بول</p>
+                    <p style="color: #e84545; font-size: 12px; margin-top: 5px;">مقفل - تحتاج 6 كرات</p>
+                </div>
+            </div>
+
+            <!-- قسم التحديات -->
+            <div class="challenge-section">
+                <h3 style="color: #4ecca3; margin-bottom: 15px;">🎯 نظام التحديات</h3>
+                <p style="margin-bottom: 15px; color: #ccc;">
+                    <strong>⚠️ تحذير:</strong> في التحدي يمكنك ربح أو خسارة كرات دراغون بول!
+                </p>
+                
+                <div class="challenge-grid" id="challengeGrid">
+                    <!-- سيتم ملؤها ديناميكياً -->
+                </div>
+                
+                <button class="btn btn-challenge" id="challengeBtn" onclick="toggleChallengeMode()">
+                    🔴 وضع التحدي غير نشط
+                </button>
+            </div>
+
+            <div id="challengeNotification" class="challenge-notification" style="display: none;">
+                <h3>🎯 تحدي جديد!</h3>
+                <p id="challengeMessage"></p>
+                <button class="btn" onclick="acceptChallenge()">قبول التحدي</button>
+                <button class="btn btn-secondary" onclick="declineChallenge()">رفض</button>
             </div>
         </div>
 
         <!-- شاشة السؤال -->
         <div id="questionScreen" class="screen">
             <div class="header">
-                <div class="logo">السؤال</div>
+                <div class="logo" id="screenTitle">السؤال</div>
                 <div class="user-info">
                     <span>النقاط: <span id="questionScore" class="score">0</span></span>
                     <div class="timer" id="timer">30</div>
@@ -410,11 +546,48 @@
                     <p style="font-size: 1.2em; margin-bottom: 30px;" id="dragonBallMessage"></p>
                     
                     <div id="dragonBallReward" style="display: none;">
-                        <div style="width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff0000); border-radius: 50%; margin: 0 auto 20px; position: relative;">
-                            <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 24px;">★</span>
-                        </div>
+                        <div class="dragon-ball"></div>
                         <p style="color: #ffd700; font-size: 1.2em; margin: 20px 0;">🎉 لقد ربحت كرة دراغون بول! 🎉</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- شاشة نتائج التحدي -->
+        <div id="challengeResultsScreen" class="screen">
+            <div class="header">
+                <div class="logo">نتائج التحدي</div>
+                <div class="user-info">
+                    <button class="btn" onclick="showScreen('studentScreen')">العودة</button>
+                    <button class="btn btn-exit" onclick="exitGame()">❌ خروج</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <h2 style="color: #4ecca3; margin-bottom: 30px;">نتائج التحدي</h2>
+                
+                <div class="challenge-results">
+                    <div class="player-result">
+                        <h3 id="player1Name"></h3>
+                        <div class="score" id="player1Score">0</div>
+                        <p>الإجابات الصحيحة: <span id="player1Correct">0</span></p>
+                        <div style="margin-top: 15px;">
+                            <span id="player1Result"></span>
+                        </div>
+                    </div>
+                    <div class="player-result">
+                        <h3 id="player2Name"></h3>
+                        <div class="score" id="player2Score">0</div>
+                        <p>الإجابات الصحيحة: <span id="player2Correct">0</span></p>
+                        <div style="margin-top: 15px;">
+                            <span id="player2Result"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 id="challengeWinner" style="color: #ffd700;"></h3>
+                    <p id="dragonBallChange" style="font-size: 1.1em; margin: 15px 0;"></p>
                 </div>
             </div>
         </div>
@@ -464,10 +637,14 @@
                 if (!this.loadData()) {
                     this.saveData({
                         students: [],
+                        challenges: [],
                         lastUpdate: new Date().toISOString()
                     });
                 }
                 this.updateConnectionStatus();
+                
+                // تنظيف التحديات القديمة كل 10 ثواني
+                setInterval(() => this.cleanOldChallenges(), 10000);
             }
 
             loadData() {
@@ -496,6 +673,13 @@
                 return data ? data.students : [];
             }
 
+            getActiveChallenges() {
+                const data = this.loadData();
+                return data ? data.challenges.filter(challenge => 
+                    Date.now() - new Date(challenge.createdAt).getTime() < 300000 // 5 دقائق
+                ) : [];
+            }
+
             updateStudent(student) {
                 const data = this.loadData();
                 if (!data) return false;
@@ -520,9 +704,50 @@
                 return this.saveData(data);
             }
 
+            addChallenge(challenge) {
+                const data = this.loadData();
+                if (!data) return false;
+
+                data.challenges.push({
+                    ...challenge,
+                    id: Date.now(),
+                    createdAt: new Date().toISOString(),
+                    status: 'pending'
+                });
+
+                return this.saveData(data);
+            }
+
+            updateChallenge(challengeId, updates) {
+                const data = this.loadData();
+                if (!data) return false;
+
+                const challengeIndex = data.challenges.findIndex(c => c.id === challengeId);
+                if (challengeIndex !== -1) {
+                    data.challenges[challengeIndex] = {
+                        ...data.challenges[challengeIndex],
+                        ...updates
+                    };
+                    return this.saveData(data);
+                }
+                return false;
+            }
+
+            cleanOldChallenges() {
+                const data = this.loadData();
+                if (!data) return;
+
+                const now = Date.now();
+                data.challenges = data.challenges.filter(challenge => 
+                    now - new Date(challenge.createdAt).getTime() < 300000 // 5 دقائق
+                );
+                this.saveData(data);
+            }
+
             clearAllData() {
                 return this.saveData({
                     students: [],
+                    challenges: [],
                     lastUpdate: new Date().toISOString()
                 });
             }
@@ -558,7 +783,10 @@
             correctAnswers: 0,
             timer: null,
             timeLeft: 30,
-            currentQuestions: []
+            currentQuestions: [],
+            challengeMode: false,
+            activeChallenge: null,
+            isChallenge: false
         };
 
         // دوال إدارة الشاشات
@@ -570,6 +798,9 @@
             
             if (screenId === 'teacherPanel') {
                 loadStudentsData();
+            } else if (screenId === 'studentScreen') {
+                updateStudentDisplay();
+                updateChallengeGrid();
             }
         }
 
@@ -582,21 +813,34 @@
                 return;
             }
 
-            gameData.currentStudent = { name: studentName };
-            gameData.studentScore = 0;
-            gameData.dragonBalls = 0;
+            const allStudents = dataManager.getAllStudents();
+            let student = allStudents.find(s => s.name === studentName);
+            
+            if (student) {
+                gameData.currentStudent = student;
+                gameData.studentScore = student.score || 0;
+                gameData.dragonBalls = student.dragonBalls || 0;
+            } else {
+                gameData.currentStudent = { name: studentName };
+                gameData.studentScore = 0;
+                gameData.dragonBalls = 0;
+            }
 
-            // حفظ التلميذ
+            // تحديث حالة التلميذ
             dataManager.updateStudent({
                 name: studentName,
-                score: 0,
-                dragonBalls: 0,
-                level: 1,
-                online: true
+                score: gameData.studentScore,
+                dragonBalls: gameData.dragonBalls,
+                level: Math.max(1, gameData.currentLevel),
+                online: true,
+                challengeReady: false
             });
 
             updateStudentDisplay();
             showScreen('studentScreen');
+            
+            // التحقق من التحديات
+            checkForChallenges();
         }
 
         // دخول الأستاذ
@@ -617,7 +861,8 @@
                     score: gameData.studentScore,
                     dragonBalls: gameData.dragonBalls,
                     level: Math.max(1, gameData.currentLevel),
-                    online: false
+                    online: false,
+                    challengeReady: false
                 });
                 gameData.currentStudent = null;
             }
@@ -631,10 +876,28 @@
                 document.getElementById('studentScore').textContent = gameData.studentScore;
                 document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
 
-                // فتح المستوى 4 إذا كان مقفولاً
-                const level4Card = document.getElementById('level4Card');
-                if (gameData.dragonBalls >= 3) {
-                    level4Card.classList.remove('locked');
+                // فتح المستويات المقفولة
+                updateLevelLocks();
+            }
+        }
+
+        // تحديث أقفال المستويات
+        function updateLevelLocks() {
+            const levels = {
+                4: 3,  // المستوى 4 يحتاج 3 كرات
+                5: 4,  // المستوى 5 يحتاج 4 كرات
+                6: 5,  // المستوى 6 يحتاج 5 كرات
+                7: 6   // المستوى 7 يحتاج 6 كرات
+            };
+
+            for (const [level, requiredBalls] of Object.entries(levels)) {
+                const levelCard = document.getElementById(`level${level}Card`);
+                if (levelCard) {
+                    if (gameData.dragonBalls >= requiredBalls) {
+                        levelCard.classList.remove('locked');
+                    } else {
+                        levelCard.classList.add('locked');
+                    }
                 }
             }
         }
@@ -655,7 +918,7 @@
                         <div>
                             <strong>${student.name}</strong>
                             <div style="font-size: 14px; color: #4ecca3;">
-                                النقاط: ${student.score} | الكرات: ${student.dragonBalls} | المستوى: ${student.level}
+                                النقاط: ${student.score} | الكرات: ${student.dragonBalls}/7 | المستوى: ${student.level}
                             </div>
                             <div style="font-size: 12px; color: #ccc;">
                                 آخر نشاط: ${new Date(student.lastActive).toLocaleString('ar-EG')}
@@ -672,9 +935,9 @@
         // إضافة تلاميذ تجريبيين
         function addSampleStudents() {
             const sampleStudents = [
-                { name: 'أحمد', score: 150, dragonBalls: 2, level: 2, online: true },
-                { name: 'فاطمة', score: 230, dragonBalls: 3, level: 3, online: true },
-                { name: 'محمد', score: 80, dragonBalls: 1, level: 1, online: false }
+                { name: 'أحمد', score: 150, dragonBalls: 2, level: 2, online: true, challengeReady: false },
+                { name: 'فاطمة', score: 230, dragonBalls: 3, level: 3, online: true, challengeReady: true },
+                { name: 'محمد', score: 80, dragonBalls: 1, level: 1, online: false, challengeReady: false }
             ];
 
             sampleStudents.forEach(student => {
@@ -691,6 +954,113 @@
                 dataManager.clearAllData();
                 loadStudentsData();
                 alert('تم مسح جميع البيانات');
+            }
+        }
+
+        // نظام التحديات
+        function toggleChallengeMode() {
+            if (!gameData.currentStudent) return;
+            
+            gameData.challengeMode = !gameData.challengeMode;
+            const btn = document.getElementById('challengeBtn');
+            
+            if (gameData.challengeMode) {
+                btn.classList.add('active');
+                btn.textContent = '🟢 وضع التحدي نشط - جاهز للتحدي';
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '🔴 وضع التحدي غير نشط';
+            }
+
+            dataManager.updateStudent({
+                name: gameData.currentStudent.name,
+                challengeReady: gameData.challengeMode
+            });
+
+            updateChallengeGrid();
+        }
+
+        function updateChallengeGrid() {
+            const grid = document.getElementById('challengeGrid');
+            if (!grid) return;
+
+            const allStudents = dataManager.getAllStudents();
+            const onlineStudents = allStudents.filter(s => 
+                s.online && s.name !== gameData.currentStudent?.name && s.challengeReady
+            );
+
+            if (onlineStudents.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #ccc; grid-column: 1 / -1;">لا يوجد تلاميذ جاهزين للتحدي</p>';
+                return;
+            }
+
+            grid.innerHTML = onlineStudents.map(student => `
+                <div class="student-challenge ready">
+                    <div><strong>${student.name}</strong></div>
+                    <div style="font-size: 14px; color: #4ecca3;">
+                        ${student.dragonBalls} كرات | ${student.score} نقطة
+                    </div>
+                    <button class="btn btn-challenge" onclick="sendChallenge('${student.name}')" style="padding: 8px 15px; font-size: 14px; margin-top: 8px;">
+                        🔴 تحدى
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function sendChallenge(targetStudentName) {
+            if (!gameData.currentStudent) return;
+
+            const challenge = {
+                from: gameData.currentStudent.name,
+                to: targetStudentName,
+                dragonBalls: Math.min(1, gameData.dragonBalls), // الرهان: كرة واحدة
+                status: 'pending'
+            };
+
+            dataManager.addChallenge(challenge);
+            alert(`تم إرسال تحدي إلى ${targetStudentName}! الرهان: كرة دراغون بول`);
+        }
+
+        function checkForChallenges() {
+            if (!gameData.currentStudent) return;
+
+            const activeChallenges = dataManager.getActiveChallenges();
+            const myChallenge = activeChallenges.find(c => 
+                c.to === gameData.currentStudent.name && c.status === 'pending'
+            );
+
+            if (myChallenge && document.getElementById('challengeNotification').style.display === 'none') {
+                document.getElementById('challengeMessage').textContent = 
+                    `تحدي من ${myChallenge.from}! الرهان: ${myChallenge.dragonBalls} كرة دراغون بول`;
+                document.getElementById('challengeNotification').style.display = 'block';
+                gameData.activeChallenge = myChallenge;
+            }
+        }
+
+        function acceptChallenge() {
+            if (!gameData.activeChallenge) return;
+
+            document.getElementById('challengeNotification').style.display = 'none';
+            
+            // بدء التحدي
+            gameData.isChallenge = true;
+            gameData.currentLevel = 2; // مستوى متوسط للتحديات
+            gameData.currentQuestions = generateQuestions(2);
+            gameData.currentQuestion = 0;
+            gameData.correctAnswers = 0;
+            gameData.timeLeft = 45;
+
+            document.getElementById('screenTitle').textContent = 'تحدي - المستوى المتوسط';
+            showScreen('questionScreen');
+            loadQuestion();
+            startTimer();
+        }
+
+        function declineChallenge() {
+            document.getElementById('challengeNotification').style.display = 'none';
+            if (gameData.activeChallenge) {
+                dataManager.updateChallenge(gameData.activeChallenge.id, { status: 'declined' });
+                gameData.activeChallenge = null;
             }
         }
 
@@ -733,6 +1103,14 @@
                         question = `(${m} + ${n}²) × (${m} - ${n}) ÷ ${m}`;
                         answer = Math.round((m + Math.pow(n, 2)) * (m - n) / m);
                         break;
+
+                    default:
+                        const u = Math.floor(Math.random() * 10) + 1;
+                        const v = Math.floor(Math.random() * 10) + 1;
+                        const w = Math.floor(Math.random() * 10) + 1;
+                        question = `${u} + ${v} × ${w}`;
+                        answer = u + v * w;
+                        break;
                 }
 
                 const options = generateOptions(answer, level);
@@ -762,24 +1140,33 @@
 
         // بدء مستوى
         function startLevel(level) {
+            gameData.isChallenge = false;
             gameData.currentLevel = level;
             gameData.currentQuestions = generateQuestions(level);
             gameData.currentQuestion = 0;
             gameData.correctAnswers = 0;
 
-            gameData.timeLeft = level === 1 ? 30 : level === 2 ? 60 : level === 3 ? 120 : 300;
+            // تحديد الوقت حسب المستوى
+            const levelTimes = {1: 30, 2: 60, 3: 120, 4: 300, 5: 420, 6: 600, 7: 900};
+            gameData.timeLeft = levelTimes[level] || 30;
 
+            document.getElementById('screenTitle').textContent = `المستوى ${level}`;
             showScreen('questionScreen');
             loadQuestion();
             startTimer();
         }
 
-        function checkLevel4() {
-            if (gameData.dragonBalls < 3) {
-                alert('المستوى 4 مقفل! تحتاج إلى 3 كرات دراغون بول على الأقل.');
+        function checkLevel4() { checkLevelAccess(4, 3); }
+        function checkLevel5() { checkLevelAccess(5, 4); }
+        function checkLevel6() { checkLevelAccess(6, 5); }
+        function checkLevel7() { checkLevelAccess(7, 6); }
+
+        function checkLevelAccess(level, requiredBalls) {
+            if (gameData.dragonBalls < requiredBalls) {
+                alert(`المستوى ${level} مقفل! تحتاج إلى ${requiredBalls} كرات دراغون بول على الأقل.`);
                 return;
             }
-            startLevel(4);
+            startLevel(level);
         }
 
         function loadQuestion() {
@@ -870,9 +1257,8 @@
 
         function resetTimer() {
             clearInterval(gameData.timer);
-            gameData.timeLeft = gameData.currentLevel === 1 ? 30 : 
-                               gameData.currentLevel === 2 ? 60 : 
-                               gameData.currentLevel === 3 ? 120 : 300;
+            const levelTimes = {1: 30, 2: 60, 3: 120, 4: 300, 5: 420, 6: 600, 7: 900};
+            gameData.timeLeft = levelTimes[gameData.currentLevel] || 30;
             startTimer();
         }
 
@@ -882,16 +1268,34 @@
 
             gameData.studentScore += earnedPoints;
 
+            if (gameData.isChallenge) {
+                endChallenge();
+                return;
+            }
+
+            // نظام الكرات العادي (90% مطلوب)
             const successRate = gameData.correctAnswers / totalQuestions;
-            if (successRate >= 0.6) {
-                gameData.dragonBalls++;
-                document.getElementById('dragonBallReward').style.display = 'block';
+            let earnedDragonBall = false;
+
+            if (successRate >= 0.9) { // 90% مطلوب
+                if (gameData.dragonBalls < 7) {
+                    gameData.dragonBalls++;
+                    earnedDragonBall = true;
+                }
             }
 
             document.getElementById('correctCount').textContent = gameData.correctAnswers;
             document.getElementById('totalQuestions').textContent = totalQuestions;
             document.getElementById('earnedPoints').textContent = earnedPoints;
             document.getElementById('dragonBalls').textContent = gameData.dragonBalls;
+
+            if (earnedDragonBall) {
+                document.getElementById('dragonBallMessage').textContent = `ممتاز! حصلت على كرة دراغون بول (${Math.round(successRate * 100)}%)`;
+                document.getElementById('dragonBallReward').style.display = 'block';
+            } else {
+                document.getElementById('dragonBallMessage').textContent = `النسبة: ${Math.round(successRate * 100)}% - تحتاج 90% لربح كرة`;
+                document.getElementById('dragonBallReward').style.display = 'none';
+            }
 
             if (gameData.currentStudent) {
                 dataManager.updateStudent({
@@ -905,6 +1309,77 @@
 
             showScreen('resultsScreen');
         }
+
+        function endChallenge() {
+            const totalQuestions = gameData.currentQuestions.length;
+            const myScore = gameData.correctAnswers;
+            
+            // في التحدي الحقيقي، هنا سيتم مقارنة النتائج مع الخصم
+            const opponentScore = Math.floor(Math.random() * (totalQuestions + 1));
+            const iWon = myScore > opponentScore;
+            const dragonBallChange = gameData.activeChallenge?.dragonBalls || 1;
+
+            // تحديث الكرات
+            if (iWon) {
+                gameData.dragonBalls += dragonBallChange;
+            } else {
+                gameData.dragonBalls = Math.max(0, gameData.dragonBalls - dragonBallChange);
+            }
+
+            // عرض النتائج
+            document.getElementById('player1Name').textContent = gameData.currentStudent.name;
+            document.getElementById('player1Score').textContent = myScore * 10;
+            document.getElementById('player1Correct').textContent = myScore;
+            
+            document.getElementById('player2Name').textContent = gameData.activeChallenge.from;
+            document.getElementById('player2Score').textContent = opponentScore * 10;
+            document.getElementById('player2Correct').textContent = opponentScore;
+
+            document.getElementById('player1Result').textContent = iWon ? '🏆 فائز' : '❌ خاسر';
+            document.getElementById('player2Result').textContent = iWon ? '❌ خاسر' : '🏆 فائز';
+
+            document.getElementById('challengeWinner').textContent = iWon ? 
+                `🎉 ${gameData.currentStudent.name} فاز بالتحدي!` : 
+                `🎉 ${gameData.activeChallenge.from} فاز بالتحدي!`;
+
+            document.getElementById('dragonBallChange').textContent = iWon ?
+                `⏫ ربحت ${dragonBallChange} كرة دراغون بول!` :
+                `⏬ خسرت ${dragonBallChange} كرة دراغون بول!`;
+
+            // تحديث بيانات التلميذ
+            if (gameData.currentStudent) {
+                dataManager.updateStudent({
+                    name: gameData.currentStudent.name,
+                    score: gameData.studentScore,
+                    dragonBalls: gameData.dragonBalls,
+                    level: Math.max(1, gameData.currentLevel),
+                    online: true
+                });
+            }
+
+            // تحديث التحدي
+            if (gameData.activeChallenge) {
+                dataManager.updateChallenge(gameData.activeChallenge.id, { 
+                    status: 'completed',
+                    winner: iWon ? gameData.currentStudent.name : gameData.activeChallenge.from,
+                    scores: { [gameData.currentStudent.name]: myScore, [gameData.activeChallenge.from]: opponentScore }
+                });
+            }
+
+            gameData.isChallenge = false;
+            gameData.activeChallenge = null;
+            showScreen('challengeResultsScreen');
+        }
+
+        // تحديث الواجهة كل 3 ثواني
+        setInterval(() => {
+            if (gameData.currentScreen === 'teacherPanel') {
+                loadStudentsData();
+            } else if (gameData.currentScreen === 'studentScreen') {
+                checkForChallenges();
+                updateChallengeGrid();
+            }
+        }, 3000);
 
         // بدء التطبيق
         window.onload = function() {
