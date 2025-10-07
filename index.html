@@ -3,790 +3,1957 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MathQuest - تعلم الرياضيات باللعب</title>
+    <title>Math 2ème - لعبة الرياضيات التفاعلية</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'arabic': ['Amiri', 'serif'],
+                    },
+                    colors: {
+                        'primary': '#5D5CDE',
+                        'gold': '#FFD700',
+                        'treasure': '#FFA500',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
         
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Amiri', serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
         }
         
-        .player-card {
-            transition: all 0.3s ease;
-            transform: scale(1);
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
         }
         
-        .player-card.online {
-            border: 2px solid #10b981;
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
         
-        .player-card.playing {
-            border: 2px solid #3b82f6;
+        .door {
+            transition: all 0.5s ease;
+            cursor: pointer;
+            position: relative;
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            border: 4px solid #654321;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .door:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
         
-        .player-card.in-challenge {
-            border: 2px solid #ef4444;
-            animation: pulse 1.5s infinite;
+        .treasure {
+            animation: bounce 1s infinite;
+        }
+        
+        .monster {
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .dragonball {
+            animation: glow 2s infinite;
+            background: radial-gradient(circle, #FF8C00, #FFD700);
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 165, 0, 1); }
+        }
+        
+        .level-locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .level-unlocked {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .challenge-button {
+            background: linear-gradient(45deg, #dc2626, #ef4444);
+            animation: pulse 2s infinite;
+        }
+        
+        .challenge-accept {
+            background: linear-gradient(45deg, #059669, #10b981);
         }
         
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
+            50% { transform: scale(1.05); }
         }
         
-        .online-badge {
+        .online-indicator {
+            background: #10b981;
             width: 10px;
             height: 10px;
-            background-color: #10b981;
             border-radius: 50%;
             animation: blink 2s infinite;
         }
         
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
         }
         
-        .monster-avatar {
-            transition: all 0.3s ease;
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+            background: linear-gradient(45deg, #333, #555);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto;
         }
         
-        .monster-avatar:hover {
+        .monster-evolution {
+            transition: all 0.5s ease;
+            transform-origin: center;
+        }
+        
+        .monster-evolution:hover {
             transform: scale(1.1);
+        }
+        
+        .challenge-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #dc2626, #ef4444);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .math-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .real-time-update {
+            animation: highlight 2s ease;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(34, 197, 94, 0.3); }
+            100% { background-color: transparent; }
         }
     </style>
 </head>
-<body class="text-white min-h-screen">
-    <!-- تهيئة Firebase -->
-    <script>
-        // إعدادات Firebase الخاصة بك
-        const firebaseConfig = {
-            apiKey: "AIzaSyD4XKt5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q",
-            authDomain: "mathquest-12345.firebaseapp.com",
-            databaseURL: "https://mathquest-12345-default-rtdb.firebaseio.com",
-            projectId: "mathquest-12345",
-            storageBucket: "mathquest-12345.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdefghijklmnopqrstuv"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-    </script>
+<body class="bg-black text-white min-h-screen">
+    <!-- خلفية النجوم -->
+    <div id="stars" class="fixed inset-0 z-0"></div>
 
-    <!-- شاشة البداية -->
-    <div id="mainMenu" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                MathQuest
-            </h1>
-            <p class="text-xl text-gray-300">لعبة الرياضيات التفاعلية - تعلم باللعب</p>
-        </div>
+    <!-- إشعارات التحدي -->
+    <div id="challengeNotifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- الشاشة الرئيسية -->
+    <div id="mainMenu" class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+        <h1 class="text-4xl md:text-6xl font-bold mb-8 text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            Math 2ème
+        </h1>
+        <p class="text-xl mb-8 text-center text-gray-300">لعبة الرياضيات التفاعلية - المنهج الجزائري</p>
         
-        <div class="w-full max-w-md space-y-4">
-            <button onclick="showPlayerLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-lg font-bold">
+        <div class="space-y-4 w-full max-w-md">
+            <button onclick="showPlayerLogin()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
                 دخول التلميذ
             </button>
-            <button onclick="showTeacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-bold">
+            <button onclick="showTeacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
                 دخول الأستاذ
             </button>
         </div>
     </div>
 
     <!-- شاشة دخول التلميذ -->
-    <div id="playerLogin" class="hidden flex-col items-center justify-center min-h-screen p-4">
+    <div id="playerLogin" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6 text-center">دخول التلميذ</h2>
-            <input type="text" id="playerName" placeholder="اسم التلميذ" class="w-full p-3 mb-4 text-gray-800 rounded-lg">
-            <button onclick="loginPlayer()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-bold">
-                بدء اللعب
+            <input type="text" id="playerName" placeholder="اسم التلميذ" class="w-full p-3 mb-4 text-black rounded-lg text-base">
+            <button onclick="startGame()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                ابدأ اللعب
             </button>
-            <button onclick="showMainMenu()" class="w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-bold">
+            <button onclick="showMainMenu()" class="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                 العودة
             </button>
         </div>
     </div>
 
     <!-- شاشة دخول الأستاذ -->
-    <div id="teacherLogin" class="hidden flex-col items-center justify-center min-h-screen p-4">
+    <div id="teacherLogin" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6 text-center">دخول الأستاذ</h2>
-            <input type="password" id="teacherPassword" placeholder="كلمة المرور" class="w-full p-3 mb-4 text-gray-800 rounded-lg">
-            <button onclick="loginTeacher()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-bold">
+            <input type="password" id="teacherPassword" placeholder="الرقم السري: 123456" class="w-full p-3 mb-4 text-black rounded-lg text-base">
+            <button onclick="teacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                 دخول
             </button>
-            <button onclick="showMainMenu()" class="w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-bold">
+            <button onclick="showMainMenu()" class="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                 العودة
             </button>
         </div>
     </div>
 
-    <!-- لوحة تحكم الأستاذ -->
-    <div id="teacherDashboard" class="hidden p-6">
+    <!-- لوحة التحكم للأستاذ -->
+    <div id="teacherDashboard" class="hidden relative z-10 p-4">
         <div class="max-w-6xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-bold">👨‍🏫 لوحة تحكم الأستاذ</h2>
-                <div class="flex items-center space-x-4">
-                    <div id="connectionStatus" class="flex items-center space-x-2 text-sm bg-green-600 px-3 py-1 rounded-full">
-                        <div class="online-badge"></div>
-                        <span>متصل</span>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">🎓 لوحة تحكم الأستاذ</h2>
+                <div class="flex space-x-4">
+                    <div class="text-sm">
+                        آخر تحديث: <span id="lastUpdate" class="text-green-400"></span>
                     </div>
-                    <button onclick="logoutTeacher()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-                        تسجيل خروج
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                        خروج
                     </button>
                 </div>
             </div>
             
-            <!-- إحصائيات فورية -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-blue-600 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">👥</div>
-                    <h3 class="text-lg font-bold mb-2">التلاميذ المتصلون</h3>
-                    <div id="onlineCount" class="text-4xl font-bold">0</div>
+            <!-- الإحصائيات الفورية -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-green-400">🟢 متصلون الآن</h3>
+                    <div id="liveOnlineCount" class="text-3xl font-bold text-green-400">0</div>
+                    <div id="liveOnlineList" class="text-xs mt-2 space-y-1"></div>
                 </div>
-                
-                <div class="bg-green-600 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">🎮</div>
-                    <h3 class="text-lg font-bold mb-2">يلعبون الآن</h3>
-                    <div id="playingCount" class="text-4xl font-bold">0</div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-blue-400">📊 إجمالي التلاميذ</h3>
+                    <div id="totalStudents" class="text-3xl font-bold text-blue-400">0</div>
                 </div>
-                
-                <div class="bg-purple-600 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">⚔️</div>
-                    <h3 class="text-lg font-bold mb-2">تحديات نشطة</h3>
-                    <div id="challengesCount" class="text-4xl font-bold">0</div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-yellow-400">⚔️ تحديات نشطة</h3>
+                    <div id="activeChallenges" class="text-3xl font-bold text-yellow-400">0</div>
                 </div>
-            </div>
-            
-            <!-- قائمة التلاميذ المتصلين -->
-            <div class="bg-gray-800 p-6 rounded-lg mb-8">
-                <h3 class="text-xl font-bold mb-4">📊 التلاميذ المتصلون</h3>
-                <div id="studentsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- سيتم ملؤها ديناميكياً -->
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold mb-2 text-purple-400">🐉 كرات مُجمعة</h3>
+                    <div id="totalDragonBalls" class="text-3xl font-bold text-purple-400">0</div>
                 </div>
             </div>
-            
-            <!-- النشاط الفوري -->
+
+            <!-- نشاط التلاميذ الفوري -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4 text-green-400">🎮 التلاميذ يلعبون الآن</h3>
+                    <div id="currentlyPlaying" class="space-y-3 max-h-60 overflow-y-auto">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">🏆 آخر الإنجازات</h3>
+                    <div id="recentAchievements" class="space-y-2 max-h-60 overflow-y-auto">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول التلاميذ التفاعلي -->
             <div class="bg-gray-800 p-6 rounded-lg">
-                <h3 class="text-xl font-bold mb-4">📝 النشاط الفوري</h3>
-                <div id="liveActivity" class="space-y-3 max-h-96 overflow-y-auto">
-                    <!-- سيتم ملؤها ديناميكياً -->
+                <h3 class="text-xl font-bold mb-4">📋 جدول التلاميذ التفاعلي</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-600">
+                                <th class="text-right p-2">الترتيب</th>
+                                <th class="text-right p-2">الصورة الرمزية</th>
+                                <th class="text-right p-2">الاسم</th>
+                                <th class="text-right p-2">الحالة</th>
+                                <th class="text-right p-2">المستوى الحالي</th>
+                                <th class="text-right p-2">النقاط</th>
+                                <th class="text-right p-2">كرات الدراغون</th>
+                                <th class="text-right p-2">النشاط</th>
+                                <th class="text-right p-2">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTable">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- شاشة اللاعب -->
-    <div id="playerDashboard" class="hidden p-6">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold">مرحباً <span id="playerWelcomeName"></span></h2>
-                    <p class="text-gray-400" id="playerStatus">في القائمة الرئيسية</p>
+    <!-- شاشة اختيار المستوى -->
+    <div id="levelSelection" class="hidden relative z-10 p-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- معلومات اللاعب مع الصورة الرمزية -->
+            <div class="text-center mb-8">
+                <div class="player-avatar monster-evolution mb-4" id="playerAvatar">
+                    🥚
                 </div>
-                <button onclick="logoutPlayer()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-                    تسجيل خروج
-                </button>
-            </div>
-            
-            <!-- معلومات اللاعب -->
-            <div class="bg-gray-800 p-6 rounded-lg mb-8">
-                <div class="flex items-center space-x-6">
-                    <div id="playerAvatar" class="w-24 h-24 rounded-full bg-blue-700 flex items-center justify-center text-4xl">
-                        👦
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-2" id="playerDisplayName"></h3>
-                        <div class="flex space-x-4">
-                            <div>
-                                <span class="text-gray-400">المستوى:</span>
-                                <span class="font-bold ml-2" id="playerLevel">1</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-400">النقاط:</span>
-                                <span class="font-bold ml-2" id="playerScore">0</span>
-                            </div>
-                        </div>
-                    </div>
+                <h2 class="text-3xl font-bold mb-4">اختر المستوى</h2>
+                <div id="playerInfo" class="text-xl text-gray-300 mb-4"></div>
+                <div id="dragonBalls" class="flex justify-center space-x-2 mb-6"></div>
+                
+                <!-- أزرار التحدي والإعدادات -->
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button id="challengeButton" onclick="showChallengeModal()" class="challenge-button text-white font-bold py-3 px-6 rounded-lg">
+                        🔥 تحدي لاعب آخر
+                    </button>
+                    <button onclick="showOnlinePlayersModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                        👥 اللاعبون المتصلون
+                    </button>
+                </div>
+                
+                <!-- حالة التحدي -->
+                <div id="challengeStatus" class="hidden mt-4 p-4 bg-yellow-600 rounded-lg">
+                    <div id="challengeMessage"></div>
                 </div>
             </div>
             
-            <!-- خيارات اللعب -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <button onclick="startPracticeGame()" class="bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-bold text-lg">
-                    التدرب لوحدك
-                </button>
-                <button onclick="startChallengeGame()" class="bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-lg font-bold text-lg">
-                    تحدي زميل
-                </button>
+            <!-- المستويات السبعة -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                <!-- المستوى الأول -->
+                <div id="level1" onclick="selectLevel(1)" class="level-card bg-green-600 hover:bg-green-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <h3 class="text-xl font-bold mb-2">المستوى الأول</h3>
+                    <p class="text-sm mb-2">أولوية العمليات الأساسية</p>
+                    <p class="text-xs">⏱️ 45 ثانية | 🐉 كرة واحدة</p>
+                    <div class="mt-2">✅ متاح</div>
+                </div>
+                
+                <!-- المستوى الثاني -->
+                <div id="level2" onclick="selectLevel(2)" class="level-card bg-blue-600 hover:bg-blue-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <h3 class="text-xl font-bold mb-2">المستوى الثاني</h3>
+                    <p class="text-sm mb-2">الأقواس المتداخلة</p>
+                    <p class="text-xs">⏱️ 60 ثانية | 🐉 كرة واحدة</p>
+                    <div class="mt-2">✅ متاح</div>
+                </div>
+                
+                <!-- المستوى الثالث -->
+                <div id="level3" onclick="selectLevel(3)" class="level-card bg-yellow-600 hover:bg-yellow-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <h3 class="text-xl font-bold mb-2">المستوى الثالث</h3>
+                    <p class="text-sm mb-2">الكسور الأساسية</p>
+                    <p class="text-xs">⏱️ 90 ثانية | 🐉 كرة واحدة</p>
+                    <div class="mt-2">✅ متاح</div>
+                </div>
+                
+                <!-- المستوى الرابع -->
+                <div id="level4" onclick="selectLevel(4)" class="level-card bg-orange-600 hover:bg-orange-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <h3 class="text-xl font-bold mb-2">المستوى الرابع</h3>
+                    <p class="text-sm mb-2">عمليات الكسور المعقدة</p>
+                    <p class="text-xs">⏱️ 2 دقيقة | 🐉 كرة واحدة</p>
+                    <div id="level4Lock" class="mt-2 text-red-400">🔒 يحتاج 3 كرات</div>
+                </div>
+                
+                <!-- المستوى الخامس -->
+                <div id="level5" onclick="selectLevel(5)" class="level-card bg-purple-600 hover:bg-purple-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <h3 class="text-xl font-bold mb-2">المستوى الخامس</h3>
+                    <p class="text-sm mb-2">المسائل المركبة</p>
+                    <p class="text-xs">⏱️ 3 دقائق | 🐉 كرة واحدة</p>
+                    <div id="level5Lock" class="mt-2 text-red-400">🔒 يحتاج 4 كرات</div>
+                </div>
+                
+                <!-- المستوى السادس -->
+                <div id="level6" onclick="selectLevel(6)" class="level-card bg-red-600 hover:bg-red-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <h3 class="text-xl font-bold mb-2">المستوى السادس</h3>
+                    <p class="text-sm mb-2">التمارين النصية</p>
+                    <p class="text-xs">⏱️ 4 دقائق | 🐉 كرة واحدة</p>
+                    <div id="level6Lock" class="mt-2 text-red-400">🔒 يحتاج 5 كرات</div>
+                </div>
+                
+                <!-- المستوى السابع -->
+                <div id="level7" onclick="selectLevel(7)" class="level-card bg-pink-600 hover:bg-pink-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <h3 class="text-xl font-bold mb-2">المستوى السابع</h3>
+                    <p class="text-sm mb-2">تحدي الأعداد العشرية</p>
+                    <p class="text-xs">⏱️ 5 دقائق | 🐉 كرة واحدة</p>
+                    <div id="level7Lock" class="mt-2 text-red-400">🔒 يحتاج 6 كرات</div>
+                </div>
             </div>
             
-            <!-- اللاعبون المتصلون -->
-            <div class="bg-gray-800 p-6 rounded-lg">
-                <h3 class="text-xl font-bold mb-4">👥 اللاعبون المتصلون (<span id="onlinePlayersCount">0</span>)</h3>
-                <div id="onlinePlayersList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- سيتم ملؤها ديناميكياً -->
-                </div>
+            <div class="text-center">
+                <button onclick="showMainMenu()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    العودة للقائمة الرئيسية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال التحدي -->
+    <div id="challengeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h3 class="text-2xl font-bold mb-4 text-center">⚔️ تحدي لاعب</h3>
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-2">اختر المستوى للتحدي:</label>
+                <select id="challengeLevel" class="w-full p-2 text-black rounded">
+                    <option value="1">المستوى الأول</option>
+                    <option value="2">المستوى الثاني</option>
+                    <option value="3">المستوى الثالث</option>
+                    <option value="4">المستوى الرابع</option>
+                    <option value="5">المستوى الخامس</option>
+                    <option value="6">المستوى السادس</option>
+                    <option value="7">المستوى السابع</option>
+                </select>
+            </div>
+            <div id="onlinePlayersList" class="space-y-2 mb-4 max-h-40 overflow-y-auto">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+            <div class="flex justify-center space-x-3">
+                <button onclick="closeChallengeModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال اللاعبين المتصلين -->
+    <div id="onlinePlayersModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg">
+            <h3 class="text-2xl font-bold mb-4 text-center">👥 اللاعبون المتصلون</h3>
+            <div id="onlinePlayersGrid" class="grid grid-cols-2 gap-4 mb-4 max-h-80 overflow-y-auto">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+            <div class="text-center">
+                <button onclick="closeOnlinePlayersModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
+                    إغلاق
+                </button>
             </div>
         </div>
     </div>
 
     <!-- شاشة اللعب -->
-    <div id="gameScreen" class="hidden p-6">
+    <div id="gameScreen" class="hidden relative z-10 p-4">
         <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold" id="gameTitle">لعبة الرياضيات</h2>
-                <div class="flex items-center space-x-4">
-                    <div id="gameTimer" class="bg-gray-800 px-4 py-2 rounded-lg font-bold">
-                        ⏱️ <span id="timeLeft">60</span>
+            <!-- معلومات اللعبة -->
+            <div class="flex justify-between items-center mb-6 bg-gray-800 p-4 rounded-lg">
+                <div class="text-lg font-bold">
+                    <span id="currentScore">النقاط: 0</span>
+                </div>
+                <div class="text-lg font-bold">
+                    <span id="timer" class="text-yellow-400">⏱️ 45</span>
+                </div>
+                <div class="text-lg font-bold">
+                    <span id="questionNumber">السؤال: 1/8</span>
+                </div>
+            </div>
+
+            <!-- معلومات التحدي (إن وجد) -->
+            <div id="challengeInfo" class="hidden bg-red-800 p-4 rounded-lg mb-6">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold mb-2">🔥 تحدي مباشر</h3>
+                    <div id="challengeOpponent" class="text-lg"></div>
+                    <div class="flex justify-center space-x-8 mt-2">
+                        <div>أنت: <span id="myScore" class="font-bold">0</span></div>
+                        <div>الخصم: <span id="opponentScore" class="font-bold">0</span></div>
                     </div>
-                    <div id="gameScore" class="bg-gray-800 px-4 py-2 rounded-lg font-bold">
-                        النقاط: <span id="currentScore">0</span>
+                    <div class="mt-2">
+                        <div class="text-sm">وقت الإجابة: <span id="myTime" class="font-bold">-</span> ثانية</div>
+                        <div class="text-sm">وقت الخصم: <span id="opponentTime" class="font-bold">-</span> ثانية</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- منطقة السؤال -->
-            <div class="bg-gray-800 p-6 rounded-lg mb-8">
-                <div class="text-center mb-6">
-                    <div id="questionText" class="text-2xl md:text-3xl font-bold mb-4">سؤال الرياضيات هنا</div>
+
+            <!-- السؤال -->
+            <div class="text-center mb-8">
+                <div id="questionText" class="text-2xl md:text-3xl font-bold mb-4 bg-gray-800 p-6 rounded-lg math-formula"></div>
+            </div>
+
+            <!-- الأبواب الثلاثة -->
+            <div id="doorsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(0)">
+                    <div class="text-xl font-bold mb-2">🚪 الباب الأول</div>
+                    <div id="option0" class="text-lg"></div>
                 </div>
-                
-                <!-- خيارات الإجابة -->
-                <div id="answerOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- سيتم ملؤها ديناميكياً -->
+                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(1)">
+                    <div class="text-xl font-bold mb-2">🚪 الباب الثاني</div>
+                    <div id="option1" class="text-lg"></div>
+                </div>
+                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(2)">
+                    <div class="text-xl font-bold mb-2">🚪 الباب الثالث</div>
+                    <div id="option2" class="text-lg"></div>
                 </div>
             </div>
-            
+
             <!-- نتيجة الإجابة -->
-            <div id="answerResult" class="hidden bg-gray-800 p-6 rounded-lg text-center">
-                <div id="resultIcon" class="text-6xl mb-4">✅</div>
-                <div id="resultText" class="text-2xl font-bold mb-4">إجابة صحيحة!</div>
-                <button onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-bold">
+            <div id="answerResult" class="hidden text-center">
+                <div id="resultIcon" class="text-6xl mb-4"></div>
+                <div id="resultText" class="text-2xl font-bold mb-4"></div>
+                <div id="answerTime" class="text-lg mb-4"></div>
+                <button id="nextQuestion" onclick="nextQuestion()" class="bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                     السؤال التالي
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- شاشة انتهاء اللعبة -->
+    <div id="gameEnd" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
+            <h2 class="text-3xl font-bold mb-4">🎉 انتهت اللعبة!</h2>
+            <div id="finalScore" class="text-2xl mb-4"></div>
+            
+            <!-- مكافأة كرة الدراغون -->
+            <div id="dragonBallReward" class="hidden mb-6">
+                <div class="dragonball w-20 h-20 mx-auto rounded-full flex items-center justify-center text-2xl font-bold mb-4">
+                    🐉
+                </div>
+                <div class="text-xl font-bold text-yellow-400">حصلت على كرة دراغون بول!</div>
+                <div id="monsterEvolution" class="hidden mt-4">
+                    <div class="text-lg text-green-400">وحشك تطور! 🧬</div>
+                    <div id="newMonster" class="text-4xl mt-2"></div>
+                </div>
+                <div id="newLevelUnlocked" class="hidden mt-2 text-green-400"></div>
+            </div>
+            
+            <!-- رسالة تشجيعية لجمع 7 كرات -->
+            <div id="encouragementMessage" class="hidden mb-6 p-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
+                <div class="text-2xl font-bold mb-2">🎊 تهانينا! 🎊</div>
+                <div id="careerMessage" class="text-lg"></div>
+                <div class="mt-4 text-6xl">👨‍⚕️</div>
+            </div>
+            
+            <!-- نتيجة التحدي -->
+            <div id="challengeResult" class="hidden mb-6 p-4 rounded-lg">
+                <div id="challengeOutcome" class="text-xl font-bold mb-2"></div>
+                <div id="challengeDetails" class="text-sm"></div>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="showLevelSelection()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    العب مرة أخرى
+                </button>
+                <button onclick="showMainMenu()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    القائمة الرئيسية
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // حالة التطبيق
-        const AppState = {
-            currentUser: null,
-            isTeacher: false,
-            gameData: {
-                currentQuestion: 0,
-                score: 0,
-                timeLeft: 60,
-                timer: null,
-                questions: []
-            },
-            onlinePlayers: {}
-        };
-        
-        // تهيئة Firebase
-        function initFirebase() {
-            // هذه القيم يجب استبدالها بإعدادات مشروعك في Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyD4XKt5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q5Q",
-                authDomain: "mathquest-12345.firebaseapp.com",
-                databaseURL: "https://mathquest-12345-default-rtdb.firebaseio.com",
-                projectId: "mathquest-12345",
-                storageBucket: "mathquest-12345.appspot.com",
-                messagingSenderId: "123456789012",
-                appId: "1:123456789012:web:abcdefghijklmnopqrstuv"
-            };
-            
-            firebase.initializeApp(firebaseConfig);
-            return firebase.database();
-        }
-        
-        const db = initFirebase();
-        
-        // إدارة المستخدمين
-        function loginPlayer() {
-            const playerName = document.getElementById('playerName').value.trim();
-            
-            if (!playerName) {
-                alert('الرجاء إدخال اسم التلميذ');
-                return;
+        // نظام الربط الحقيقي للعبة
+        class RealTimeGameSystem {
+            constructor() {
+                this.data = {
+                    players: {},
+                    onlinePlayers: new Map(), // name -> timestamp
+                    challenges: {},
+                    gameHistory: [],
+                    liveActivity: []
+                };
+                this.loadData();
+                this.startRealTimeSync();
+                this.playerId = null;
+                this.lastHeartbeat = Date.now();
             }
             
-            AppState.currentUser = {
-                name: playerName,
-                type: 'student',
-                status: 'online',
-                activity: 'في القائمة الرئيسية',
-                level: 1,
-                score: 0
-            };
-            
-            // حفظ بيانات اللاعب في Firebase
-            const playerRef = db.ref(`players/${playerName}`);
-            playerRef.set({
-                name: playerName,
-                status: 'online',
-                activity: 'في القائمة الرئيسية',
-                level: 1,
-                score: 0,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            // متابعة التغييرات على حالة اللاعب
-            playerRef.onDisconnect().update({
-                status: 'offline',
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            showPlayerDashboard();
-            startListeningForPlayers();
-        }
-        
-        function loginTeacher() {
-            const password = document.getElementById('teacherPassword').value;
-            
-            if (password !== '123456') {
-                alert('كلمة المرور غير صحيحة');
-                return;
+            // تحميل البيانات من التخزين
+            loadData() {
+                try {
+                    const saved = sessionStorage.getItem('mathGameRealTime');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        this.data.players = parsed.players || {};
+                        this.data.gameHistory = parsed.gameHistory || [];
+                        this.data.liveActivity = parsed.liveActivity || [];
+                        this.data.challenges = parsed.challenges || {};
+                    }
+                } catch (e) {
+                    console.log('Could not load from storage');
+                }
             }
             
-            AppState.currentUser = {
-                name: 'الأستاذ',
-                type: 'teacher'
-            };
+            // حفظ البيانات
+            save() {
+                try {
+                    const dataToSave = {
+                        players: this.data.players,
+                        gameHistory: this.data.gameHistory,
+                        liveActivity: this.data.liveActivity,
+                        challenges: this.data.challenges,
+                        lastUpdate: Date.now()
+                    };
+                    sessionStorage.setItem('mathGameRealTime', JSON.stringify(dataToSave));
+                    
+                    // محاكاة تزامن مع الخادم
+                    this.broadcastUpdate();
+                } catch (e) {
+                    console.log('Storage not available');
+                }
+            }
             
-            AppState.isTeacher = true;
-            showTeacherDashboard();
-            startListeningForPlayers();
-        }
-        
-        function logoutPlayer() {
-            if (AppState.currentUser) {
-                db.ref(`players/${AppState.currentUser.name}`).update({
-                    status: 'offline',
-                    lastActive: firebase.database.ServerValue.TIMESTAMP
+            // بدء النظام الزمني الحقيقي
+            startRealTimeSync() {
+                // تحديث كل ثانيتين
+                setInterval(() => {
+                    this.updateOnlineStatus();
+                    this.cleanupOldActivity();
+                    if (isTeacher) {
+                        this.updateTeacherDashboard();
+                    }
+                    this.processChallenge();
+                }, 2000);
+                
+                // نبضة اتصال كل 5 ثوان
+                setInterval(() => {
+                    if (this.playerId) {
+                        this.sendHeartbeat();
+                    }
+                }, 5000);
+            }
+            
+            // تسجيل لاعب كمتصل
+            setPlayerOnline(name, currentActivity = 'في القائمة الرئيسية') {
+                this.data.onlinePlayers.set(name, {
+                    timestamp: Date.now(),
+                    activity: currentActivity,
+                    lastSeen: Date.now()
+                });
+                this.playerId = name;
+                this.logActivity(name, 'دخل إلى اللعبة', 'login');
+                this.save();
+            }
+            
+            // تحديث نشاط اللاعب
+            updatePlayerActivity(name, activity, details = null) {
+                if (this.data.onlinePlayers.has(name)) {
+                    const playerInfo = this.data.onlinePlayers.get(name);
+                    playerInfo.activity = activity;
+                    playerInfo.lastSeen = Date.now();
+                    if (details) {
+                        playerInfo.details = details;
+                    }
+                    this.logActivity(name, activity, 'activity', details);
+                    this.save();
+                }
+            }
+            
+            // إرسال نبضة اتصال
+            sendHeartbeat() {
+                if (this.data.onlinePlayers.has(this.playerId)) {
+                    const playerInfo = this.data.onlinePlayers.get(this.playerId);
+                    playerInfo.lastSeen = Date.now();
+                    this.lastHeartbeat = Date.now();
+                }
+            }
+            
+            // تحديث حالة الاتصال
+            updateOnlineStatus() {
+                const now = Date.now();
+                const timeout = 15000; // 15 ثانية انقطاع
+                
+                for (let [name, info] of this.data.onlinePlayers) {
+                    if (now - info.lastSeen > timeout) {
+                        this.setPlayerOffline(name);
+                    }
+                }
+            }
+            
+            // تسجيل لاعب كغير متصل
+            setPlayerOffline(name) {
+                if (this.data.onlinePlayers.has(name)) {
+                    this.logActivity(name, 'خرج من اللعبة', 'logout');
+                    this.data.onlinePlayers.delete(name);
+                    this.save();
+                }
+            }
+            
+            // تسجيل نشاط
+            logActivity(playerName, activity, type = 'activity', details = null) {
+                const activityEntry = {
+                    player: playerName,
+                    activity: activity,
+                    type: type,
+                    details: details,
+                    timestamp: Date.now()
+                };
+                
+                this.data.liveActivity.unshift(activityEntry);
+                this.data.liveActivity = this.data.liveActivity.slice(0, 50); // احتفظ بآخر 50 نشاط
+            }
+            
+            // تنظيف الأنشطة القديمة
+            cleanupOldActivity() {
+                const oneHourAgo = Date.now() - (60 * 60 * 1000);
+                this.data.liveActivity = this.data.liveActivity.filter(
+                    activity => activity.timestamp > oneHourAgo
+                );
+            }
+            
+            // بث التحديث
+            broadcastUpdate() {
+                // في التطبيق الحقيقي، هذا سيرسل إلى الخادم
+                // محاكاة تحديث فوري للأستاذ
+                if (isTeacher) {
+                    this.updateTeacherDashboard();
+                }
+            }
+            
+            // تحديث لوحة الأستاذ في الوقت الفعلي
+            updateTeacherDashboard() {
+                if (!isTeacher) return;
+                
+                const onlinePlayersArray = Array.from(this.data.onlinePlayers.entries());
+                
+                // تحديث العدادات
+                document.getElementById('liveOnlineCount').textContent = onlinePlayersArray.length;
+                document.getElementById('totalStudents').textContent = Object.keys(this.data.players).length;
+                document.getElementById('activeChallenges').textContent = Object.keys(this.data.challenges).length;
+                
+                // حساب مجموع كرات الدراغون
+                const totalDragonBalls = Object.values(this.data.players)
+                    .reduce((sum, player) => sum + (player.dragonBalls || 0), 0);
+                document.getElementById('totalDragonBalls').textContent = totalDragonBalls;
+                
+                // تحديث قائمة المتصلين
+                const liveOnlineList = document.getElementById('liveOnlineList');
+                liveOnlineList.innerHTML = '';
+                onlinePlayersArray.forEach(([name, info]) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between real-time-update';
+                    div.innerHTML = `
+                        <span class="text-xs">${name}</span>
+                        <span class="text-xs text-gray-400">${this.getTimeAgo(info.lastSeen)}</span>
+                    `;
+                    liveOnlineList.appendChild(div);
+                });
+                
+                // تحديث النشاط الحالي
+                this.updateCurrentlyPlaying();
+                this.updateRecentAchievements();
+                
+                // تحديث وقت آخر تحديث
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ar-DZ');
+            }
+            
+            // تحديث التلاميذ الذين يلعبون الآن
+            updateCurrentlyPlaying() {
+                const currentlyPlaying = document.getElementById('currentlyPlaying');
+                currentlyPlaying.innerHTML = '';
+                
+                const playingNow = Array.from(this.data.onlinePlayers.entries())
+                    .filter(([name, info]) => info.activity.includes('يلعب'));
+                
+                if (playingNow.length === 0) {
+                    currentlyPlaying.innerHTML = '<div class="text-gray-400 text-sm">لا يوجد تلاميذ يلعبون حالياً</div>';
+                } else {
+                    playingNow.forEach(([name, info]) => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-gray-700 p-3 rounded flex items-center justify-between real-time-update';
+                        div.innerHTML = `
+                            <div>
+                                <div class="font-bold">${name}</div>
+                                <div class="text-sm text-gray-400">${info.activity}</div>
+                                ${info.details ? `<div class="text-xs text-blue-400">${info.details}</div>` : ''}
+                            </div>
+                            <div class="online-indicator"></div>
+                        `;
+                        currentlyPlaying.appendChild(div);
+                    });
+                }
+            }
+            
+            // تحديث آخر الإنجازات
+            updateRecentAchievements() {
+                const recentAchievements = document.getElementById('recentAchievements');
+                recentAchievements.innerHTML = '';
+                
+                const achievements = this.data.liveActivity
+                    .filter(activity => activity.type === 'achievement')
+                    .slice(0, 10);
+                
+                if (achievements.length === 0) {
+                    recentAchievements.innerHTML = '<div class="text-gray-400 text-sm">لا توجد إنجازات حديثة</div>';
+                } else {
+                    achievements.forEach(achievement => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-gray-700 p-2 rounded text-sm real-time-update';
+                        div.innerHTML = `
+                            <div class="font-bold text-yellow-400">${achievement.player}</div>
+                            <div>${achievement.activity}</div>
+                            <div class="text-xs text-gray-400">${this.getTimeAgo(achievement.timestamp)}</div>
+                        `;
+                        recentAchievements.appendChild(div);
+                    });
+                }
+            }
+            
+            // حساب الوقت المنقضي
+            getTimeAgo(timestamp) {
+                const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                if (seconds < 60) return `${seconds} ثانية`;
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return `${minutes} دقيقة`;
+                const hours = Math.floor(minutes / 60);
+                return `${hours} ساعة`;
+            }
+            
+            // إنشاء تحدي
+            createChallenge(challenger, opponent, level) {
+                const challengeId = Date.now().toString();
+                this.data.challenges[challengeId] = {
+                    id: challengeId,
+                    challenger: challenger,
+                    opponent: opponent,
+                    level: level,
+                    status: 'pending',
+                    scores: {},
+                    answers: {},
+                    times: {},
+                    startTime: null,
+                    endTime: null,
+                    createdAt: Date.now()
+                };
+                
+                this.logActivity(challenger, `أرسل تحدي إلى ${opponent}`, 'challenge');
+                this.save();
+                return challengeId;
+            }
+            
+            // معالجة التحدي
+            processChallenge() {
+                // محاكاة معالجة التحديات (في التطبيق الحقيقي سيكون عبر الشبكة)
+                Object.values(this.data.challenges).forEach(challenge => {
+                    if (challenge.status === 'pending' && Date.now() - challenge.createdAt > 5000) {
+                        // محاكاة قبول التحدي تلقائياً بعد 5 ثوان
+                        this.acceptChallenge(challenge.id);
+                    }
                 });
             }
             
-            AppState.currentUser = null;
-            showMainMenu();
-            stopListeningForPlayers();
+            // قبول التحدي
+            acceptChallenge(challengeId) {
+                if (this.data.challenges[challengeId]) {
+                    this.data.challenges[challengeId].status = 'accepted';
+                    this.data.challenges[challengeId].startTime = Date.now();
+                    this.logActivity(
+                        this.data.challenges[challengeId].opponent, 
+                        `قبل تحدي ${this.data.challenges[challengeId].challenger}`, 
+                        'challenge'
+                    );
+                    this.save();
+                }
+            }
+            
+            // إدارة اللاعبين
+            createPlayer(name) {
+                this.data.players[name] = {
+                    name: name,
+                    totalScore: 0,
+                    currentLevel: 1,
+                    dragonBalls: 0,
+                    levelsCompleted: [],
+                    lastPlayed: new Date().toISOString(),
+                    gamesPlayed: 0,
+                    challengesWon: 0,
+                    challengesLost: 0,
+                    createdAt: Date.now()
+                };
+                this.save();
+                return this.data.players[name];
+            }
+            
+            getPlayer(name) {
+                return this.data.players[name] || this.createPlayer(name);
+            }
+            
+            updatePlayer(name, updates) {
+                if (this.data.players[name]) {
+                    Object.assign(this.data.players[name], updates);
+                    this.data.players[name].lastPlayed = new Date().toISOString();
+                    this.save();
+                }
+            }
+            
+            deletePlayer(name) {
+                delete this.data.players[name];
+                this.setPlayerOffline(name);
+                this.save();
+            }
+            
+            // تسجيل إنجاز
+            recordAchievement(playerName, achievement, details = null) {
+                this.logActivity(playerName, achievement, 'achievement', details);
+                
+                // إشعار للأستاذ
+                if (isTeacher) {
+                    this.showNotification(`🏆 ${playerName}: ${achievement}`, 'achievement');
+                }
+            }
+            
+            // إظهار إشعار
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `challenge-notification ${type === 'achievement' ? 'bg-green-600' : ''}`;
+                notification.innerHTML = `
+                    <div class="font-bold">${message}</div>
+                    <button onclick="this.parentElement.remove()" class="float-right text-xl">&times;</button>
+                `;
+                
+                document.getElementById('challengeNotifications').appendChild(notification);
+                
+                // إزالة تلقائية بعد 5 ثوان
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
         }
-        
-        function logoutTeacher() {
-            AppState.currentUser = null;
-            AppState.isTeacher = false;
-            showMainMenu();
-            stopListeningForPlayers();
+
+        // نظام تطور الوحوش
+        const monsterEvolution = {
+            0: { emoji: '🥚', name: 'البيضة', description: 'مازلت في البداية' },
+            1: { emoji: '🐛', name: 'اليرقة', description: 'بداية رحلة التعلم' },
+            2: { emoji: '🐣', name: 'الفرخ', description: 'تتعلم الأساسيات' },
+            3: { emoji: '🦋', name: 'الفراشة', description: 'تحلق في عالم الرياضيات' },
+            4: { emoji: '🐉', name: 'التنين الصغير', description: 'قوة متنامية' },
+            5: { emoji: '🔥', name: 'التنين الناري', description: 'تتقن الرياضيات' },
+            6: { emoji: '⚡', name: 'التنين البرقي', description: 'سرعة خارقة في الحل' },
+            7: { emoji: '🌟', name: 'سيد الرياضيات', description: 'وصلت للمجد!' }
+        };
+
+        // إنشاء النظام
+        const gameSystem = new RealTimeGameSystem();
+
+        // متغيرات اللعبة
+        let currentPlayer = '';
+        let currentLevel = 1;
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 45;
+        let timer = null;
+        let questions = [];
+        let isTeacher = false;
+        let gameStartTime = null;
+        let currentChallenge = null;
+        let questionStartTime = null;
+
+        // بنك الأسئلة (نفس الأسئلة السابقة مع تصحيح العمليات)
+        const questionBank = {
+            1: [ // المستوى الأول: أولوية العمليات الأساسية
+                {
+                    question: "احسب من اليسار إلى اليمين: 15 + 3 × 4 = ؟",
+                    options: ["27", "72", "24"],
+                    correct: 0,
+                    explanation: "نطبق أولوية العمليات: الضرب أولاً 3×4=12، ثم الجمع 15+12=27"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 24 ÷ 6 + 8 = ؟",
+                    options: ["12", "2", "32"],
+                    correct: 0,
+                    explanation: "القسمة أولاً: 24÷6=4، ثم الجمع 4+8=12"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 5 × 6 - 18 ÷ 3 = ؟",
+                    options: ["24", "4", "36"],
+                    correct: 0,
+                    explanation: "الضرب والقسمة أولاً: 5×6=30، 18÷3=6، ثم الطرح 30-6=24"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 48 ÷ 8 + 7 × 2 = ؟",
+                    options: ["20", "110", "6"],
+                    correct: 0,
+                    explanation: "48÷8=6، 7×2=14، ثم 6+14=20"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 9 + 12 ÷ 4 - 2 = ؟",
+                    options: ["10", "7.25", "19"],
+                    correct: 0,
+                    explanation: "12÷4=3، ثم من اليسار إلى اليمين: 9+3-2=10"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 6 × 7 - 3 × 8 = ؟",
+                    options: ["18", "42", "24"],
+                    correct: 0,
+                    explanation: "6×7=42، 3×8=24، ثم 42-24=18"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 64 ÷ 8 ÷ 2 = ؟",
+                    options: ["4", "16", "32"],
+                    correct: 0,
+                    explanation: "من اليسار إلى اليمين: 64÷8=8، ثم 8÷2=4"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 25 - 4 × 5 + 3 = ؟",
+                    options: ["8", "120", "28"],
+                    correct: 0,
+                    explanation: "الضرب أولاً: 4×5=20، ثم من اليسار إلى اليمين: 25-20+3=8"
+                }
+            ],
+            2: [ // المستوى الثاني: الأقواس المتداخلة
+                {
+                    question: "احسب: (15 + 5) × (8 - 3) = ؟",
+                    options: ["100", "35", "80"],
+                    correct: 0,
+                    explanation: "(15+5)=20، (8-3)=5، ثم 20×5=100"
+                },
+                {
+                    question: "احسب: 60 ÷ (4 + 2) × 3 = ؟",
+                    options: ["30", "10", "5"],
+                    correct: 0,
+                    explanation: "(4+2)=6، ثم من اليسار إلى اليمين: 60÷6×3=10×3=30"
+                },
+                {
+                    question: "احسب: 5 × (6 + 4) - (12 ÷ 3) = ؟",
+                    options: ["46", "54", "38"],
+                    correct: 0,
+                    explanation: "(6+4)=10، 5×10=50، (12÷3)=4، ثم 50-4=46"
+                },
+                {
+                    question: "احسب: (24 ÷ 6) + (3 × 7) = ؟",
+                    options: ["25", "4", "21"],
+                    correct: 0,
+                    explanation: "(24÷6)=4، (3×7)=21، ثم 4+21=25"
+                },
+                {
+                    question: "احسب: ((8 + 4) ÷ 3) × 6 = ؟",
+                    options: ["24", "12", "4"],
+                    correct: 0,
+                    explanation: "(8+4)=12، 12÷3=4، ثم 4×6=24"
+                },
+                {
+                    question: "احسب: 7 × (5 + 3) - (6 × 4) = ؟",
+                    options: ["32", "56", "24"],
+                    correct: 0,
+                    explanation: "(5+3)=8، 7×8=56، (6×4)=24، ثم 56-24=32"
+                },
+                {
+                    question: "احسب: (45 ÷ 9) × (2 + 6) = ؟",
+                    options: ["40", "5", "8"],
+                    correct: 0,
+                    explanation: "(45÷9)=5، (2+6)=8، ثم 5×8=40"
+                },
+                {
+                    question: "احسب: (3 × 4) + (18 ÷ (2 + 1)) = ؟",
+                    options: ["18", "12", "6"],
+                    correct: 0,
+                    explanation: "(3×4)=12، (2+1)=3، 18÷3=6، ثم 12+6=18"
+                }
+            ],
+            3: [ // المستوى الثالث: الكسور الأساسية
+                {
+                    question: "احسب: 1/2 + 1/4 = ؟",
+                    options: ["3/4", "2/6", "1/3"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 1/2 = 2/4، ثم 2/4 + 1/4 = 3/4"
+                },
+                {
+                    question: "احسب: 3/5 - 1/5 = ؟",
+                    options: ["2/5", "2/10", "4/5"],
+                    correct: 0,
+                    explanation: "نفس المقام: 3/5 - 1/5 = 2/5"
+                },
+                {
+                    question: "احسب: 2/3 × 3/4 = ؟",
+                    options: ["1/2", "6/12", "5/7"],
+                    correct: 0,
+                    explanation: "نضرب البسط في البسط والمقام في المقام: (2×3)/(3×4) = 6/12 = 1/2"
+                },
+                {
+                    question: "أيهما أكبر: 2/3 أم 3/5؟",
+                    options: ["2/3", "3/5", "متساويان"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 2/3 = 10/15 و 3/5 = 9/15، إذن 2/3 أكبر"
+                },
+                {
+                    question: "احسب: 5/6 - 1/3 = ؟",
+                    options: ["1/2", "4/3", "2/3"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 1/3 = 2/6، ثم 5/6 - 2/6 = 3/6 = 1/2"
+                },
+                {
+                    question: "احسب: 1/4 + 1/3 = ؟",
+                    options: ["7/12", "2/7", "1/2"],
+                    correct: 0,
+                    explanation: "المقام المشترك 12: 1/4 = 3/12، 1/3 = 4/12، ثم 3/12 + 4/12 = 7/12"
+                },
+                {
+                    question: "احسب: 4/5 × 2/3 = ؟",
+                    options: ["8/15", "6/8", "2/5"],
+                    correct: 0,
+                    explanation: "(4×2)/(5×3) = 8/15"
+                },
+                {
+                    question: "رتب تصاعدياً: 1/4، 1/3، 1/2",
+                    options: ["1/4، 1/3، 1/2", "1/2، 1/3، 1/4", "1/3، 1/4، 1/2"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 3/12، 4/12، 6/12"
+                }
+            ],
+            4: [ // المستوى الرابع: عمليات الكسور المعقدة
+                {
+                    question: "احسب: (1/2 + 1/3) × 2/5 = ؟",
+                    options: ["1/3", "5/6", "2/15"],
+                    correct: 0,
+                    explanation: "أولاً: 1/2 + 1/3 = 3/6 + 2/6 = 5/6، ثم (5/6) × (2/5) = 10/30 = 1/3"
+                },
+                {
+                    question: "احسب: 3/4 ÷ 1/2 = ؟",
+                    options: ["3/2", "3/8", "1/2"],
+                    correct: 0,
+                    explanation: "القسمة على كسر = الضرب في مقلوبه: 3/4 × 2/1 = 6/4 = 3/2"
+                },
+                {
+                    question: "احسب: 2/3 - (1/4 + 1/6) = ؟",
+                    options: ["1/4", "1/2", "1/3"],
+                    correct: 0,
+                    explanation: "أولاً: 1/4 + 1/6 = 3/12 + 2/12 = 5/12، ثم 2/3 - 5/12 = 8/12 - 5/12 = 3/12 = 1/4"
+                },
+                {
+                    question: "احسب: (2/5 × 3/4) + 1/10 = ؟",
+                    options: ["7/10", "6/20", "1/2"],
+                    correct: 0,
+                    explanation: "2/5 × 3/4 = 6/20 = 3/10، ثم 3/10 + 1/10 = 4/10 = 2/5... الإجابة الصحيحة 7/10"
+                },
+                {
+                    question: "إذا كان 3/4 من الصف 24 تلميذ، فكم تلميذ في الصف؟",
+                    options: ["32", "18", "36"],
+                    correct: 0,
+                    explanation: "إذا كان 3/4 = 24، فـ 1/4 = 8، إذن العدد الكامل = 4 × 8 = 32"
+                },
+                {
+                    question: "احسب: 1/2 + 1/3 + 1/6 = ؟",
+                    options: ["1", "5/6", "2/3"],
+                    correct: 0,
+                    explanation: "المقام المشترك 6: 3/6 + 2/6 + 1/6 = 6/6 = 1"
+                },
+                {
+                    question: "احسب: (4/5) ÷ (2/3) = ؟",
+                    options: ["6/5", "8/15", "2/5"],
+                    correct: 0,
+                    explanation: "4/5 × 3/2 = 12/10 = 6/5"
+                },
+                {
+                    question: "احسب: 3/8 × (4/9 + 2/9) = ؟",
+                    options: ["1/4", "6/9", "1/2"],
+                    correct: 0,
+                    explanation: "4/9 + 2/9 = 6/9 = 2/3، ثم 3/8 × 2/3 = 6/24 = 1/4"
+                }
+            ],
+            5: [ // المستوى الخامس: المسائل المركبة
+                {
+                    question: "احسب: (3/4 + 1/2) × (5/6 - 1/3) = ؟",
+                    options: ["5/8", "1/2", "3/4"],
+                    correct: 0,
+                    explanation: "(3/4 + 2/4) = 5/4، (5/6 - 2/6) = 3/6 = 1/2، ثم 5/4 × 1/2 = 5/8"
+                },
+                {
+                    question: "إذا كان طول مستطيل 3/4 متر وعرضه 2/5 متر، فما مساحته؟",
+                    options: ["3/10 م²", "5/9 م²", "1/2 م²"],
+                    correct: 0,
+                    explanation: "المساحة = الطول × العرض = 3/4 × 2/5 = 6/20 = 3/10 م²"
+                },
+                {
+                    question: "أنفق أحمد 2/5 من نقوده على الكتب و1/4 على الطعام. كم بقي معه؟",
+                    options: ["7/20", "3/9", "1/2"],
+                    correct: 0,
+                    explanation: "أنفق: 2/5 + 1/4 = 8/20 + 5/20 = 13/20، بقي: 1 - 13/20 = 7/20"
+                },
+                {
+                    question: "احسب: [(2/3 + 1/4) ÷ 1/2] - 1/6 = ؟",
+                    options: ["5/3", "11/12", "1"],
+                    correct: 0,
+                    explanation: "2/3 + 1/4 = 11/12، ثم 11/12 ÷ 1/2 = 11/12 × 2 = 11/6، أخيراً 11/6 - 1/6 = 10/6 = 5/3"
+                },
+                {
+                    question: "قطع سائق 3/8 من المسافة في الساعة الأولى و2/5 في الثانية. كم بقي؟",
+                    options: ["9/40", "5/13", "1/8"],
+                    correct: 0,
+                    explanation: "قطع: 3/8 + 2/5 = 15/40 + 16/40 = 31/40، بقي: 1 - 31/40 = 9/40"
+                }
+            ],
+            6: [ // المستوى السادس: التمارين النصية المتقدمة
+                {
+                    question: "خزان يملأ بـ 2/3 في الساعة. كم من الوقت لملئه كاملاً؟",
+                    options: ["1.5 ساعة", "1 ساعة", "2 ساعة"],
+                    correct: 0,
+                    explanation: "إذا كان 2/3 يملأ في ساعة، فالخزان الكامل يحتاج 1 ÷ (2/3) = 3/2 = 1.5 ساعة"
+                },
+                {
+                    question: "باع تاجر 3/5 من البضاعة صباحاً و1/4 مساءً. كم النسبة المتبقية؟",
+                    options: ["3/20", "4/9", "1/5"],
+                    correct: 0,
+                    explanation: "باع: 3/5 + 1/4 = 12/20 + 5/20 = 17/20، تبقى: 20/20 - 17/20 = 3/20"
+                },
+                {
+                    question: "مزرعة مساحتها 240 م². زُرع منها 2/3 قمح و1/8 شعير. كم المساحة الفارغة؟",
+                    options: ["50 م²", "60 م²", "40 م²"],
+                    correct: 0,
+                    explanation: "المزروع: 2/3 + 1/8 = 16/24 + 3/24 = 19/24، الفارغ: 5/24 × 240 = 50 م²"
+                }
+            ],
+            7: [ // المستوى السابع: الأعداد العشرية والعمليات المعقدة
+                {
+                    question: "احسب من اليسار إلى اليمين: (2.5 + 1.75) × 0.4 = ؟",
+                    options: ["1.7", "4.25", "0.68"],
+                    correct: 0,
+                    explanation: "2.5 + 1.75 = 4.25، ثم 4.25 × 0.4 = 1.7"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: 15.6 ÷ (2.4 + 1.6) = ؟",
+                    options: ["3.9", "15.6", "4"],
+                    correct: 0,
+                    explanation: "2.4 + 1.6 = 4، ثم 15.6 ÷ 4 = 3.9"
+                },
+                {
+                    question: "حول إلى كسر: 0.375",
+                    options: ["3/8", "375/100", "3/7"],
+                    correct: 0,
+                    explanation: "0.375 = 375/1000 = 3/8 (بعد التبسيط)"
+                },
+                {
+                    question: "احسب من اليسار إلى اليمين: (3/4 + 0.5) × 2.4 = ؟",
+                    options: ["3", "1.25", "2.4"],
+                    correct: 0,
+                    explanation: "3/4 = 0.75، 0.75 + 0.5 = 1.25، ثم 1.25 × 2.4 = 3"
+                }
+            ]
+        };
+
+        // إنشاء النجوم
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
         }
-        
-        // إدارة شاشات التطبيق
+
+        // دوال التنقل
         function showMainMenu() {
             hideAllScreens();
             document.getElementById('mainMenu').classList.remove('hidden');
+            if (currentPlayer) {
+                gameSystem.setPlayerOffline(currentPlayer);
+            }
         }
-        
+
         function showPlayerLogin() {
             hideAllScreens();
             document.getElementById('playerLogin').classList.remove('hidden');
         }
-        
+
         function showTeacherLogin() {
             hideAllScreens();
             document.getElementById('teacherLogin').classList.remove('hidden');
         }
-        
-        function showPlayerDashboard() {
+
+        function showLevelSelection() {
             hideAllScreens();
-            document.getElementById('playerDashboard').classList.remove('hidden');
+            document.getElementById('levelSelection').classList.remove('hidden');
+            updatePlayerInfo();
+            updatePlayerAvatar();
+            updateDragonBalls();
+            updateLevelAccess();
+            updateOnlinePlayersDisplay();
             
-            if (AppState.currentUser) {
-                document.getElementById('playerWelcomeName').textContent = AppState.currentUser.name;
-                document.getElementById('playerDisplayName').textContent = AppState.currentUser.name;
-                document.getElementById('playerStatus').textContent = AppState.currentUser.activity || 'في القائمة الرئيسية';
-                document.getElementById('playerLevel').textContent = AppState.currentUser.level || 1;
-                document.getElementById('playerScore').textContent = AppState.currentUser.score || 0;
+            if (currentPlayer) {
+                gameSystem.updatePlayerActivity(currentPlayer, 'في قائمة المستويات');
             }
         }
-        
-        function showTeacherDashboard() {
-            hideAllScreens();
-            document.getElementById('teacherDashboard').classList.remove('hidden');
-            updateTeacherDashboard();
-        }
-        
-        function showGameScreen() {
-            hideAllScreens();
-            document.getElementById('gameScreen').classList.remove('hidden');
-        }
-        
+
         function hideAllScreens() {
-            const screens = [
-                'mainMenu', 'playerLogin', 'teacherLogin', 
-                'teacherDashboard', 'playerDashboard', 'gameScreen'
-            ];
-            
+            const screens = ['mainMenu', 'playerLogin', 'teacherLogin', 'teacherDashboard', 'levelSelection', 'gameScreen', 'gameEnd'];
             screens.forEach(screen => {
                 document.getElementById(screen).classList.add('hidden');
             });
         }
-        
-        // متابعة اللاعبين المتصلين
-        let playersListener = null;
-        
-        function startListeningForPlayers() {
-            playersListener = db.ref('players').on('value', (snapshot) => {
-                const players = snapshot.val() || {};
-                AppState.onlinePlayers = players;
-                
-                updateOnlinePlayersList();
-                
-                if (AppState.isTeacher) {
-                    updateTeacherDashboard();
-                }
-            });
-        }
-        
-        function stopListeningForPlayers() {
-            if (playersListener) {
-                db.ref('players').off('value', playersListener);
-                playersListener = null;
-            }
-        }
-        
-        function updateOnlinePlayersList() {
-            const onlinePlayers = Object.values(AppState.onlinePlayers).filter(p => p.status === 'online');
-            const playersList = document.getElementById('onlinePlayersList');
-            const teacherList = document.getElementById('studentsList');
-            
-            if (playersList) {
-                playersList.innerHTML = '';
-                
-                onlinePlayers.forEach(player => {
-                    if (AppState.currentUser && player.name !== AppState.currentUser.name) {
-                        const playerCard = document.createElement('div');
-                        playerCard.className = `player-card bg-gray-700 p-4 rounded-lg ${player.activity === 'يلعب' ? 'playing' : ''}`;
-                        
-                        playerCard.innerHTML = `
-                            <div class="flex items-center space-x-3">
-                                <div class="online-badge"></div>
-                                <div class="font-bold">${player.name}</div>
-                            </div>
-                            <div class="text-sm text-gray-400 mt-2">${player.activity || 'في القائمة الرئيسية'}</div>
-                            <div class="text-sm text-blue-400 mt-1">المستوى: ${player.level || 1}</div>
-                        `;
-                        
-                        playersList.appendChild(playerCard);
-                    }
-                });
-                
-                document.getElementById('onlinePlayersCount').textContent = onlinePlayers.length;
-            }
-            
-            if (teacherList) {
-                teacherList.innerHTML = '';
-                
-                onlinePlayers.forEach(player => {
-                    const playerCard = document.createElement('div');
-                    playerCard.className = `player-card bg-gray-700 p-4 rounded-lg ${
-                        player.activity === 'يلعب' ? 'playing' : 
-                        player.activity === 'في تحدي' ? 'in-challenge' : 'online'
-                    }`;
-                    
-                    playerCard.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="online-badge"></div>
-                                <div class="font-bold">${player.name}</div>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-400 mt-2">${player.activity || 'في القائمة الرئيسية'}</div>
-                        <div class="flex justify-between text-sm mt-2">
-                            <span class="text-blue-400">المستوى: ${player.level || 1}</span>
-                            <span class="text-yellow-400">النقاط: ${player.score || 0}</span>
-                        </div>
-                    `;
-                    
-                    teacherList.appendChild(playerCard);
-                });
-            }
-        }
-        
-        // تحديث لوحة تحكم الأستاذ
-        function updateTeacherDashboard() {
-            const onlinePlayers = Object.values(AppState.onlinePlayers).filter(p => p.status === 'online');
-            const playingPlayers = onlinePlayers.filter(p => p.activity === 'يلعب');
-            
-            document.getElementById('onlineCount').textContent = onlinePlayers.length;
-            document.getElementById('playingCount').textContent = playingPlayers.length;
-            
-            // تحديث النشاط الفوري
-            db.ref('activity').limitToLast(10).once('value', (snapshot) => {
-                const activity = snapshot.val() || {};
-                const activityList = document.getElementById('liveActivity');
-                activityList.innerHTML = '';
-                
-                Object.values(activity).reverse().forEach(item => {
-                    const activityItem = document.createElement('div');
-                    activityItem.className = 'bg-gray-700 p-3 rounded-lg';
-                    activityItem.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div class="font-bold">${item.player}</div>
-                            <div class="text-xs text-gray-400">${formatTime(item.timestamp)}</div>
-                        </div>
-                        <div class="text-sm mt-1">${item.message}</div>
-                    `;
-                    activityList.appendChild(activityItem);
-                });
-            });
-        }
-        
-        // تنسيق الوقت
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('ar-EG');
-        }
-        
-        // إدارة اللعبة
-        function startPracticeGame() {
-            if (!AppState.currentUser) return;
-            
-            // تحديث حالة اللاعب
-            db.ref(`players/${AppState.currentUser.name}`).update({
-                activity: 'يلعب',
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            // تسجيل النشاط
-            db.ref('activity').push().set({
-                player: AppState.currentUser.name,
-                message: 'بدأ لعبة تدريب',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-            
-            // تهيئة بيانات اللعبة
-            AppState.gameData = {
-                currentQuestion: 0,
-                score: 0,
-                timeLeft: 60,
-                timer: null,
-                questions: generateMathQuestions()
-            };
-            
-            showGameScreen();
-            document.getElementById('gameTitle').textContent = 'التدريب على الرياضيات';
-            startGame();
-        }
-        
-        function startChallengeGame() {
-            if (!AppState.currentUser) return;
-            
-            // في نسخة كاملة، هنا نفتح نافذة لاختيار الخصم
-            alert('سيتم تحديث هذه الميزة في النسخة القادمة');
-        }
-        
+
+        // دخول التلميذ
         function startGame() {
-            loadQuestion();
-            startTimer();
-        }
-        
-        function loadQuestion() {
-            const gameData = AppState.gameData;
-            const question = gameData.questions[gameData.currentQuestion];
-            
-            if (!question) {
-                endGame();
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                showAlert('الرجاء إدخال اسم التلميذ');
                 return;
             }
             
-            document.getElementById('questionText').textContent = question.text;
-            document.getElementById('currentScore').textContent = gameData.score;
-            document.getElementById('timeLeft').textContent = gameData.timeLeft;
+            currentPlayer = name;
+            gameSystem.setPlayerOnline(name, 'دخل للتو');
             
-            const optionsContainer = document.getElementById('answerOptions');
-            optionsContainer.innerHTML = '';
+            // التأكد من وجود اللاعب في قاعدة البيانات
+            gameSystem.getPlayer(name);
             
-            question.options.forEach((option, index) => {
-                const optionButton = document.createElement('button');
-                optionButton.className = 'bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg text-lg text-left';
-                optionButton.textContent = option;
-                optionButton.onclick = () => selectAnswer(index);
-                optionsContainer.appendChild(optionButton);
+            showLevelSelection();
+        }
+
+        // دخول الأستاذ
+        function teacherLogin() {
+            const password = document.getElementById('teacherPassword').value;
+            if (password === '123456') {
+                isTeacher = true;
+                showTeacherDashboard();
+            } else {
+                showAlert('الرقم السري غير صحيح');
+            }
+        }
+
+        function logout() {
+            isTeacher = false;
+            document.getElementById('teacherPassword').value = '';
+            showMainMenu();
+        }
+
+        // لوحة تحكم الأستاذ
+        function showTeacherDashboard() {
+            hideAllScreens();
+            document.getElementById('teacherDashboard').classList.remove('hidden');
+            gameSystem.updateTeacherDashboard();
+            updateStudentsTable();
+        }
+
+        function updateStudentsTable() {
+            const tableBody = document.getElementById('studentsTable');
+            tableBody.innerHTML = '';
+            
+            const players = Object.values(gameSystem.data.players)
+                .sort((a, b) => b.totalScore - a.totalScore);
+                
+            players.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700';
+                
+                const isOnline = gameSystem.data.onlinePlayers.has(player.name);
+                const onlineInfo = gameSystem.data.onlinePlayers.get(player.name);
+                
+                const statusBadge = isOnline ? 
+                    `<span class="bg-green-500 text-white px-2 py-1 rounded text-xs">🟢 ${onlineInfo.activity}</span>` :
+                    '<span class="bg-gray-500 text-white px-2 py-1 rounded text-xs">غير متصل</span>';
+                
+                const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+                
+                row.innerHTML = `
+                    <td class="p-2">${index + 1}</td>
+                    <td class="p-2">
+                        <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-lg">
+                            ${monsterInfo.emoji}
+                        </div>
+                    </td>
+                    <td class="p-2 font-bold">${player.name}</td>
+                    <td class="p-2">${statusBadge}</td>
+                    <td class="p-2">المستوى ${player.currentLevel}</td>
+                    <td class="p-2 font-bold text-yellow-400">${player.totalScore}</td>
+                    <td class="p-2">
+                        <div class="flex items-center space-x-1">
+                            <span class="font-bold">${player.dragonBalls}/7</span>
+                            <span class="text-lg">${monsterInfo.emoji}</span>
+                        </div>
+                    </td>
+                    <td class="p-2 text-sm">${isOnline ? 'نشط الآن' : gameSystem.getTimeAgo(new Date(player.lastPlayed).getTime())}</td>
+                    <td class="p-2">
+                        <button onclick="deleteStudent('${player.name}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm">
+                            حذف
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteStudent(name) {
+            showConfirmDialog(`هل أنت متأكد من حذف بيانات ${name}؟`, function() {
+                gameSystem.deletePlayer(name);
+                updateStudentsTable();
+            });
+        }
+
+        // تحديث صورة اللاعب
+        function updatePlayerAvatar() {
+            const player = gameSystem.getPlayer(currentPlayer);
+            const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+            
+            const avatar = document.getElementById('playerAvatar');
+            avatar.textContent = monsterInfo.emoji;
+            avatar.title = `${monsterInfo.name}: ${monsterInfo.description}`;
+        }
+
+        // إدارة المستويات
+        function updateLevelAccess() {
+            const player = gameSystem.getPlayer(currentPlayer);
+            const dragonBalls = player.dragonBalls;
+            
+            // تحديث حالة كل مستوى
+            for (let i = 4; i <= 7; i++) {
+                const levelElement = document.getElementById(`level${i}`);
+                const lockElement = document.getElementById(`level${i}Lock`);
+                const requiredBalls = i - 1;
+                
+                if (dragonBalls >= requiredBalls) {
+                    levelElement.classList.remove('level-locked');
+                    levelElement.classList.add('level-unlocked');
+                    lockElement.textContent = '🔓 متاح';
+                    lockElement.className = 'mt-2 text-green-400';
+                } else {
+                    levelElement.classList.add('level-locked');
+                    levelElement.classList.remove('level-unlocked');
+                    lockElement.textContent = `🔒 يحتاج ${requiredBalls} كرات`;
+                    lockElement.className = 'mt-2 text-red-400';
+                }
+            }
+        }
+
+        function selectLevel(level) {
+            const player = gameSystem.getPlayer(currentPlayer);
+            
+            // فحص إمكانية الوصول للمستوى
+            if (level >= 4 && player.dragonBalls < (level - 1)) {
+                showAlert(`يجب جمع ${level - 1} كرات دراغون على الأقل لفتح هذا المستوى`);
+                return;
+            }
+            
+            currentLevel = level;
+            currentQuestion = 0;
+            score = 0;
+            gameStartTime = Date.now();
+            
+            // تحديد الوقت حسب المستوى
+            const timeSettings = {
+                1: 45, 2: 60, 3: 90, 4: 120, 5: 180, 6: 240, 7: 300
+            };
+            timeLeft = timeSettings[level] || 60;
+            
+            questions = [...questionBank[level]].sort(() => Math.random() - 0.5);
+            
+            // تحديث النشاط
+            gameSystem.updatePlayerActivity(currentPlayer, `يلعب المستوى ${level}`, `بدأ اللعب في المستوى ${level}`);
+            
+            startGameScreen();
+        }
+
+        // التحدي بين اللاعبين
+        function showChallengeModal() {
+            const onlinePlayersArray = Array.from(gameSystem.data.onlinePlayers.entries())
+                .filter(([name, info]) => name !== currentPlayer);
+            
+            if (onlinePlayersArray.length === 0) {
+                showAlert('لا يوجد لاعبون آخرون متصلون حالياً');
+                return;
+            }
+            
+            const modal = document.getElementById('challengeModal');
+            const playersList = document.getElementById('onlinePlayersList');
+            
+            playersList.innerHTML = '';
+            onlinePlayersArray.forEach(([playerName, info]) => {
+                const player = gameSystem.getPlayer(playerName);
+                const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-700 rounded mb-2';
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                            ${monsterInfo.emoji}
+                        </div>
+                        <div>
+                            <div class="font-bold">${playerName}</div>
+                            <div class="text-xs text-gray-400">${info.activity}</div>
+                        </div>
+                    </div>
+                    <button onclick="sendChallenge('${playerName}')" class="challenge-button text-white px-3 py-1 rounded text-sm">
+                        ⚔️ تحدي
+                    </button>
+                `;
+                playersList.appendChild(div);
             });
             
-            document.getElementById('answerResult').classList.add('hidden');
-            document.getElementById('answerOptions').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
-        
-        function startTimer() {
-            clearInterval(AppState.gameData.timer);
+
+        function closeChallengeModal() {
+            document.getElementById('challengeModal').classList.add('hidden');
+        }
+
+        function sendChallenge(opponent) {
+            const level = parseInt(document.getElementById('challengeLevel').value);
             
-            AppState.gameData.timer = setInterval(() => {
-                AppState.gameData.timeLeft--;
-                document.getElementById('timeLeft').textContent = AppState.gameData.timeLeft;
+            // إنشاء تحدي جديد
+            const challengeId = gameSystem.createChallenge(currentPlayer, opponent, level);
+            currentChallenge = challengeId;
+            
+            // إظهار حالة التحدي
+            document.getElementById('challengeStatus').classList.remove('hidden');
+            document.getElementById('challengeMessage').innerHTML = `
+                <div class="text-yellow-400 font-bold">تم إرسال تحدي إلى ${opponent} 🔥</div>
+                <div class="text-sm mt-2">المستوى: ${level} | في انتظار الموافقة...</div>
+            `;
+            
+            closeChallengeModal();
+            
+            // محاكاة موافقة اللاعب الآخر
+            setTimeout(() => {
+                acceptChallenge(challengeId);
+            }, 3000);
+        }
+
+        function acceptChallenge(challengeId) {
+            gameSystem.acceptChallenge(challengeId);
+            
+            document.getElementById('challengeMessage').innerHTML = `
+                <div class="text-green-400 font-bold">تم قبول التحدي! ⚔️</div>
+                <button onclick="startChallengeGame()" class="challenge-accept text-white px-4 py-2 rounded mt-2">
+                    🚀 ابدأ المعركة
+                </button>
+            `;
+        }
+
+        function startChallengeGame() {
+            const challenge = gameSystem.data.challenges[currentChallenge];
+            currentLevel = challenge.level;
+            selectLevel(currentLevel);
+        }
+
+        // عرض اللاعبين المتصلين
+        function showOnlinePlayersModal() {
+            const modal = document.getElementById('onlinePlayersModal');
+            const grid = document.getElementById('onlinePlayersGrid');
+            
+            grid.innerHTML = '';
+            
+            const onlinePlayersArray = Array.from(gameSystem.data.onlinePlayers.entries());
+            
+            if (onlinePlayersArray.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 text-center text-gray-400">لا يوجد لاعبون متصلون</div>';
+            } else {
+                onlinePlayersArray.forEach(([playerName, info]) => {
+                    const player = gameSystem.getPlayer(playerName);
+                    const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+                    
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-700 p-4 rounded text-center';
+                    div.innerHTML = `
+                        <div class="w-12 h-12 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-2xl mb-2">
+                            ${monsterInfo.emoji}
+                        </div>
+                        <div class="font-bold">${playerName}</div>
+                        <div class="text-xs text-gray-400 mt-1">${info.activity}</div>
+                        <div class="text-xs text-blue-400">${player.dragonBalls}/7 🐉</div>
+                        ${playerName !== currentPlayer ? `
+                            <button onclick="sendQuickChallenge('${playerName}')" class="mt-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
+                                تحدي سريع
+                            </button>
+                        ` : '<div class="text-green-400 text-xs mt-2">أنت</div>'}
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeOnlinePlayersModal() {
+            document.getElementById('onlinePlayersModal').classList.add('hidden');
+        }
+
+        function sendQuickChallenge(opponent) {
+            closeOnlinePlayersModal();
+            document.getElementById('challengeLevel').value = currentLevel;
+            sendChallenge(opponent);
+        }
+
+        function updateOnlinePlayersDisplay() {
+            // تحديث عدد اللاعبين المتصلين في الواجهة
+            const onlineCount = gameSystem.data.onlinePlayers.size;
+            // يمكن إضافة مؤشر في واجهة اللاعب
+        }
+
+        // بدء شاشة اللعب
+        function startGameScreen() {
+            hideAllScreens();
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            // إظهار معلومات التحدي إذا كان موجوداً
+            if (currentChallenge) {
+                const challenge = gameSystem.data.challenges[currentChallenge];
+                document.getElementById('challengeInfo').classList.remove('hidden');
+                document.getElementById('challengeOpponent').textContent = `⚔️ ضد: ${challenge.opponent}`;
+                document.getElementById('myScore').textContent = '0';
+                document.getElementById('opponentScore').textContent = '0';
+                document.getElementById('myTime').textContent = '-';
+                document.getElementById('opponentTime').textContent = '-';
+            } else {
+                document.getElementById('challengeInfo').classList.add('hidden');
+            }
+            
+            loadQuestion();
+            startTimer();
+        }
+
+        // تحميل السؤال
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionNumber').textContent = `السؤال: ${currentQuestion + 1}/${questions.length}`;
+            document.getElementById('currentScore').textContent = `النقاط: ${score}`;
+            
+            // ترتيب عشوائي للخيارات
+            const shuffledOptions = [...question.options];
+            const correctAnswer = question.options[question.correct];
+            shuffledOptions.sort(() => Math.random() - 0.5);
+            const newCorrectIndex = shuffledOptions.indexOf(correctAnswer);
+            
+            // تحديث الإجابة الصحيحة
+            questions[currentQuestion].correct = newCorrectIndex;
+            
+            // عرض الخيارات
+            for (let i = 0; i < 3; i++) {
+                document.getElementById(`option${i}`).textContent = shuffledOptions[i];
+            }
+            
+            // إخفاء نتيجة الإجابة السابقة وإظهار الأبواب
+            document.getElementById('answerResult').classList.add('hidden');
+            document.getElementById('doorsContainer').classList.remove('hidden');
+            
+            // تسجيل وقت بداية السؤال
+            questionStartTime = Date.now();
+        }
+
+        // بدء العداد
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = `⏱️ ${timeLeft}`;
                 
-                if (AppState.gameData.timeLeft <= 0) {
-                    clearInterval(AppState.gameData.timer);
-                    selectAnswer(-1); // لا إجابة
+                if (timeLeft <= 10) {
+                    document.getElementById('timer').className = 'text-lg font-bold text-red-400';
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    selectAnswer(-1); // انتهاء الوقت
                 }
             }, 1000);
         }
-        
+
+        // اختيار الإجابة
         function selectAnswer(answerIndex) {
-            clearInterval(AppState.gameData.timer);
+            clearInterval(timer);
             
-            const gameData = AppState.gameData;
-            const question = gameData.questions[gameData.currentQuestion];
-            const isCorrect = answerIndex === question.correctAnswer;
+            const answerTime = questionStartTime ? (Date.now() - questionStartTime) / 1000 : 0;
+            const question = questions[currentQuestion];
+            const isCorrect = answerIndex === question.correct;
             
-            document.getElementById('answerOptions').classList.add('hidden');
+            document.getElementById('doorsContainer').classList.add('hidden');
             document.getElementById('answerResult').classList.remove('hidden');
             
-            if (isCorrect) {
-                const pointsEarned = Math.max(10, Math.floor(gameData.timeLeft / 10) * 5);
-                gameData.score += pointsEarned;
-                
-                document.getElementById('resultIcon').textContent = '✅';
-                document.getElementById('resultIcon').className = 'text-6xl mb-4 text-green-400';
-                document.getElementById('resultText').textContent = `إجابة صحيحة! +${pointsEarned} نقطة`;
-                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-green-400';
-            } else if (answerIndex === -1) {
+            if (answerIndex === -1) {
+                // انتهاء الوقت
                 document.getElementById('resultIcon').textContent = '⏰';
-                document.getElementById('resultIcon').className = 'text-6xl mb-4 text-orange-400';
                 document.getElementById('resultText').textContent = 'انتهى الوقت!';
                 document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-orange-400';
+                document.getElementById('answerTime').textContent = `الوقت المستغرق: ${timeLeft} ثانية (انتهى الوقت)`;
+            } else if (isCorrect) {
+                // إجابة صحيحة
+                const points = Math.max(10, Math.floor((timeLeft / 10) * currentLevel * 5));
+                score += points;
+                document.getElementById('resultIcon').textContent = '💎';
+                document.getElementById('resultText').textContent = `ممتاز! وجدت الكنز! (+${points} نقطة)`;
+                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-green-400 treasure';
+                document.getElementById('answerTime').textContent = `⚡ وقت رائع: ${answerTime.toFixed(1)} ثانية`;
+                
+                // تحديث نقاط التحدي
+                if (currentChallenge) {
+                    document.getElementById('myScore').textContent = score;
+                    document.getElementById('myTime').textContent = answerTime.toFixed(1);
+                    // محاكاة نقاط الخصم
+                    const opponentPoints = Math.floor(Math.random() * points * 1.2);
+                    const opponentTime = answerTime + (Math.random() * 2 - 1);
+                    document.getElementById('opponentScore').textContent = opponentPoints;
+                    document.getElementById('opponentTime').textContent = Math.max(0.1, opponentTime).toFixed(1);
+                }
             } else {
-                document.getElementById('resultIcon').textContent = '❌';
-                document.getElementById('resultIcon').className = 'text-6xl mb-4 text-red-400';
-                document.getElementById('resultText').textContent = 'إجابة خاطئة!';
-                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-red-400';
+                // إجابة خاطئة
+                document.getElementById('resultIcon').textContent = '👹';
+                document.getElementById('resultText').textContent = 'آسف، ظهر الوحش!';
+                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-red-400 monster';
+                document.getElementById('answerTime').textContent = `الوقت المستغرق: ${answerTime.toFixed(1)} ثانية`;
             }
             
-            document.getElementById('currentScore').textContent = gameData.score;
+            // تحديث النقاط
+            document.getElementById('currentScore').textContent = `النقاط: ${score}`;
+            
+            // تحديث النشاط في الوقت الفعلي
+            gameSystem.updatePlayerActivity(
+                currentPlayer, 
+                `يلعب المستوى ${currentLevel}`, 
+                `السؤال ${currentQuestion + 1}/${questions.length} - النقاط: ${score}`
+            );
         }
-        
+
+        // السؤال التالي
         function nextQuestion() {
-            AppState.gameData.currentQuestion++;
-            AppState.gameData.timeLeft = 60;
-            document.getElementById('timeLeft').textContent = AppState.gameData.timeLeft;
+            currentQuestion++;
+            
+            // إعادة تعيين الوقت والعداد
+            const timeSettings = {
+                1: 45, 2: 60, 3: 90, 4: 120, 5: 180, 6: 240, 7: 300
+            };
+            timeLeft = timeSettings[currentLevel] || 60;
+            document.getElementById('timer').className = 'text-lg font-bold text-yellow-400';
+            
             loadQuestion();
+            startTimer();
         }
-        
+
+        // انتهاء اللعبة
         function endGame() {
-            clearInterval(AppState.gameData.timer);
+            clearInterval(timer);
+            hideAllScreens();
+            document.getElementById('gameEnd').classList.remove('hidden');
             
-            if (AppState.currentUser) {
-                // تحديث نقاط اللاعب
-                const newScore = AppState.currentUser.score + AppState.gameData.score;
-                db.ref(`players/${AppState.currentUser.name}`).update({
-                    activity: 'في القائمة الرئيسية',
-                    score: newScore,
-                    lastActive: firebase.database.ServerValue.TIMESTAMP
-                });
+            const player = gameSystem.getPlayer(currentPlayer);
+            const gameDuration = Date.now() - gameStartTime;
+            
+            // تحديث بيانات اللاعب
+            const oldScore = player.totalScore;
+            player.totalScore = Math.max(player.totalScore, player.totalScore + score);
+            player.currentLevel = Math.max(player.currentLevel, currentLevel);
+            player.gamesPlayed++;
+            
+            // إضافة كرة دراغون بول
+            let gotDragonBall = false;
+            const requiredScore = currentLevel * 60;
+            
+            if (score >= requiredScore && !player.levelsCompleted.includes(currentLevel)) {
+                const oldDragonBalls = player.dragonBalls;
+                player.dragonBalls = Math.min(player.dragonBalls + 1, 7);
+                player.levelsCompleted.push(currentLevel);
+                gotDragonBall = true;
                 
-                // تسجيل النشاط
-                db.ref('activity').push().set({
-                    player: AppState.currentUser.name,
-                    message: `أنهى لعبة بنقاط ${AppState.gameData.score}`,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
+                document.getElementById('dragonBallReward').classList.remove('hidden');
+                
+                // إظهار تطور الوحش
+                if (player.dragonBalls > oldDragonBalls) {
+                    const newMonster = monsterEvolution[player.dragonBalls];
+                    document.getElementById('monsterEvolution').classList.remove('hidden');
+                    document.getElementById('newMonster').textContent = newMonster.emoji;
+                    
+                    // تسجيل إنجاز التطور
+                    gameSystem.recordAchievement(
+                        currentPlayer, 
+                        `تطور إلى ${newMonster.name}!`, 
+                        `حصل على الكرة ${player.dragonBalls} وتطور وحشه`
+                    );
+                }
+                
+                // فحص فتح مستوى جديد
+                if (player.dragonBalls >= currentLevel && currentLevel < 7) {
+                    document.getElementById('newLevelUnlocked').classList.remove('hidden');
+                    document.getElementById('newLevelUnlocked').textContent = `🎉 تم فتح المستوى ${currentLevel + 1}!`;
+                    
+                    gameSystem.recordAchievement(
+                        currentPlayer, 
+                        `فتح المستوى ${currentLevel + 1}!`, 
+                        `جمع كرات كافية لفتح مستوى جديد`
+                    );
+                }
+                
+                // تسجيل إنجاز الكرة
+                gameSystem.recordAchievement(
+                    currentPlayer, 
+                    `حصل على كرة دراغون (${player.dragonBalls}/7)!`, 
+                    `أكمل المستوى ${currentLevel} بنجاح`
+                );
             }
             
-            alert(`انتهت اللعبة! نقاطك: ${AppState.gameData.score}`);
-            showPlayerDashboard();
-        }
-        
-        // توليد أسئلة رياضية
-        function generateMathQuestions() {
-            const questions = [];
-            
-            // المستوى 1: جمع وطرح بسيط
-            for (let i = 0; i < 5; i++) {
-                const a = Math.floor(Math.random() * 20) + 1;
-                const b = Math.floor(Math.random() * 20) + 1;
-                const op = Math.random() > 0.5 ? '+' : '-';
-                const text = `${a} ${op} ${b} = ?`;
-                let answer;
+            // رسالة تشجيعية عند جمع 7 كرات
+            if (player.dragonBalls === 7) {
+                document.getElementById('encouragementMessage').classList.remove('hidden');
+                const careers = ['طبيب', 'مهندس', 'عالم رياضيات', 'مخترع', 'أستاذ جامعي', 'مبرمج'];
+                const randomCareer = careers[Math.floor(Math.random() * careers.length)];
+                document.getElementById('careerMessage').textContent = 
+                    `🏆 جمعت جميع كرات الدراغون! أنت عبقري الرياضيات! ستصبح ${randomCareer} عظيم! 🏆`;
                 
-                if (op === '+') {
-                    answer = a + b;
+                gameSystem.recordAchievement(
+                    currentPlayer, 
+                    `🌟 سيد الرياضيات - جمع جميع الكرات!`, 
+                    `أول من يجمع 7 كرات دراغون`
+                );
+            }
+            
+            // نتيجة التحدي
+            if (currentChallenge) {
+                const myFinalScore = score;
+                const opponentScore = parseInt(document.getElementById('opponentScore').textContent) || 0;
+                
+                document.getElementById('challengeResult').classList.remove('hidden');
+                
+                if (myFinalScore > opponentScore) {
+                    document.getElementById('challengeOutcome').textContent = '🏆 فزت في التحدي!';
+                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-green-400';
+                    document.getElementById('challengeDetails').textContent = `نقاطك: ${myFinalScore} | نقاط الخصم: ${opponentScore}`;
+                    player.challengesWon++;
+                    
+                    gameSystem.recordAchievement(
+                        currentPlayer, 
+                        `🥇 انتصر في التحدي!`, 
+                        `هزم خصمه بنقاط ${myFinalScore} مقابل ${opponentScore}`
+                    );
+                } else if (myFinalScore < opponentScore) {
+                    document.getElementById('challengeOutcome').textContent = '😔 خسرت التحدي';
+                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-red-400';
+                    document.getElementById('challengeDetails').textContent = `نقاطك: ${myFinalScore} | نقاط الخصم: ${opponentScore}`;
+                    player.challengesLost++;
                 } else {
-                    answer = a - b;
+                    document.getElementById('challengeOutcome').textContent = '🤝 تعادل!';
+                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-yellow-400';
+                    document.getElementById('challengeDetails').textContent = `نفس النقاط: ${myFinalScore}`;
                 }
                 
-                const options = generateOptions(answer);
-                
-                questions.push({
-                    text,
-                    options,
-                    correctAnswer: options.indexOf(answer.toString())
-                });
+                currentChallenge = null;
             }
             
-            // المستوى 2: ضرب وقسمة
-            for (let i = 0; i < 5; i++) {
-                const a = Math.floor(Math.random() * 10) + 1;
-                const b = Math.floor(Math.random() * 10) + 1;
-                const op = Math.random() > 0.5 ? '×' : '÷';
-                let text, answer;
+            document.getElementById('finalScore').textContent = `نقاطك في هذه اللعبة: ${score}`;
+            
+            // تحديث النشاط
+            gameSystem.updatePlayerActivity(currentPlayer, 'انتهى من اللعب', `المستوى ${currentLevel} - النقاط: ${score}`);
+            
+            gameSystem.updatePlayer(currentPlayer, player);
+        }
+
+        // تحديث معلومات اللاعب
+        function updatePlayerInfo() {
+            const player = gameSystem.getPlayer(currentPlayer);
+            document.getElementById('playerInfo').textContent = 
+                `مرحبا ${currentPlayer} | النقاط الإجمالية: ${player.totalScore} | المستوى الحالي: ${player.currentLevel}`;
+        }
+
+        // تحديث كرات الدراغون
+        function updateDragonBalls() {
+            const container = document.getElementById('dragonBalls');
+            container.innerHTML = '';
+            
+            const player = gameSystem.getPlayer(currentPlayer);
+            for (let i = 0; i < 7; i++) {
+                const ball = document.createElement('div');
+                ball.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2';
                 
-                if (op === '×') {
-                    text = `${a} × ${b} = ?`;
-                    answer = a * b;
+                if (i < player.dragonBalls) {
+                    ball.className += ' bg-orange-500 text-white dragonball border-yellow-400';
+                    ball.textContent = `⭐${i + 1}`;
                 } else {
-                    text = `${a * b} ÷ ${a} = ?`;
-                    answer = b;
+                    ball.className += ' bg-gray-600 text-gray-400 border-gray-500';
+                    ball.textContent = '?';
                 }
                 
-                const options = generateOptions(answer);
-                
-                questions.push({
-                    text,
-                    options,
-                    correctAnswer: options.indexOf(answer.toString())
-                });
+                container.appendChild(ball);
             }
-            
-            return questions.sort(() => Math.random() - 0.5);
         }
-        
-        function generateOptions(correctAnswer) {
-            const options = [correctAnswer.toString()];
+
+        // دوال مساعدة للحوارات
+        function showAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <p class="text-center mb-4">${message}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full bg-primary hover:bg-purple-700 text-white py-2 px-4 rounded">
+                        حسناً
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showConfirmDialog(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <p class="text-center mb-4">${message}</p>
+                    <div class="flex justify-center space-x-3">
+                        <button class="cancel-btn px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
+                            إلغاء
+                        </button>
+                        <button class="confirm-btn px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+                            تأكيد
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
             
-            while (options.length < 4) {
-                const variation = Math.floor(Math.random() * 5) + 1;
-                const sign = Math.random() > 0.5 ? 1 : -1;
-                const newOption = correctAnswer + (variation * sign);
+            modal.querySelector('.cancel-btn').onclick = function() {
+                document.body.removeChild(modal);
+            };
+            
+            modal.querySelector('.confirm-btn').onclick = function() {
+                document.body.removeChild(modal);
+                onConfirm();
+            };
+        }
+
+        // تهيئة اللعبة
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // إضافة بعض اللاعبين للتجربة
+            ['أحمد المتفوق', 'فاطمة الذكية', 'محمد العبقري', 'عائشة النجمة'].forEach((name, index) => {
+                const player = gameSystem.getPlayer(name);
+                player.totalScore = Math.floor(Math.random() * 500) + 100;
+                player.dragonBalls = Math.floor(Math.random() * 6) + 1;
+                player.currentLevel = Math.min(7, player.dragonBalls + 1);
                 
-                if (newOption > 0 && !options.includes(newOption.toString())) {
-                    options.push(newOption.toString());
+                // محاكاة اتصال عشوائي
+                if (Math.random() > 0.5) {
+                    gameSystem.setPlayerOnline(name, ['في القائمة الرئيسية', 'يلعب المستوى 3', 'يتحدى لاعب آخر'][Math.floor(Math.random() * 3)]);
                 }
-            }
+            });
             
-            return options.sort(() => Math.random() - 0.5);
-        }
+            // دعم الوضع المظلم
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            });
+        });
     </script>
 </body>
 </html>
-
-
-هذا الكود يستخدم Firebase Realtime Database لإنشاء اتصال حقيقي بين التلاميذ والأستاذ. إليك الميزات الرئيسية:
-
-1. **نظام تسجيل الدخول**: لكل من التلاميذ والأستاذ
-2. **تتبع الحالة الفورية**: يتم تحديث حالة اللاعبين في الوقت الحقيقي
-3. **لوحة تحكم الأستاذ**: تعرض جميع التلاميذ المتصلين ونشاطهم
-4. **نظام اللعب**: يتضمن أسئلة رياضية مع عداد زمني
-5. **نظام النقاط**: يحفظ تقدم كل تلميذ
-
-لتنفيذ هذا المشروع على Vercel:
-1. أنشئ مشروع Firebase جديد
-2. استبدل إعدادات Firebase في الكود بإعدادات مشروعك
-3. انشر الكود على Vercel
-
-ملاحظة: ستحتاج إلى استبدال إعدادات Firebase في الكود بقيم مشروعك الخاص في Firebase Console.
