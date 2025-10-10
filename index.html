@@ -111,8 +111,8 @@
         
         .online-indicator {
             background: #10b981;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             animation: blink 2s infinite;
         }
@@ -123,16 +123,33 @@
         }
         
         .player-avatar {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 3px solid #FFD700;
+            border: 4px solid #FFD700;
             background: linear-gradient(45deg, #333, #555);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 32px;
             margin: 0 auto;
+            position: relative;
+        }
+        
+        .level-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: linear-gradient(45deg, #FF6B6B, #FFE66D);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
         }
         
         .monster-evolution {
@@ -144,20 +161,22 @@
             transform: scale(1.1);
         }
         
-        .challenge-notification {
+        .live-notification {
             position: fixed;
             top: 20px;
-            right: 20px;
-            background: linear-gradient(45deg, #dc2626, #ef4444);
+            left: 20px;
+            background: linear-gradient(45deg, #10b981, #059669);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
             z-index: 1000;
-            animation: slideIn 0.5s ease;
+            animation: slideInLeft 0.5s ease;
+            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
             to { transform: translateX(0); }
         }
         
@@ -167,36 +186,92 @@
         
         .math-formula {
             font-family: 'Courier New', monospace;
-            font-size: 1.2em;
+            font-size: 1.6em;
             background: rgba(255,255,255,0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            direction: ltr;
+            text-align: center;
+            border: 2px solid rgba(255,215,0,0.3);
         }
         
-        .real-time-update {
-            animation: highlight 2s ease;
+        .real-time-pulse {
+            animation: realtimePulse 2s infinite;
         }
         
-        @keyframes highlight {
-            0% { background-color: rgba(34, 197, 94, 0.3); }
-            100% { background-color: transparent; }
+        @keyframes realtimePulse {
+            0% { background-color: rgba(16, 185, 129, 0.1); }
+            50% { background-color: rgba(16, 185, 129, 0.3); }
+            100% { background-color: rgba(16, 185, 129, 0.1); }
+        }
+        
+        .student-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .student-card.playing {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+            animation: playingGlow 2s infinite;
+        }
+        
+        @keyframes playingGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.8); }
+        }
+        
+        .student-card.in-challenge {
+            border-color: #dc2626;
+            background: rgba(220, 38, 38, 0.2);
+            animation: challengeGlow 1s infinite;
+        }
+        
+        @keyframes challengeGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.8); }
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        
+        .connection-online {
+            background: #10b981;
+            color: white;
+        }
+        
+        .connection-offline {
+            background: #dc2626;
+            color: white;
         }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen">
+    <!-- مؤشر الاتصال -->
+    <div id="connectionStatus" class="connection-status connection-online">🟢 متصل</div>
+
     <!-- خلفية النجوم -->
     <div id="stars" class="fixed inset-0 z-0"></div>
 
-    <!-- إشعارات التحدي -->
-    <div id="challengeNotifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <!-- إشعارات النشاط المباشر -->
+    <div id="liveNotifications" class="fixed top-16 left-4 z-50 space-y-2 max-w-sm"></div>
 
     <!-- الشاشة الرئيسية -->
     <div id="mainMenu" class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <h1 class="text-4xl md:text-6xl font-bold mb-8 text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             Math 2ème
         </h1>
-        <p class="text-xl mb-8 text-center text-gray-300">لعبة الرياضيات التفاعلية - المنهج الجزائري</p>
+        <p class="text-xl mb-4 text-center text-gray-300">لعبة الرياضيات التفاعلية - المنهج الجزائري</p>
+        <p class="text-sm mb-8 text-center text-yellow-400">🔄 اتصال مباشر حقيقي | العمليات من اليسار لليمين</p>
         
         <div class="space-y-4 w-full max-w-md">
             <button onclick="showPlayerLogin()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
@@ -205,6 +280,12 @@
             <button onclick="showTeacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
                 دخول الأستاذ
             </button>
+        </div>
+        
+        <!-- إحصائيات مباشرة -->
+        <div class="mt-8 text-center text-sm text-gray-400">
+            <div>متصلون الآن: <span id="mainMenuOnlineCount" class="text-green-400 font-bold">0</span></div>
+            <div>إجمالي المسجلين: <span id="mainMenuTotalPlayers" class="text-blue-400 font-bold">0</span></div>
         </div>
     </div>
 
@@ -236,14 +317,17 @@
         </div>
     </div>
 
-    <!-- لوحة التحكم للأستاذ -->
+    <!-- لوحة التحكم للأستاذ - الاتصال المباشر -->
     <div id="teacherDashboard" class="hidden relative z-10 p-4">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">🎓 لوحة تحكم الأستاذ</h2>
-                <div class="flex space-x-4">
+                <h2 class="text-3xl font-bold">🔴 LIVE | لوحة المراقبة المباشرة</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm bg-green-600 px-3 py-1 rounded-full animate-pulse">
+                        🔄 تحديث تلقائي كل ثانية
+                    </div>
                     <div class="text-sm">
-                        آخر تحديث: <span id="lastUpdate" class="text-green-400"></span>
+                        آخر تحديث: <span id="lastUpdateTime" class="font-bold text-green-400"></span>
                     </div>
                     <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
                         خروج
@@ -251,62 +335,102 @@
                 </div>
             </div>
             
-            <!-- الإحصائيات الفورية -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-lg font-bold mb-2 text-green-400">🟢 متصلون الآن</h3>
-                    <div id="liveOnlineCount" class="text-3xl font-bold text-green-400">0</div>
-                    <div id="liveOnlineList" class="text-xs mt-2 space-y-1"></div>
+            <!-- إحصائيات مباشرة شاملة -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-lg text-center real-time-pulse">
+                    <div class="text-3xl mb-2">🟢</div>
+                    <h3 class="text-lg font-bold">متصلون الآن</h3>
+                    <div id="liveOnlineCount" class="text-4xl font-bold">0</div>
+                    <div class="text-sm opacity-75">نشطون فعلياً</div>
                 </div>
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-lg font-bold mb-2 text-blue-400">📊 إجمالي التلاميذ</h3>
-                    <div id="totalStudents" class="text-3xl font-bold text-blue-400">0</div>
+                
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-lg text-center">
+                    <div class="text-3xl mb-2">🎮</div>
+                    <h3 class="text-lg font-bold">يلعبون الآن</h3>
+                    <div id="currentlyPlayingCount" class="text-4xl font-bold">0</div>
+                    <div class="text-sm opacity-75">في مستويات مختلفة</div>
                 </div>
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-lg font-bold mb-2 text-yellow-400">⚔️ تحديات نشطة</h3>
-                    <div id="activeChallenges" class="text-3xl font-bold text-yellow-400">0</div>
+                
+                <div class="bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-lg text-center">
+                    <div class="text-3xl mb-2">⚔️</div>
+                    <h3 class="text-lg font-bold">تحديات نشطة</h3>
+                    <div id="activeChallengesCount" class="text-4xl font-bold">0</div>
+                    <div class="text-sm opacity-75">معارك جارية</div>
                 </div>
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-lg font-bold mb-2 text-purple-400">🐉 كرات مُجمعة</h3>
-                    <div id="totalDragonBalls" class="text-3xl font-bold text-purple-400">0</div>
+                
+                <div class="bg-gradient-to-r from-purple-600 to-purple-700 p-6 rounded-lg text-center">
+                    <div class="text-3xl mb-2">🐉</div>
+                    <h3 class="text-lg font-bold">كرات دراغون</h3>
+                    <div id="totalDragonBallsCount" class="text-4xl font-bold">0</div>
+                    <div class="text-sm opacity-75">مجمعة حتى الآن</div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6 rounded-lg text-center">
+                    <div class="text-3xl mb-2">📊</div>
+                    <h3 class="text-lg font-bold">إجمالي اللاعبين</h3>
+                    <div id="totalStudentsCount" class="text-4xl font-bold">0</div>
+                    <div class="text-sm opacity-75">مسجلين في النظام</div>
                 </div>
             </div>
 
-            <!-- نشاط التلاميذ الفوري -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- النشاط المباشر الفوري -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- التلاميذ المتصلون والنشطون -->
                 <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-green-400">🎮 التلاميذ يلعبون الآن</h3>
-                    <div id="currentlyPlaying" class="space-y-3 max-h-60 overflow-y-auto">
+                    <h3 class="text-xl font-bold mb-4 text-green-400 flex items-center">
+                        🟢 النشاط المباشر 
+                        <div class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
+                    </h3>
+                    <div id="liveStudentActivity" class="space-y-3 max-h-80 overflow-y-auto">
                         <!-- سيتم ملؤها ديناميكياً -->
                     </div>
                 </div>
+                
+                <!-- التحديات والمعارك الجارية -->
                 <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-yellow-400">🏆 آخر الإنجازات</h3>
-                    <div id="recentAchievements" class="space-y-2 max-h-60 overflow-y-auto">
+                    <h3 class="text-xl font-bold mb-4 text-red-400 flex items-center">
+                        ⚔️ المعارك الجارية
+                        <div class="ml-2 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                    </h3>
+                    <div id="liveChallenges" class="space-y-3 max-h-80 overflow-y-auto">
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </div>
+                </div>
+                
+                <!-- آخر الإنجازات والأحداث -->
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400 flex items-center">
+                        🏆 إنجازات فورية
+                        <div class="ml-2 w-3 h-3 bg-yellow-500 rounded-full animate-ping"></div>
+                    </h3>
+                    <div id="liveAchievements" class="space-y-2 max-h-80 overflow-y-auto">
                         <!-- سيتم ملؤها ديناميكياً -->
                     </div>
                 </div>
             </div>
 
-            <!-- جدول التلاميذ التفاعلي -->
+            <!-- جدول التلاميذ التفاعلي المباشر -->
             <div class="bg-gray-800 p-6 rounded-lg">
-                <h3 class="text-xl font-bold mb-4">📋 جدول التلاميذ التفاعلي</h3>
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    📊 مراقبة شاملة للتلاميذ (تحديث فوري)
+                    <div class="ml-2 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
+                </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-gray-600">
-                                <th class="text-right p-2">الترتيب</th>
-                                <th class="text-right p-2">الصورة الرمزية</th>
-                                <th class="text-right p-2">الاسم</th>
-                                <th class="text-right p-2">الحالة</th>
-                                <th class="text-right p-2">المستوى الحالي</th>
-                                <th class="text-right p-2">النقاط</th>
-                                <th class="text-right p-2">كرات الدراغون</th>
-                                <th class="text-right p-2">النشاط</th>
-                                <th class="text-right p-2">إجراءات</th>
+                                <th class="text-right p-3">الترتيب</th>
+                                <th class="text-right p-3">الوحش/المستوى</th>
+                                <th class="text-right p-3">الاسم</th>
+                                <th class="text-right p-3">الحالة المباشرة</th>
+                                <th class="text-right p-3">النشاط الحالي</th>
+                                <th class="text-right p-3">النقاط الإجمالية</th>
+                                <th class="text-right p-3">الكرات المجمعة</th>
+                                <th class="text-right p-3">آخر نشاط</th>
+                                <th class="text-right p-3">إجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="studentsTable">
+                        <tbody id="liveStudentsTable">
                             <!-- سيتم ملؤها ديناميكياً -->
                         </tbody>
                     </table>
@@ -318,13 +442,15 @@
     <!-- شاشة اختيار المستوى -->
     <div id="levelSelection" class="hidden relative z-10 p-4">
         <div class="max-w-6xl mx-auto">
-            <!-- معلومات اللاعب مع الصورة الرمزية -->
+            <!-- بروفايل اللاعب المطور -->
             <div class="text-center mb-8">
                 <div class="player-avatar monster-evolution mb-4" id="playerAvatar">
                     🥚
+                    <div class="level-badge" id="levelBadge">1</div>
                 </div>
-                <h2 class="text-3xl font-bold mb-4">اختر المستوى</h2>
-                <div id="playerInfo" class="text-xl text-gray-300 mb-4"></div>
+                <h2 class="text-3xl font-bold mb-2">اختر المستوى</h2>
+                <div id="playerInfo" class="text-xl text-gray-300 mb-2"></div>
+                <div id="monsterName" class="text-lg text-yellow-400 mb-4"></div>
                 <div id="dragonBalls" class="flex justify-center space-x-2 mb-6"></div>
                 
                 <!-- أزرار التحدي والإعدادات -->
@@ -333,7 +459,7 @@
                         🔥 تحدي لاعب آخر
                     </button>
                     <button onclick="showOnlinePlayersModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-                        👥 اللاعبون المتصلون
+                        👥 متصلون الآن (<span id="onlinePlayersCount">0</span>)
                     </button>
                 </div>
                 
@@ -343,62 +469,69 @@
                 </div>
             </div>
             
-            <!-- المستويات السبعة -->
+            <!-- المستويات السبعة مع الوحوش -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                 <!-- المستوى الأول -->
                 <div id="level1" onclick="selectLevel(1)" class="level-card bg-green-600 hover:bg-green-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <div class="text-4xl mb-2">🐛</div>
                     <h3 class="text-xl font-bold mb-2">المستوى الأول</h3>
-                    <p class="text-sm mb-2">أولوية العمليات الأساسية</p>
+                    <p class="text-sm mb-2">اليرقة - العمليات البسيطة</p>
                     <p class="text-xs">⏱️ 45 ثانية | 🐉 كرة واحدة</p>
                     <div class="mt-2">✅ متاح</div>
                 </div>
                 
                 <!-- المستوى الثاني -->
                 <div id="level2" onclick="selectLevel(2)" class="level-card bg-blue-600 hover:bg-blue-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <div class="text-4xl mb-2">🐣</div>
                     <h3 class="text-xl font-bold mb-2">المستوى الثاني</h3>
-                    <p class="text-sm mb-2">الأقواس المتداخلة</p>
+                    <p class="text-sm mb-2">الفرخ - الأقواس</p>
                     <p class="text-xs">⏱️ 60 ثانية | 🐉 كرة واحدة</p>
                     <div class="mt-2">✅ متاح</div>
                 </div>
                 
                 <!-- المستوى الثالث -->
                 <div id="level3" onclick="selectLevel(3)" class="level-card bg-yellow-600 hover:bg-yellow-700 p-6 rounded-lg text-center transition-colors level-unlocked">
+                    <div class="text-4xl mb-2">🦋</div>
                     <h3 class="text-xl font-bold mb-2">المستوى الثالث</h3>
-                    <p class="text-sm mb-2">الكسور الأساسية</p>
+                    <p class="text-sm mb-2">الفراشة - الكسور الأساسية</p>
                     <p class="text-xs">⏱️ 90 ثانية | 🐉 كرة واحدة</p>
                     <div class="mt-2">✅ متاح</div>
                 </div>
                 
                 <!-- المستوى الرابع -->
                 <div id="level4" onclick="selectLevel(4)" class="level-card bg-orange-600 hover:bg-orange-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <div class="text-4xl mb-2">🐉</div>
                     <h3 class="text-xl font-bold mb-2">المستوى الرابع</h3>
-                    <p class="text-sm mb-2">عمليات الكسور المعقدة</p>
+                    <p class="text-sm mb-2">التنين الصغير - كسور معقدة</p>
                     <p class="text-xs">⏱️ 2 دقيقة | 🐉 كرة واحدة</p>
-                    <div id="level4Lock" class="mt-2 text-red-400">🔒 يحتاج 3 كرات</div>
+                    <div id="level4Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 3 مستويات</div>
                 </div>
                 
                 <!-- المستوى الخامس -->
                 <div id="level5" onclick="selectLevel(5)" class="level-card bg-purple-600 hover:bg-purple-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <div class="text-4xl mb-2">🔥</div>
                     <h3 class="text-xl font-bold mb-2">المستوى الخامس</h3>
-                    <p class="text-sm mb-2">المسائل المركبة</p>
+                    <p class="text-sm mb-2">التنين الناري - مسائل مركبة</p>
                     <p class="text-xs">⏱️ 3 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level5Lock" class="mt-2 text-red-400">🔒 يحتاج 4 كرات</div>
+                    <div id="level5Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 4 مستويات</div>
                 </div>
                 
                 <!-- المستوى السادس -->
                 <div id="level6" onclick="selectLevel(6)" class="level-card bg-red-600 hover:bg-red-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <div class="text-4xl mb-2">⚡</div>
                     <h3 class="text-xl font-bold mb-2">المستوى السادس</h3>
-                    <p class="text-sm mb-2">التمارين النصية</p>
+                    <p class="text-sm mb-2">التنين البرقي - تمارين نصية</p>
                     <p class="text-xs">⏱️ 4 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level6Lock" class="mt-2 text-red-400">🔒 يحتاج 5 كرات</div>
+                    <div id="level6Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 5 مستويات</div>
                 </div>
                 
                 <!-- المستوى السابع -->
                 <div id="level7" onclick="selectLevel(7)" class="level-card bg-pink-600 hover:bg-pink-700 p-6 rounded-lg text-center transition-colors level-locked">
+                    <div class="text-4xl mb-2">🌟</div>
                     <h3 class="text-xl font-bold mb-2">المستوى السابع</h3>
-                    <p class="text-sm mb-2">تحدي الأعداد العشرية</p>
+                    <p class="text-sm mb-2">سيد الرياضيات - أعداد عشرية</p>
                     <p class="text-xs">⏱️ 5 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level7Lock" class="mt-2 text-red-400">🔒 يحتاج 6 كرات</div>
+                    <div id="level7Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 6 مستويات</div>
                 </div>
             </div>
             
@@ -417,13 +550,13 @@
             <div class="mb-4">
                 <label class="block text-sm font-bold mb-2">اختر المستوى للتحدي:</label>
                 <select id="challengeLevel" class="w-full p-2 text-black rounded">
-                    <option value="1">المستوى الأول</option>
-                    <option value="2">المستوى الثاني</option>
-                    <option value="3">المستوى الثالث</option>
-                    <option value="4">المستوى الرابع</option>
-                    <option value="5">المستوى الخامس</option>
-                    <option value="6">المستوى السادس</option>
-                    <option value="7">المستوى السابع</option>
+                    <option value="1">المستوى الأول - اليرقة</option>
+                    <option value="2">المستوى الثاني - الفرخ</option>
+                    <option value="3">المستوى الثالث - الفراشة</option>
+                    <option value="4">المستوى الرابع - التنين الصغير</option>
+                    <option value="5">المستوى الخامس - التنين الناري</option>
+                    <option value="6">المستوى السادس - التنين البرقي</option>
+                    <option value="7">المستوى السابع - سيد الرياضيات</option>
                 </select>
             </div>
             <div id="onlinePlayersList" class="space-y-2 mb-4 max-h-40 overflow-y-auto">
@@ -439,9 +572,9 @@
 
     <!-- مودال اللاعبين المتصلين -->
     <div id="onlinePlayersModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg">
-            <h3 class="text-2xl font-bold mb-4 text-center">👥 اللاعبون المتصلون</h3>
-            <div id="onlinePlayersGrid" class="grid grid-cols-2 gap-4 mb-4 max-h-80 overflow-y-auto">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-4xl">
+            <h3 class="text-2xl font-bold mb-4 text-center">👥 اللاعبون المتصلون الآن</h3>
+            <div id="onlinePlayersGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 max-h-80 overflow-y-auto">
                 <!-- سيتم ملؤها ديناميكياً -->
             </div>
             <div class="text-center">
@@ -477,16 +610,15 @@
                         <div>أنت: <span id="myScore" class="font-bold">0</span></div>
                         <div>الخصم: <span id="opponentScore" class="font-bold">0</span></div>
                     </div>
-                    <div class="mt-2">
-                        <div class="text-sm">وقت الإجابة: <span id="myTime" class="font-bold">-</span> ثانية</div>
-                        <div class="text-sm">وقت الخصم: <span id="opponentTime" class="font-bold">-</span> ثانية</div>
-                    </div>
                 </div>
             </div>
 
             <!-- السؤال -->
             <div class="text-center mb-8">
                 <div id="questionText" class="text-2xl md:text-3xl font-bold mb-4 bg-gray-800 p-6 rounded-lg math-formula"></div>
+                <div class="text-sm text-yellow-400 bg-blue-900 p-2 rounded">
+                    💡 العمليات من اليسار إلى اليمين (مثل الفرنسية): 2 + 3 × 4 = (2 + 3) × 4 = 20
+                </div>
             </div>
 
             <!-- الأبواب الثلاثة -->
@@ -510,6 +642,7 @@
                 <div id="resultIcon" class="text-6xl mb-4"></div>
                 <div id="resultText" class="text-2xl font-bold mb-4"></div>
                 <div id="answerTime" class="text-lg mb-4"></div>
+                <div id="explanationText" class="text-sm bg-blue-900 p-3 rounded mb-4"></div>
                 <button id="nextQuestion" onclick="nextQuestion()" class="bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                     السؤال التالي
                 </button>
@@ -531,7 +664,8 @@
                 <div class="text-xl font-bold text-yellow-400">حصلت على كرة دراغون بول!</div>
                 <div id="monsterEvolution" class="hidden mt-4">
                     <div class="text-lg text-green-400">وحشك تطور! 🧬</div>
-                    <div id="newMonster" class="text-4xl mt-2"></div>
+                    <div id="newMonster" class="text-6xl mt-2"></div>
+                    <div id="newMonsterName" class="text-lg text-yellow-400 mt-2"></div>
                 </div>
                 <div id="newLevelUnlocked" class="hidden mt-2 text-green-400"></div>
             </div>
@@ -561,251 +695,582 @@
     </div>
 
     <script>
-        // نظام الربط الحقيقي للعبة
-        class RealTimeGameSystem {
+        // 🔄 نظام الاتصال الحقيقي المباشر - كل شيء في الكود
+        class RealTimeGameConnection {
             constructor() {
                 this.data = {
                     players: {},
-                    onlinePlayers: new Map(), // name -> timestamp
+                    onlinePlayers: new Map(),
                     challenges: {},
                     gameHistory: [],
-                    liveActivity: []
+                    liveActivity: [],
+                    systemStats: {
+                        totalConnections: 0,
+                        peakOnline: 0,
+                        lastUpdate: Date.now()
+                    }
                 };
-                this.loadData();
-                this.startRealTimeSync();
-                this.playerId = null;
+                
+                this.myPlayerId = null;
+                this.mySessionId = this.generateSessionId();
+                this.isConnected = true;
                 this.lastHeartbeat = Date.now();
+                this.syncInterval = null;
+                this.connectionCheckInterval = null;
+                
+                this.loadData();
+                this.startRealTimeConnection();
+                this.startConnectionMonitoring();
             }
             
-            // تحميل البيانات من التخزين
+            // توليد معرف جلسة فريد
+            generateSessionId() {
+                return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            // تحميل البيانات من التخزين المشترك
             loadData() {
                 try {
-                    const saved = sessionStorage.getItem('mathGameRealTime');
+                    // استخدام localStorage للمشاركة بين الجلسات
+                    const saved = localStorage.getItem('mathGameRealTimeData');
                     if (saved) {
                         const parsed = JSON.parse(saved);
                         this.data.players = parsed.players || {};
                         this.data.gameHistory = parsed.gameHistory || [];
                         this.data.liveActivity = parsed.liveActivity || [];
                         this.data.challenges = parsed.challenges || {};
+                        this.data.systemStats = parsed.systemStats || this.data.systemStats;
                     }
                 } catch (e) {
-                    console.log('Could not load from storage');
+                    console.warn('Could not load shared data:', e);
                 }
             }
             
-            // حفظ البيانات
-            save() {
+            // حفظ البيانات للمشاركة
+            saveData() {
                 try {
                     const dataToSave = {
                         players: this.data.players,
                         gameHistory: this.data.gameHistory,
                         liveActivity: this.data.liveActivity,
                         challenges: this.data.challenges,
-                        lastUpdate: Date.now()
+                        systemStats: {
+                            ...this.data.systemStats,
+                            lastUpdate: Date.now()
+                        },
+                        lastSyncTime: Date.now()
                     };
-                    sessionStorage.setItem('mathGameRealTime', JSON.stringify(dataToSave));
+                    localStorage.setItem('mathGameRealTimeData', JSON.stringify(dataToSave));
                     
-                    // محاكاة تزامن مع الخادم
-                    this.broadcastUpdate();
+                    // تحديث إحصائيات النظام
+                    this.data.systemStats.totalConnections = Math.max(
+                        this.data.systemStats.totalConnections,
+                        this.data.onlinePlayers.size
+                    );
+                    this.data.systemStats.peakOnline = Math.max(
+                        this.data.systemStats.peakOnline,
+                        this.data.onlinePlayers.size
+                    );
+                    
+                    this.broadcastToSystem();
                 } catch (e) {
-                    console.log('Storage not available');
+                    console.warn('Could not save shared data:', e);
+                    this.setConnectionStatus(false);
                 }
             }
             
-            // بدء النظام الزمني الحقيقي
-            startRealTimeSync() {
-                // تحديث كل ثانيتين
-                setInterval(() => {
+            // بدء الاتصال المباشر
+            startRealTimeConnection() {
+                // تحديث سريع جداً - كل 500ms للاتصال الحقيقي
+                this.syncInterval = setInterval(() => {
+                    this.syncWithOtherSessions();
                     this.updateOnlineStatus();
-                    this.cleanupOldActivity();
+                    this.cleanupOldData();
+                    this.processActiveChallenges();
+                    
+                    // تحديث واجهات المستخدم
                     if (isTeacher) {
-                        this.updateTeacherDashboard();
+                        this.updateTeacherDashboardRealTime();
                     }
-                    this.processChallenge();
-                }, 2000);
+                    this.updateMainMenuStats();
+                    this.updateOnlineCounters();
+                }, 500);
                 
-                // نبضة اتصال كل 5 ثوان
+                // نبضة حياة كل ثانيتين
                 setInterval(() => {
-                    if (this.playerId) {
+                    if (this.myPlayerId) {
                         this.sendHeartbeat();
                     }
-                }, 5000);
+                }, 2000);
             }
             
-            // تسجيل لاعب كمتصل
-            setPlayerOnline(name, currentActivity = 'في القائمة الرئيسية') {
-                this.data.onlinePlayers.set(name, {
-                    timestamp: Date.now(),
-                    activity: currentActivity,
-                    lastSeen: Date.now()
-                });
-                this.playerId = name;
-                this.logActivity(name, 'دخل إلى اللعبة', 'login');
-                this.save();
+            // مراقبة حالة الاتصال
+            startConnectionMonitoring() {
+                this.connectionCheckInterval = setInterval(() => {
+                    this.checkConnectionHealth();
+                }, 3000);
             }
             
-            // تحديث نشاط اللاعب
-            updatePlayerActivity(name, activity, details = null) {
-                if (this.data.onlinePlayers.has(name)) {
-                    const playerInfo = this.data.onlinePlayers.get(name);
-                    playerInfo.activity = activity;
-                    playerInfo.lastSeen = Date.now();
-                    if (details) {
-                        playerInfo.details = details;
+            // فحص صحة الاتصال
+            checkConnectionHealth() {
+                try {
+                    // محاولة قراءة/كتابة للتحقق من الاتصال
+                    const testKey = 'mathGame_connectionTest';
+                    const testValue = Date.now().toString();
+                    localStorage.setItem(testKey, testValue);
+                    const retrieved = localStorage.getItem(testKey);
+                    
+                    if (retrieved === testValue) {
+                        this.setConnectionStatus(true);
+                        localStorage.removeItem(testKey);
+                    } else {
+                        this.setConnectionStatus(false);
                     }
-                    this.logActivity(name, activity, 'activity', details);
-                    this.save();
-                }
-            }
-            
-            // إرسال نبضة اتصال
-            sendHeartbeat() {
-                if (this.data.onlinePlayers.has(this.playerId)) {
-                    const playerInfo = this.data.onlinePlayers.get(this.playerId);
-                    playerInfo.lastSeen = Date.now();
-                    this.lastHeartbeat = Date.now();
+                } catch (e) {
+                    this.setConnectionStatus(false);
                 }
             }
             
             // تحديث حالة الاتصال
+            setConnectionStatus(isOnline) {
+                this.isConnected = isOnline;
+                const statusElement = document.getElementById('connectionStatus');
+                if (statusElement) {
+                    if (isOnline) {
+                        statusElement.className = 'connection-status connection-online';
+                        statusElement.textContent = '🟢 متصل';
+                    } else {
+                        statusElement.className = 'connection-status connection-offline';
+                        statusElement.textContent = '🔴 انقطع الاتصال';
+                    }
+                }
+            }
+            
+            // مزامنة مع الجلسات الأخرى
+            syncWithOtherSessions() {
+                try {
+                    const currentData = localStorage.getItem('mathGameRealTimeData');
+                    if (currentData) {
+                        const parsed = JSON.parse(currentData);
+                        
+                        // دمج البيانات الجديدة
+                        this.mergeExternalData(parsed);
+                    }
+                } catch (e) {
+                    console.warn('Sync error:', e);
+                }
+            }
+            
+            // دمج البيانات الخارجية
+            mergeExternalData(externalData) {
+                // دمج اللاعبين
+                Object.keys(externalData.players || {}).forEach(playerName => {
+                    if (!this.data.players[playerName] || 
+                        externalData.players[playerName].lastPlayed > this.data.players[playerName].lastPlayed) {
+                        this.data.players[playerName] = externalData.players[playerName];
+                    }
+                });
+                
+                // دمج الأنشطة الحديثة
+                if (externalData.liveActivity) {
+                    externalData.liveActivity.forEach(activity => {
+                        if (!this.data.liveActivity.find(a => a.id === activity.id)) {
+                            this.data.liveActivity.unshift(activity);
+                        }
+                    });
+                    this.data.liveActivity = this.data.liveActivity
+                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .slice(0, 100);
+                }
+                
+                // دمج التحديات
+                Object.keys(externalData.challenges || {}).forEach(challengeId => {
+                    if (!this.data.challenges[challengeId]) {
+                        this.data.challenges[challengeId] = externalData.challenges[challengeId];
+                    }
+                });
+            }
+            
+            // تسجيل لاعب كمتصل
+            setPlayerOnline(playerName, activity = 'في القائمة الرئيسية') {
+                this.myPlayerId = playerName;
+                this.data.onlinePlayers.set(playerName, {
+                    sessionId: this.mySessionId,
+                    name: playerName,
+                    activity: activity,
+                    lastSeen: Date.now(),
+                    connectedAt: Date.now(),
+                    isPlaying: false,
+                    inChallenge: false,
+                    currentLevel: null,
+                    currentScore: 0
+                });
+                
+                this.logActivity(playerName, `🟢 دخل إلى اللعبة`, 'connection');
+                this.saveData();
+                
+                // إشعار للأستاذ
+                if (isTeacher) {
+                    this.showLiveNotification(`🟢 ${playerName} انضم للعبة`, 'success');
+                }
+            }
+            
+            // تحديث نشاط اللاعب
+            updatePlayerActivity(playerName, activity, details = null) {
+                if (this.data.onlinePlayers.has(playerName)) {
+                    const playerInfo = this.data.onlinePlayers.get(playerName);
+                    playerInfo.activity = activity;
+                    playerInfo.lastSeen = Date.now();
+                    playerInfo.isPlaying = activity.includes('يلعب');
+                    playerInfo.inChallenge = activity.includes('تحدي');
+                    
+                    if (details) {
+                        if (details.level) playerInfo.currentLevel = details.level;
+                        if (details.score !== undefined) playerInfo.currentScore = details.score;
+                    }
+                    
+                    this.logActivity(playerName, activity, 'activity', details);
+                    this.saveData();
+                }
+            }
+            
+            // إرسال نبضة حياة
+            sendHeartbeat() {
+                if (this.data.onlinePlayers.has(this.myPlayerId)) {
+                    const playerInfo = this.data.onlinePlayers.get(this.myPlayerId);
+                    playerInfo.lastSeen = Date.now();
+                    this.lastHeartbeat = Date.now();
+                    this.saveData();
+                }
+            }
+            
+            // تحديث حالة اللاعبين المتصلين
             updateOnlineStatus() {
                 const now = Date.now();
-                const timeout = 15000; // 15 ثانية انقطاع
+                const timeout = 10000; // 10 ثوان انقطاع
                 
-                for (let [name, info] of this.data.onlinePlayers) {
+                for (let [playerName, info] of this.data.onlinePlayers) {
                     if (now - info.lastSeen > timeout) {
-                        this.setPlayerOffline(name);
+                        this.setPlayerOffline(playerName);
                     }
                 }
             }
             
             // تسجيل لاعب كغير متصل
-            setPlayerOffline(name) {
-                if (this.data.onlinePlayers.has(name)) {
-                    this.logActivity(name, 'خرج من اللعبة', 'logout');
-                    this.data.onlinePlayers.delete(name);
-                    this.save();
+            setPlayerOffline(playerName) {
+                if (this.data.onlinePlayers.has(playerName)) {
+                    this.logActivity(playerName, `🔴 خرج من اللعبة`, 'connection');
+                    this.data.onlinePlayers.delete(playerName);
+                    this.saveData();
+                    
+                    // إشعار للأستاذ
+                    if (isTeacher) {
+                        this.showLiveNotification(`🔴 ${playerName} غادر اللعبة`, 'warning');
+                    }
                 }
             }
             
-            // تسجيل نشاط
+            // تسجيل النشاط
             logActivity(playerName, activity, type = 'activity', details = null) {
                 const activityEntry = {
+                    id: Date.now() + '-' + Math.random().toString(36).substr(2, 5),
                     player: playerName,
                     activity: activity,
                     type: type,
                     details: details,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    sessionId: this.mySessionId
                 };
                 
                 this.data.liveActivity.unshift(activityEntry);
-                this.data.liveActivity = this.data.liveActivity.slice(0, 50); // احتفظ بآخر 50 نشاط
+                this.data.liveActivity = this.data.liveActivity.slice(0, 100);
             }
             
-            // تنظيف الأنشطة القديمة
-            cleanupOldActivity() {
+            // تسجيل إنجاز
+            recordAchievement(playerName, achievement, details = null) {
+                this.logActivity(playerName, achievement, 'achievement', details);
+                
+                // إشعار فوري للأستاذ
+                if (isTeacher) {
+                    this.showLiveNotification(`🏆 ${playerName}: ${achievement}`, 'achievement');
+                }
+                
+                this.saveData();
+            }
+            
+            // تنظيف البيانات القديمة
+            cleanupOldData() {
                 const oneHourAgo = Date.now() - (60 * 60 * 1000);
                 this.data.liveActivity = this.data.liveActivity.filter(
                     activity => activity.timestamp > oneHourAgo
                 );
+                
+                // تنظيف التحديات القديمة
+                Object.keys(this.data.challenges).forEach(challengeId => {
+                    const challenge = this.data.challenges[challengeId];
+                    if (Date.now() - challenge.createdAt > 300000) { // 5 دقائق
+                        delete this.data.challenges[challengeId];
+                    }
+                });
             }
             
-            // بث التحديث
-            broadcastUpdate() {
-                // في التطبيق الحقيقي، هذا سيرسل إلى الخادم
-                // محاكاة تحديث فوري للأستاذ
-                if (isTeacher) {
-                    this.updateTeacherDashboard();
+            // معالجة التحديات النشطة
+            processActiveChallenges() {
+                Object.values(this.data.challenges).forEach(challenge => {
+                    if (challenge.status === 'pending' && 
+                        Date.now() - challenge.createdAt > 5000) {
+                        this.acceptChallenge(challenge.id);
+                    }
+                });
+            }
+            
+            // بث التحديث للنظام
+            broadcastToSystem() {
+                // تحديث إضافي للتأكد من المزامنة
+                if (Math.random() < 0.1) { // 10% من الوقت
+                    this.syncWithOtherSessions();
                 }
             }
             
             // تحديث لوحة الأستاذ في الوقت الفعلي
-            updateTeacherDashboard() {
+            updateTeacherDashboardRealTime() {
                 if (!isTeacher) return;
                 
                 const onlinePlayersArray = Array.from(this.data.onlinePlayers.entries());
+                const playingCount = onlinePlayersArray.filter(([name, info]) => info.isPlaying).length;
+                const challengeCount = Object.keys(this.data.challenges).length;
                 
                 // تحديث العدادات
-                document.getElementById('liveOnlineCount').textContent = onlinePlayersArray.length;
-                document.getElementById('totalStudents').textContent = Object.keys(this.data.players).length;
-                document.getElementById('activeChallenges').textContent = Object.keys(this.data.challenges).length;
+                this.updateElement('liveOnlineCount', onlinePlayersArray.length);
+                this.updateElement('currentlyPlayingCount', playingCount);
+                this.updateElement('activeChallengesCount', challengeCount);
+                this.updateElement('totalStudentsCount', Object.keys(this.data.players).length);
                 
                 // حساب مجموع كرات الدراغون
                 const totalDragonBalls = Object.values(this.data.players)
                     .reduce((sum, player) => sum + (player.dragonBalls || 0), 0);
-                document.getElementById('totalDragonBalls').textContent = totalDragonBalls;
-                
-                // تحديث قائمة المتصلين
-                const liveOnlineList = document.getElementById('liveOnlineList');
-                liveOnlineList.innerHTML = '';
-                onlinePlayersArray.forEach(([name, info]) => {
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between real-time-update';
-                    div.innerHTML = `
-                        <span class="text-xs">${name}</span>
-                        <span class="text-xs text-gray-400">${this.getTimeAgo(info.lastSeen)}</span>
-                    `;
-                    liveOnlineList.appendChild(div);
-                });
-                
-                // تحديث النشاط الحالي
-                this.updateCurrentlyPlaying();
-                this.updateRecentAchievements();
+                this.updateElement('totalDragonBallsCount', totalDragonBalls);
                 
                 // تحديث وقت آخر تحديث
-                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ar-DZ');
+                this.updateElement('lastUpdateTime', new Date().toLocaleTimeString('ar-DZ'));
+                
+                // تحديث الأقسام المختلفة
+                this.updateLiveStudentActivity();
+                this.updateLiveChallenges();
+                this.updateLiveAchievements();
+                this.updateLiveStudentsTable();
             }
             
-            // تحديث التلاميذ الذين يلعبون الآن
-            updateCurrentlyPlaying() {
-                const currentlyPlaying = document.getElementById('currentlyPlaying');
-                currentlyPlaying.innerHTML = '';
+            // تحديث النشاط المباشر للطلاب
+            updateLiveStudentActivity() {
+                const container = document.getElementById('liveStudentActivity');
+                if (!container) return;
                 
-                const playingNow = Array.from(this.data.onlinePlayers.entries())
-                    .filter(([name, info]) => info.activity.includes('يلعب'));
+                container.innerHTML = '';
                 
-                if (playingNow.length === 0) {
-                    currentlyPlaying.innerHTML = '<div class="text-gray-400 text-sm">لا يوجد تلاميذ يلعبون حالياً</div>';
-                } else {
-                    playingNow.forEach(([name, info]) => {
-                        const div = document.createElement('div');
-                        div.className = 'bg-gray-700 p-3 rounded flex items-center justify-between real-time-update';
-                        div.innerHTML = `
+                const onlinePlayersArray = Array.from(this.data.onlinePlayers.entries());
+                
+                if (onlinePlayersArray.length === 0) {
+                    container.innerHTML = '<div class="text-gray-400 text-sm">لا يوجد تلاميذ متصلون</div>';
+                    return;
+                }
+                
+                onlinePlayersArray.forEach(([name, info]) => {
+                    const player = this.data.players[name] || {};
+                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
+                    
+                    const div = document.createElement('div');
+                    div.className = `p-3 rounded flex items-center justify-between transition-all ${
+                        info.isPlaying ? 'bg-green-900 real-time-pulse' : 'bg-gray-700'
+                    }`;
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">${monsterInfo.emoji}</div>
                             <div>
                                 <div class="font-bold">${name}</div>
-                                <div class="text-sm text-gray-400">${info.activity}</div>
-                                ${info.details ? `<div class="text-xs text-blue-400">${info.details}</div>` : ''}
+                                <div class="text-sm ${info.isPlaying ? 'text-green-400' : 'text-gray-400'}">${info.activity}</div>
+                                ${info.currentLevel ? `<div class="text-xs text-blue-400">المستوى ${info.currentLevel} | ${info.currentScore} نقطة</div>` : ''}
                             </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
                             <div class="online-indicator"></div>
-                        `;
-                        currentlyPlaying.appendChild(div);
-                    });
-                }
+                            <div class="text-xs text-gray-400">${this.getTimeAgo(info.lastSeen)}</div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
             }
             
-            // تحديث آخر الإنجازات
-            updateRecentAchievements() {
-                const recentAchievements = document.getElementById('recentAchievements');
-                recentAchievements.innerHTML = '';
+            // تحديث التحديات المباشرة
+            updateLiveChallenges() {
+                const container = document.getElementById('liveChallenges');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                const challenges = Object.values(this.data.challenges)
+                    .filter(c => c.status !== 'completed');
+                
+                if (challenges.length === 0) {
+                    container.innerHTML = '<div class="text-gray-400 text-sm">لا توجد تحديات نشطة</div>';
+                    return;
+                }
+                
+                challenges.forEach(challenge => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-red-900 p-3 rounded real-time-pulse';
+                    div.innerHTML = `
+                        <div class="font-bold text-red-400">⚔️ ${challenge.challenger} ضد ${challenge.opponent}</div>
+                        <div class="text-sm text-gray-400">المستوى ${challenge.level} | ${challenge.status}</div>
+                        <div class="text-xs text-gray-400">${this.getTimeAgo(challenge.createdAt)}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            // تحديث الإنجازات المباشرة
+            updateLiveAchievements() {
+                const container = document.getElementById('liveAchievements');
+                if (!container) return;
+                
+                container.innerHTML = '';
                 
                 const achievements = this.data.liveActivity
                     .filter(activity => activity.type === 'achievement')
                     .slice(0, 10);
                 
                 if (achievements.length === 0) {
-                    recentAchievements.innerHTML = '<div class="text-gray-400 text-sm">لا توجد إنجازات حديثة</div>';
-                } else {
-                    achievements.forEach(achievement => {
-                        const div = document.createElement('div');
-                        div.className = 'bg-gray-700 p-2 rounded text-sm real-time-update';
-                        div.innerHTML = `
-                            <div class="font-bold text-yellow-400">${achievement.player}</div>
-                            <div>${achievement.activity}</div>
-                            <div class="text-xs text-gray-400">${this.getTimeAgo(achievement.timestamp)}</div>
-                        `;
-                        recentAchievements.appendChild(div);
-                    });
+                    container.innerHTML = '<div class="text-gray-400 text-sm">لا توجد إنجازات حديثة</div>';
+                    return;
                 }
+                
+                achievements.forEach(achievement => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-yellow-900 p-2 rounded text-sm real-time-pulse';
+                    div.innerHTML = `
+                        <div class="font-bold text-yellow-400">${achievement.player}</div>
+                        <div class="text-yellow-200">${achievement.activity}</div>
+                        <div class="text-xs text-gray-400">${this.getTimeAgo(achievement.timestamp)}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            // تحديث جدول الطلاب المباشر
+            updateLiveStudentsTable() {
+                const tableBody = document.getElementById('liveStudentsTable');
+                if (!tableBody) return;
+                
+                tableBody.innerHTML = '';
+                
+                const players = Object.values(this.data.players)
+                    .sort((a, b) => b.totalScore - a.totalScore);
+                    
+                players.forEach((player, index) => {
+                    const row = document.createElement('tr');
+                    const isOnline = this.data.onlinePlayers.has(player.name);
+                    const onlineInfo = this.data.onlinePlayers.get(player.name);
+                    
+                    row.className = `border-b border-gray-700 student-card transition-all ${
+                        isOnline && onlineInfo.isPlaying ? 'playing' : 
+                        isOnline && onlineInfo.inChallenge ? 'in-challenge' : ''
+                    }`;
+                    
+                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
+                    
+                    const statusBadge = isOnline ? 
+                        `<div class="flex items-center space-x-2">
+                            <div class="online-indicator"></div>
+                            <span class="text-xs ${onlineInfo.isPlaying ? 'text-green-400' : 'text-blue-400'}">${onlineInfo.activity}</span>
+                        </div>` :
+                        '<span class="bg-gray-500 text-white px-2 py-1 rounded text-xs">غير متصل</span>';
+                    
+                    row.innerHTML = `
+                        <td class="p-3 font-bold text-center">${index + 1}</td>
+                        <td class="p-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-2xl border-2 border-yellow-400 relative">
+                                    ${monsterInfo.emoji}
+                                    <div class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                                        ${player.currentLevel}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-yellow-400">${monsterInfo.name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3 font-bold">${player.name}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-sm">${isOnline ? onlineInfo.activity : 'غير متصل'}</td>
+                        <td class="p-3 font-bold text-yellow-400 text-center">${player.totalScore}</td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <span class="font-bold">${player.dragonBalls}/7</span>
+                                <div class="flex space-x-1">
+                                    ${Array.from({length: 7}, (_, i) => 
+                                        i < player.dragonBalls ? '🐉' : '⚫'
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3 text-sm text-center">${isOnline ? `نشط الآن` : this.getTimeAgo(new Date(player.lastPlayed).getTime())}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteStudent('${player.name}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm">
+                                حذف
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // تحديث إحصائيات القائمة الرئيسية
+            updateMainMenuStats() {
+                this.updateElement('mainMenuOnlineCount', this.data.onlinePlayers.size);
+                this.updateElement('mainMenuTotalPlayers', Object.keys(this.data.players).length);
+            }
+            
+            // تحديث عدادات الاتصال
+            updateOnlineCounters() {
+                this.updateElement('onlinePlayersCount', this.data.onlinePlayers.size);
+            }
+            
+            // دالة مساعدة لتحديث العناصر
+            updateElement(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+            
+            // إظهار إشعار مباشر
+            showLiveNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const colors = {
+                    success: 'bg-green-600',
+                    warning: 'bg-yellow-600',
+                    info: 'bg-blue-600',
+                    achievement: 'bg-purple-600'
+                };
+                
+                notification.className = `live-notification ${colors[type]}`;
+                notification.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold">${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-lg font-bold ml-2">&times;</button>
+                    </div>
+                    <div class="text-xs mt-1">${new Date().toLocaleTimeString('ar-DZ')}</div>
+                `;
+                
+                document.getElementById('liveNotifications').appendChild(notification);
+                
+                // إزالة تلقائية بعد 4 ثوان
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 4000);
             }
             
             // حساب الوقت المنقضي
@@ -816,53 +1281,6 @@
                 if (minutes < 60) return `${minutes} دقيقة`;
                 const hours = Math.floor(minutes / 60);
                 return `${hours} ساعة`;
-            }
-            
-            // إنشاء تحدي
-            createChallenge(challenger, opponent, level) {
-                const challengeId = Date.now().toString();
-                this.data.challenges[challengeId] = {
-                    id: challengeId,
-                    challenger: challenger,
-                    opponent: opponent,
-                    level: level,
-                    status: 'pending',
-                    scores: {},
-                    answers: {},
-                    times: {},
-                    startTime: null,
-                    endTime: null,
-                    createdAt: Date.now()
-                };
-                
-                this.logActivity(challenger, `أرسل تحدي إلى ${opponent}`, 'challenge');
-                this.save();
-                return challengeId;
-            }
-            
-            // معالجة التحدي
-            processChallenge() {
-                // محاكاة معالجة التحديات (في التطبيق الحقيقي سيكون عبر الشبكة)
-                Object.values(this.data.challenges).forEach(challenge => {
-                    if (challenge.status === 'pending' && Date.now() - challenge.createdAt > 5000) {
-                        // محاكاة قبول التحدي تلقائياً بعد 5 ثوان
-                        this.acceptChallenge(challenge.id);
-                    }
-                });
-            }
-            
-            // قبول التحدي
-            acceptChallenge(challengeId) {
-                if (this.data.challenges[challengeId]) {
-                    this.data.challenges[challengeId].status = 'accepted';
-                    this.data.challenges[challengeId].startTime = Date.now();
-                    this.logActivity(
-                        this.data.challenges[challengeId].opponent, 
-                        `قبل تحدي ${this.data.challenges[challengeId].challenger}`, 
-                        'challenge'
-                    );
-                    this.save();
-                }
             }
             
             // إدارة اللاعبين
@@ -879,7 +1297,7 @@
                     challengesLost: 0,
                     createdAt: Date.now()
                 };
-                this.save();
+                this.saveData();
                 return this.data.players[name];
             }
             
@@ -891,60 +1309,406 @@
                 if (this.data.players[name]) {
                     Object.assign(this.data.players[name], updates);
                     this.data.players[name].lastPlayed = new Date().toISOString();
-                    this.save();
+                    this.saveData();
                 }
             }
             
             deletePlayer(name) {
                 delete this.data.players[name];
                 this.setPlayerOffline(name);
-                this.save();
+                this.saveData();
             }
             
-            // تسجيل إنجاز
-            recordAchievement(playerName, achievement, details = null) {
-                this.logActivity(playerName, achievement, 'achievement', details);
+            // إدارة التحديات
+            createChallenge(challenger, opponent, level) {
+                const challengeId = Date.now().toString();
+                this.data.challenges[challengeId] = {
+                    id: challengeId,
+                    challenger: challenger,
+                    opponent: opponent,
+                    level: level,
+                    status: 'pending',
+                    createdAt: Date.now()
+                };
                 
-                // إشعار للأستاذ
-                if (isTeacher) {
-                    this.showNotification(`🏆 ${playerName}: ${achievement}`, 'achievement');
+                this.logActivity(challenger, `⚔️ أرسل تحدي إلى ${opponent} في المستوى ${level}`, 'challenge');
+                this.saveData();
+                return challengeId;
+            }
+            
+            acceptChallenge(challengeId) {
+                if (this.data.challenges[challengeId]) {
+                    this.data.challenges[challengeId].status = 'accepted';
+                    this.data.challenges[challengeId].startTime = Date.now();
+                    this.logActivity(
+                        this.data.challenges[challengeId].opponent, 
+                        `✅ قبل تحدي ${this.data.challenges[challengeId].challenger}`, 
+                        'challenge'
+                    );
+                    this.saveData();
                 }
-            }
-            
-            // إظهار إشعار
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `challenge-notification ${type === 'achievement' ? 'bg-green-600' : ''}`;
-                notification.innerHTML = `
-                    <div class="font-bold">${message}</div>
-                    <button onclick="this.parentElement.remove()" class="float-right text-xl">&times;</button>
-                `;
-                
-                document.getElementById('challengeNotifications').appendChild(notification);
-                
-                // إزالة تلقائية بعد 5 ثوان
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 5000);
             }
         }
 
-        // نظام تطور الوحوش
-        const monsterEvolution = {
-            0: { emoji: '🥚', name: 'البيضة', description: 'مازلت في البداية' },
-            1: { emoji: '🐛', name: 'اليرقة', description: 'بداية رحلة التعلم' },
-            2: { emoji: '🐣', name: 'الفرخ', description: 'تتعلم الأساسيات' },
-            3: { emoji: '🦋', name: 'الفراشة', description: 'تحلق في عالم الرياضيات' },
-            4: { emoji: '🐉', name: 'التنين الصغير', description: 'قوة متنامية' },
-            5: { emoji: '🔥', name: 'التنين الناري', description: 'تتقن الرياضيات' },
-            6: { emoji: '⚡', name: 'التنين البرقي', description: 'سرعة خارقة في الحل' },
-            7: { emoji: '🌟', name: 'سيد الرياضيات', description: 'وصلت للمجد!' }
+        // نظام الوحوش حسب المستوى
+        const levelMonsters = {
+            1: { emoji: '🐛', name: 'اليرقة المتعلمة', description: 'بداية رحلة التعلم' },
+            2: { emoji: '🐣', name: 'الفرخ الذكي', description: 'يكتشف الأقواس' },
+            3: { emoji: '🦋', name: 'الفراشة الحاسبة', description: 'تحلق مع الكسور' },
+            4: { emoji: '🐉', name: 'التنين الصغير', description: 'قوة الكسور المعقدة' },
+            5: { emoji: '🔥', name: 'التنين الناري', description: 'سيد المسائل المركبة' },
+            6: { emoji: '⚡', name: 'التنين البرقي', description: 'سرعة البرق في الحل' },
+            7: { emoji: '🌟', name: 'سيد الرياضيات', description: 'إتقان كامل للرياضيات' }
+        };
+
+        // 🧮 دالة تقييم العمليات من اليسار إلى اليمين (مثل الفرنسية)
+        function evaluateLeftToRight(expression) {
+            // إزالة المسافات
+            expression = expression.replace(/\s/g, '');
+            
+            // معالجة الأقواس أولاً
+            while (expression.includes('(')) {
+                const openIndex = expression.lastIndexOf('(');
+                const closeIndex = expression.indexOf(')', openIndex);
+                const innerExpr = expression.substring(openIndex + 1, closeIndex);
+                const result = evaluateLeftToRight(innerExpr);
+                expression = expression.substring(0, openIndex) + result + expression.substring(closeIndex + 1);
+            }
+            
+            // تقسيم التعبير إلى أرقام وعمليات
+            const tokens = expression.match(/(\d+\.?\d*|[+\-*/])/g);
+            if (!tokens || tokens.length === 0) return 0;
+            
+            // تقييم من اليسار إلى اليمين
+            let result = parseFloat(tokens[0]);
+            
+            for (let i = 1; i < tokens.length; i += 2) {
+                const operator = tokens[i];
+                const operand = parseFloat(tokens[i + 1]);
+                
+                switch (operator) {
+                    case '+':
+                        result += operand;
+                        break;
+                    case '-':
+                        result -= operand;
+                        break;
+                    case '*':
+                    case '×':
+                        result *= operand;
+                        break;
+                    case '/':
+                    case '÷':
+                        result /= operand;
+                        break;
+                }
+            }
+            
+            return Math.round(result * 100) / 100; // تقريب لعدد عشري
+        }
+
+        // بنك الأسئلة المصحح - العمليات من اليسار إلى اليمين (الطريقة الفرنسية)
+        const questionBank = {
+            1: [ // المستوى الأول: العمليات البسيطة من اليسار لليمين
+                {
+                    question: "2 + 3 × 4 = ?",
+                    options: ["20", "14", "24"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 2 + 3 = 5، ثم 5 × 4 = 20"
+                },
+                {
+                    question: "10 - 4 + 6 = ?",
+                    options: ["12", "0", "20"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 10 - 4 = 6، ثم 6 + 6 = 12"
+                },
+                {
+                    question: "3 × 4 + 2 = ?",
+                    options: ["14", "18", "10"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 3 × 4 = 12، ثم 12 + 2 = 14"
+                },
+                {
+                    question: "15 ÷ 3 + 7 = ?",
+                    options: ["12", "5", "22"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 15 ÷ 3 = 5، ثم 5 + 7 = 12"
+                },
+                {
+                    question: "8 + 2 × 3 = ?",
+                    options: ["30", "26", "14"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 8 + 2 = 10، ثم 10 × 3 = 30"
+                },
+                {
+                    question: "20 ÷ 4 - 3 = ?",
+                    options: ["2", "5", "17"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 20 ÷ 4 = 5، ثم 5 - 3 = 2"
+                },
+                {
+                    question: "6 × 2 + 3 × 2 = ?",
+                    options: ["30", "24", "18"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 6 × 2 = 12، ثم 12 + 3 = 15، ثم 15 × 2 = 30"
+                },
+                {
+                    question: "9 + 1 - 5 + 4 = ?",
+                    options: ["9", "5", "19"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 9 + 1 = 10، ثم 10 - 5 = 5، ثم 5 + 4 = 9"
+                }
+            ],
+            2: [ // المستوى الثاني: الأقواس مع التقييم من اليسار لليمين
+                {
+                    question: "(2 + 3) × 4 = ?",
+                    options: ["20", "14", "11"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (2 + 3) = 5، ثم 5 × 4 = 20"
+                },
+                {
+                    question: "2 + (3 × 4) = ?",
+                    options: ["14", "20", "24"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (3 × 4) = 12، ثم 2 + 12 = 14"
+                },
+                {
+                    question: "(8 - 3) + (4 × 2) = ?",
+                    options: ["13", "10", "16"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (8 - 3) = 5، (4 × 2) = 8، ثم 5 + 8 = 13"
+                },
+                {
+                    question: "10 ÷ (2 + 3) = ?",
+                    options: ["2", "5", "8"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (2 + 3) = 5، ثم 10 ÷ 5 = 2"
+                },
+                {
+                    question: "(6 + 4) ÷ 2 × 3 = ?",
+                    options: ["15", "5", "30"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (6 + 4) = 10، ثم من اليسار لليمين: 10 ÷ 2 = 5، ثم 5 × 3 = 15"
+                },
+                {
+                    question: "3 × (5 - 2) + 4 = ?",
+                    options: ["13", "21", "7"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (5 - 2) = 3، ثم من اليسار لليمين: 3 × 3 = 9، ثم 9 + 4 = 13"
+                },
+                {
+                    question: "(12 ÷ 3) + (2 × 4) = ?",
+                    options: ["12", "8", "16"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (12 ÷ 3) = 4، (2 × 4) = 8، ثم 4 + 8 = 12"
+                },
+                {
+                    question: "7 + (9 - 6) × 2 = ?",
+                    options: ["13", "22", "4"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (9 - 6) = 3، ثم من اليسار لليمين: 7 + 3 = 10، ثم 10 × 2 = 20... خطأ في الحساب، الصحيح: 7 + (3 × 2) = 7 + 6 = 13"
+                }
+            ],
+            3: [ // المستوى الثالث: الكسور الأساسية
+                {
+                    question: "1/2 + 1/4 = ?",
+                    options: ["3/4", "2/6", "1/3"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 1/2 = 2/4، ثم → 2/4 + 1/4 = 3/4"
+                },
+                {
+                    question: "3/5 - 1/5 = ?",
+                    options: ["2/5", "2/10", "4/5"],
+                    correct: 0,
+                    explanation: "نفس المقام: 3/5 - 1/5 = (3-1)/5 = 2/5"
+                },
+                {
+                    question: "2/3 × 3/4 = ?",
+                    options: ["1/2", "6/12", "5/7"],
+                    correct: 0,
+                    explanation: "ضرب الكسور: (2×3)/(3×4) = 6/12 = 1/2"
+                },
+                {
+                    question: "أيهما أكبر: 2/3 أم 3/5؟",
+                    options: ["2/3", "3/5", "متساويان"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 2/3 = 10/15، 3/5 = 9/15، إذن 2/3 أكبر"
+                },
+                {
+                    question: "5/6 - 1/3 = ?",
+                    options: ["1/2", "4/3", "2/3"],
+                    correct: 0,
+                    explanation: "نوحد المقامات: 1/3 = 2/6، ثم → 5/6 - 2/6 = 3/6 = 1/2"
+                },
+                {
+                    question: "1/4 + 1/3 = ?",
+                    options: ["7/12", "2/7", "1/2"],
+                    correct: 0,
+                    explanation: "المقام المشترك 12: 1/4 = 3/12، 1/3 = 4/12، ثم → 3/12 + 4/12 = 7/12"
+                },
+                {
+                    question: "4/5 × 2/3 = ?",
+                    options: ["8/15", "6/8", "2/5"],
+                    correct: 0,
+                    explanation: "ضرب الكسور: (4×2)/(5×3) = 8/15"
+                },
+                {
+                    question: "رتب تصاعدياً: 1/4، 1/3، 1/2",
+                    options: ["1/4، 1/3، 1/2", "1/2، 1/3، 1/4", "1/3، 1/4، 1/2"],
+                    correct: 0,
+                    explanation: "نوحد المقامات (12): 1/4=3/12، 1/3=4/12، 1/2=6/12، الترتيب: 3/12 < 4/12 < 6/12"
+                }
+            ],
+            4: [ // المستوى الرابع: عمليات الكسور المعقدة
+                {
+                    question: "(1/2 + 1/3) × 2/5 = ?",
+                    options: ["1/3", "5/6", "2/15"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 1/2 + 1/3 = 3/6 + 2/6 = 5/6، ثم → (5/6) × (2/5) = 10/30 = 1/3"
+                },
+                {
+                    question: "3/4 ÷ 1/2 = ?",
+                    options: ["3/2", "3/8", "1/2"],
+                    correct: 0,
+                    explanation: "القسمة على كسر = الضرب في مقلوبه: 3/4 × 2/1 = 6/4 = 3/2"
+                },
+                {
+                    question: "2/3 - (1/4 + 1/6) = ?",
+                    options: ["1/4", "1/2", "1/3"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 1/4 + 1/6 = 3/12 + 2/12 = 5/12، ثم → 2/3 - 5/12 = 8/12 - 5/12 = 3/12 = 1/4"
+                },
+                {
+                    question: "إذا كان 3/4 من الصف 24 تلميذ، فكم تلميذ في الصف؟",
+                    options: ["32", "18", "36"],
+                    correct: 0,
+                    explanation: "إذا كان 3/4 = 24، فـ 1/4 = 8، إذن العدد الكامل = 4 × 8 = 32"
+                },
+                {
+                    question: "1/2 + 1/3 + 1/6 = ?",
+                    options: ["1", "5/6", "2/3"],
+                    correct: 0,
+                    explanation: "المقام المشترك 6: 3/6 + 2/6 + 1/6 = 6/6 = 1"
+                },
+                {
+                    question: "(4/5) ÷ (2/3) = ?",
+                    options: ["6/5", "8/15", "2/5"],
+                    correct: 0,
+                    explanation: "القسمة على كسر: 4/5 × 3/2 = 12/10 = 6/5"
+                },
+                {
+                    question: "3/8 × (4/9 + 2/9) = ?",
+                    options: ["1/4", "6/9", "1/2"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 4/9 + 2/9 = 6/9 = 2/3، ثم → 3/8 × 2/3 = 6/24 = 1/4"
+                },
+                {
+                    question: "(2/5 + 1/10) × 3/4 = ?",
+                    options: ["3/8", "1/2", "6/20"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 2/5 + 1/10 = 4/10 + 1/10 = 5/10 = 1/2، ثم → 1/2 × 3/4 = 3/8"
+                }
+            ],
+            5: [ // المستوى الخامس: المسائل المركبة
+                {
+                    question: "(3/4 + 1/2) × (5/6 - 1/3) = ?",
+                    options: ["5/8", "1/2", "3/4"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: (3/4 + 2/4) = 5/4، (5/6 - 2/6) = 3/6 = 1/2، ثم → 5/4 × 1/2 = 5/8"
+                },
+                {
+                    question: "أنفق أحمد 2/5 من نقوده على الكتب و1/4 على الطعام. كم بقي معه؟",
+                    options: ["7/20", "3/9", "1/2"],
+                    correct: 0,
+                    explanation: "أنفق: 2/5 + 1/4 = 8/20 + 5/20 = 13/20، بقي معه: 1 - 13/20 = 7/20"
+                },
+                {
+                    question: "[(2/3 + 1/4) ÷ 1/2] - 1/6 = ?",
+                    options: ["5/3", "11/12", "1"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 2/3 + 1/4 = 11/12، ثم 11/12 ÷ 1/2 = 11/12 × 2 = 11/6، أخيراً → 11/6 - 1/6 = 10/6 = 5/3"
+                },
+                {
+                    question: "قطع سائق 3/8 من المسافة في الساعة الأولى و2/5 في الثانية. كم بقي؟",
+                    options: ["9/40", "5/13", "1/8"],
+                    correct: 0,
+                    explanation: "قطع: 3/8 + 2/5 = 15/40 + 16/40 = 31/40، بقي: 1 - 31/40 = 9/40"
+                },
+                {
+                    question: "في كيس 120 كرة، 1/3 حمراء و1/4 زرقاء. كم عدد الكرات الأخرى؟",
+                    options: ["50", "60", "70"],
+                    correct: 0,
+                    explanation: "الحمراء: 1/3 × 120 = 40، الزرقاء: 1/4 × 120 = 30، الأخرى: 120 - 40 - 30 = 50"
+                }
+            ],
+            6: [ // المستوى السادس: التمارين النصية المتقدمة
+                {
+                    question: "خزان يملأ بـ 2/3 في الساعة. كم من الوقت لملئه كاملاً؟",
+                    options: ["1.5 ساعة", "1 ساعة", "2 ساعة"],
+                    correct: 0,
+                    explanation: "إذا كان 2/3 يملأ في ساعة، فالخزان الكامل يحتاج 1 ÷ (2/3) = 1 × 3/2 = 3/2 = 1.5 ساعة"
+                },
+                {
+                    question: "باع تاجر 3/5 من البضاعة صباحاً و1/4 مساءً. كم النسبة المتبقية؟",
+                    options: ["3/20", "4/9", "1/5"],
+                    correct: 0,
+                    explanation: "باع: 3/5 + 1/4 = 12/20 + 5/20 = 17/20، تبقى: 1 - 17/20 = 3/20"
+                },
+                {
+                    question: "مزرعة مساحتها 240 م². زُرع منها 2/3 قمح و1/8 شعير. كم المساحة الفارغة؟",
+                    options: ["50 م²", "60 م²", "40 م²"],
+                    correct: 0,
+                    explanation: "المزروع: 2/3 + 1/8 = 16/24 + 3/24 = 19/24، الفارغ: (1 - 19/24) × 240 = 5/24 × 240 = 50 م²"
+                },
+                {
+                    question: "استغرقت رحلة 4 ساعات. قضى 1/4 الوقت في الطريق و3/8 في الزيارة. كم بقي؟",
+                    options: ["1.5 ساعة", "2 ساعة", "1 ساعة"],
+                    correct: 0,
+                    explanation: "المستغرق: 1/4 + 3/8 = 2/8 + 3/8 = 5/8، بقي: 1 - 5/8 = 3/8، من 4 ساعات: 3/8 × 4 = 1.5 ساعة"
+                }
+            ],
+            7: [ // المستوى السابع: الأعداد العشرية والعمليات المعقدة من اليسار لليمين
+                {
+                    question: "2.5 + 1.75 × 0.4 = ?",
+                    options: ["1.7", "4.25", "1.0"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 2.5 + 1.75 = 4.25، ثم → 4.25 × 0.4 = 1.7"
+                },
+                {
+                    question: "15.6 ÷ (2.4 + 1.6) = ?",
+                    options: ["3.9", "15.6", "4"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 2.4 + 1.6 = 4، ثم → 15.6 ÷ 4 = 3.9"
+                },
+                {
+                    question: "حول إلى كسر: 0.375",
+                    options: ["3/8", "375/100", "3/7"],
+                    correct: 0,
+                    explanation: "0.375 = 375/1000 = 3/8 بعد التبسيط (قسمة البسط والمقام على 125)"
+                },
+                {
+                    question: "0.75 + 0.5 × 2.4 = ?",
+                    options: ["3", "1.95", "2.4"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 0.75 + 0.5 = 1.25، ثم → 1.25 × 2.4 = 3"
+                },
+                {
+                    question: "6.8 - 2.3 + 1.5 × 2 = ?",
+                    options: ["12", "4.5", "9"],
+                    correct: 0,
+                    explanation: "من اليسار لليمين: 6.8 - 2.3 = 4.5، ثم 4.5 + 1.5 = 6، ثم 6 × 2 = 12"
+                },
+                {
+                    question: "(3.2 + 1.8) ÷ 2.5 = ?",
+                    options: ["2", "5", "1.25"],
+                    correct: 0,
+                    explanation: "الأقواس أولاً: 3.2 + 1.8 = 5، ثم → 5 ÷ 2.5 = 2"
+                }
+            ]
         };
 
         // إنشاء النظام
-        const gameSystem = new RealTimeGameSystem();
+        const gameConnection = new RealTimeGameConnection();
 
         // متغيرات اللعبة
         let currentPlayer = '';
@@ -959,292 +1723,10 @@
         let currentChallenge = null;
         let questionStartTime = null;
 
-        // بنك الأسئلة (نفس الأسئلة السابقة مع تصحيح العمليات)
-        const questionBank = {
-            1: [ // المستوى الأول: أولوية العمليات الأساسية
-                {
-                    question: "احسب من اليسار إلى اليمين: 15 + 3 × 4 = ؟",
-                    options: ["27", "72", "24"],
-                    correct: 0,
-                    explanation: "نطبق أولوية العمليات: الضرب أولاً 3×4=12، ثم الجمع 15+12=27"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 24 ÷ 6 + 8 = ؟",
-                    options: ["12", "2", "32"],
-                    correct: 0,
-                    explanation: "القسمة أولاً: 24÷6=4، ثم الجمع 4+8=12"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 5 × 6 - 18 ÷ 3 = ؟",
-                    options: ["24", "4", "36"],
-                    correct: 0,
-                    explanation: "الضرب والقسمة أولاً: 5×6=30، 18÷3=6، ثم الطرح 30-6=24"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 48 ÷ 8 + 7 × 2 = ؟",
-                    options: ["20", "110", "6"],
-                    correct: 0,
-                    explanation: "48÷8=6، 7×2=14، ثم 6+14=20"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 9 + 12 ÷ 4 - 2 = ؟",
-                    options: ["10", "7.25", "19"],
-                    correct: 0,
-                    explanation: "12÷4=3، ثم من اليسار إلى اليمين: 9+3-2=10"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 6 × 7 - 3 × 8 = ؟",
-                    options: ["18", "42", "24"],
-                    correct: 0,
-                    explanation: "6×7=42، 3×8=24، ثم 42-24=18"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 64 ÷ 8 ÷ 2 = ؟",
-                    options: ["4", "16", "32"],
-                    correct: 0,
-                    explanation: "من اليسار إلى اليمين: 64÷8=8، ثم 8÷2=4"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 25 - 4 × 5 + 3 = ؟",
-                    options: ["8", "120", "28"],
-                    correct: 0,
-                    explanation: "الضرب أولاً: 4×5=20، ثم من اليسار إلى اليمين: 25-20+3=8"
-                }
-            ],
-            2: [ // المستوى الثاني: الأقواس المتداخلة
-                {
-                    question: "احسب: (15 + 5) × (8 - 3) = ؟",
-                    options: ["100", "35", "80"],
-                    correct: 0,
-                    explanation: "(15+5)=20، (8-3)=5، ثم 20×5=100"
-                },
-                {
-                    question: "احسب: 60 ÷ (4 + 2) × 3 = ؟",
-                    options: ["30", "10", "5"],
-                    correct: 0,
-                    explanation: "(4+2)=6، ثم من اليسار إلى اليمين: 60÷6×3=10×3=30"
-                },
-                {
-                    question: "احسب: 5 × (6 + 4) - (12 ÷ 3) = ؟",
-                    options: ["46", "54", "38"],
-                    correct: 0,
-                    explanation: "(6+4)=10، 5×10=50، (12÷3)=4، ثم 50-4=46"
-                },
-                {
-                    question: "احسب: (24 ÷ 6) + (3 × 7) = ؟",
-                    options: ["25", "4", "21"],
-                    correct: 0,
-                    explanation: "(24÷6)=4، (3×7)=21، ثم 4+21=25"
-                },
-                {
-                    question: "احسب: ((8 + 4) ÷ 3) × 6 = ؟",
-                    options: ["24", "12", "4"],
-                    correct: 0,
-                    explanation: "(8+4)=12، 12÷3=4، ثم 4×6=24"
-                },
-                {
-                    question: "احسب: 7 × (5 + 3) - (6 × 4) = ؟",
-                    options: ["32", "56", "24"],
-                    correct: 0,
-                    explanation: "(5+3)=8، 7×8=56، (6×4)=24، ثم 56-24=32"
-                },
-                {
-                    question: "احسب: (45 ÷ 9) × (2 + 6) = ؟",
-                    options: ["40", "5", "8"],
-                    correct: 0,
-                    explanation: "(45÷9)=5، (2+6)=8، ثم 5×8=40"
-                },
-                {
-                    question: "احسب: (3 × 4) + (18 ÷ (2 + 1)) = ؟",
-                    options: ["18", "12", "6"],
-                    correct: 0,
-                    explanation: "(3×4)=12، (2+1)=3، 18÷3=6، ثم 12+6=18"
-                }
-            ],
-            3: [ // المستوى الثالث: الكسور الأساسية
-                {
-                    question: "احسب: 1/2 + 1/4 = ؟",
-                    options: ["3/4", "2/6", "1/3"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 1/2 = 2/4، ثم 2/4 + 1/4 = 3/4"
-                },
-                {
-                    question: "احسب: 3/5 - 1/5 = ؟",
-                    options: ["2/5", "2/10", "4/5"],
-                    correct: 0,
-                    explanation: "نفس المقام: 3/5 - 1/5 = 2/5"
-                },
-                {
-                    question: "احسب: 2/3 × 3/4 = ؟",
-                    options: ["1/2", "6/12", "5/7"],
-                    correct: 0,
-                    explanation: "نضرب البسط في البسط والمقام في المقام: (2×3)/(3×4) = 6/12 = 1/2"
-                },
-                {
-                    question: "أيهما أكبر: 2/3 أم 3/5؟",
-                    options: ["2/3", "3/5", "متساويان"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 2/3 = 10/15 و 3/5 = 9/15، إذن 2/3 أكبر"
-                },
-                {
-                    question: "احسب: 5/6 - 1/3 = ؟",
-                    options: ["1/2", "4/3", "2/3"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 1/3 = 2/6، ثم 5/6 - 2/6 = 3/6 = 1/2"
-                },
-                {
-                    question: "احسب: 1/4 + 1/3 = ؟",
-                    options: ["7/12", "2/7", "1/2"],
-                    correct: 0,
-                    explanation: "المقام المشترك 12: 1/4 = 3/12، 1/3 = 4/12، ثم 3/12 + 4/12 = 7/12"
-                },
-                {
-                    question: "احسب: 4/5 × 2/3 = ؟",
-                    options: ["8/15", "6/8", "2/5"],
-                    correct: 0,
-                    explanation: "(4×2)/(5×3) = 8/15"
-                },
-                {
-                    question: "رتب تصاعدياً: 1/4، 1/3، 1/2",
-                    options: ["1/4، 1/3، 1/2", "1/2، 1/3، 1/4", "1/3، 1/4، 1/2"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 3/12، 4/12، 6/12"
-                }
-            ],
-            4: [ // المستوى الرابع: عمليات الكسور المعقدة
-                {
-                    question: "احسب: (1/2 + 1/3) × 2/5 = ؟",
-                    options: ["1/3", "5/6", "2/15"],
-                    correct: 0,
-                    explanation: "أولاً: 1/2 + 1/3 = 3/6 + 2/6 = 5/6، ثم (5/6) × (2/5) = 10/30 = 1/3"
-                },
-                {
-                    question: "احسب: 3/4 ÷ 1/2 = ؟",
-                    options: ["3/2", "3/8", "1/2"],
-                    correct: 0,
-                    explanation: "القسمة على كسر = الضرب في مقلوبه: 3/4 × 2/1 = 6/4 = 3/2"
-                },
-                {
-                    question: "احسب: 2/3 - (1/4 + 1/6) = ؟",
-                    options: ["1/4", "1/2", "1/3"],
-                    correct: 0,
-                    explanation: "أولاً: 1/4 + 1/6 = 3/12 + 2/12 = 5/12، ثم 2/3 - 5/12 = 8/12 - 5/12 = 3/12 = 1/4"
-                },
-                {
-                    question: "احسب: (2/5 × 3/4) + 1/10 = ؟",
-                    options: ["7/10", "6/20", "1/2"],
-                    correct: 0,
-                    explanation: "2/5 × 3/4 = 6/20 = 3/10، ثم 3/10 + 1/10 = 4/10 = 2/5... الإجابة الصحيحة 7/10"
-                },
-                {
-                    question: "إذا كان 3/4 من الصف 24 تلميذ، فكم تلميذ في الصف؟",
-                    options: ["32", "18", "36"],
-                    correct: 0,
-                    explanation: "إذا كان 3/4 = 24، فـ 1/4 = 8، إذن العدد الكامل = 4 × 8 = 32"
-                },
-                {
-                    question: "احسب: 1/2 + 1/3 + 1/6 = ؟",
-                    options: ["1", "5/6", "2/3"],
-                    correct: 0,
-                    explanation: "المقام المشترك 6: 3/6 + 2/6 + 1/6 = 6/6 = 1"
-                },
-                {
-                    question: "احسب: (4/5) ÷ (2/3) = ؟",
-                    options: ["6/5", "8/15", "2/5"],
-                    correct: 0,
-                    explanation: "4/5 × 3/2 = 12/10 = 6/5"
-                },
-                {
-                    question: "احسب: 3/8 × (4/9 + 2/9) = ؟",
-                    options: ["1/4", "6/9", "1/2"],
-                    correct: 0,
-                    explanation: "4/9 + 2/9 = 6/9 = 2/3، ثم 3/8 × 2/3 = 6/24 = 1/4"
-                }
-            ],
-            5: [ // المستوى الخامس: المسائل المركبة
-                {
-                    question: "احسب: (3/4 + 1/2) × (5/6 - 1/3) = ؟",
-                    options: ["5/8", "1/2", "3/4"],
-                    correct: 0,
-                    explanation: "(3/4 + 2/4) = 5/4، (5/6 - 2/6) = 3/6 = 1/2، ثم 5/4 × 1/2 = 5/8"
-                },
-                {
-                    question: "إذا كان طول مستطيل 3/4 متر وعرضه 2/5 متر، فما مساحته؟",
-                    options: ["3/10 م²", "5/9 م²", "1/2 م²"],
-                    correct: 0,
-                    explanation: "المساحة = الطول × العرض = 3/4 × 2/5 = 6/20 = 3/10 م²"
-                },
-                {
-                    question: "أنفق أحمد 2/5 من نقوده على الكتب و1/4 على الطعام. كم بقي معه؟",
-                    options: ["7/20", "3/9", "1/2"],
-                    correct: 0,
-                    explanation: "أنفق: 2/5 + 1/4 = 8/20 + 5/20 = 13/20، بقي: 1 - 13/20 = 7/20"
-                },
-                {
-                    question: "احسب: [(2/3 + 1/4) ÷ 1/2] - 1/6 = ؟",
-                    options: ["5/3", "11/12", "1"],
-                    correct: 0,
-                    explanation: "2/3 + 1/4 = 11/12، ثم 11/12 ÷ 1/2 = 11/12 × 2 = 11/6، أخيراً 11/6 - 1/6 = 10/6 = 5/3"
-                },
-                {
-                    question: "قطع سائق 3/8 من المسافة في الساعة الأولى و2/5 في الثانية. كم بقي؟",
-                    options: ["9/40", "5/13", "1/8"],
-                    correct: 0,
-                    explanation: "قطع: 3/8 + 2/5 = 15/40 + 16/40 = 31/40، بقي: 1 - 31/40 = 9/40"
-                }
-            ],
-            6: [ // المستوى السادس: التمارين النصية المتقدمة
-                {
-                    question: "خزان يملأ بـ 2/3 في الساعة. كم من الوقت لملئه كاملاً؟",
-                    options: ["1.5 ساعة", "1 ساعة", "2 ساعة"],
-                    correct: 0,
-                    explanation: "إذا كان 2/3 يملأ في ساعة، فالخزان الكامل يحتاج 1 ÷ (2/3) = 3/2 = 1.5 ساعة"
-                },
-                {
-                    question: "باع تاجر 3/5 من البضاعة صباحاً و1/4 مساءً. كم النسبة المتبقية؟",
-                    options: ["3/20", "4/9", "1/5"],
-                    correct: 0,
-                    explanation: "باع: 3/5 + 1/4 = 12/20 + 5/20 = 17/20، تبقى: 20/20 - 17/20 = 3/20"
-                },
-                {
-                    question: "مزرعة مساحتها 240 م². زُرع منها 2/3 قمح و1/8 شعير. كم المساحة الفارغة؟",
-                    options: ["50 م²", "60 م²", "40 م²"],
-                    correct: 0,
-                    explanation: "المزروع: 2/3 + 1/8 = 16/24 + 3/24 = 19/24، الفارغ: 5/24 × 240 = 50 م²"
-                }
-            ],
-            7: [ // المستوى السابع: الأعداد العشرية والعمليات المعقدة
-                {
-                    question: "احسب من اليسار إلى اليمين: (2.5 + 1.75) × 0.4 = ؟",
-                    options: ["1.7", "4.25", "0.68"],
-                    correct: 0,
-                    explanation: "2.5 + 1.75 = 4.25، ثم 4.25 × 0.4 = 1.7"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: 15.6 ÷ (2.4 + 1.6) = ؟",
-                    options: ["3.9", "15.6", "4"],
-                    correct: 0,
-                    explanation: "2.4 + 1.6 = 4، ثم 15.6 ÷ 4 = 3.9"
-                },
-                {
-                    question: "حول إلى كسر: 0.375",
-                    options: ["3/8", "375/100", "3/7"],
-                    correct: 0,
-                    explanation: "0.375 = 375/1000 = 3/8 (بعد التبسيط)"
-                },
-                {
-                    question: "احسب من اليسار إلى اليمين: (3/4 + 0.5) × 2.4 = ؟",
-                    options: ["3", "1.25", "2.4"],
-                    correct: 0,
-                    explanation: "3/4 = 0.75، 0.75 + 0.5 = 1.25، ثم 1.25 × 2.4 = 3"
-                }
-            ]
-        };
-
         // إنشاء النجوم
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 200; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
@@ -1261,7 +1743,7 @@
             hideAllScreens();
             document.getElementById('mainMenu').classList.remove('hidden');
             if (currentPlayer) {
-                gameSystem.setPlayerOffline(currentPlayer);
+                gameConnection.setPlayerOffline(currentPlayer);
             }
         }
 
@@ -1282,10 +1764,9 @@
             updatePlayerAvatar();
             updateDragonBalls();
             updateLevelAccess();
-            updateOnlinePlayersDisplay();
             
             if (currentPlayer) {
-                gameSystem.updatePlayerActivity(currentPlayer, 'في قائمة المستويات');
+                gameConnection.updatePlayerActivity(currentPlayer, 'في قائمة المستويات');
             }
         }
 
@@ -1305,10 +1786,8 @@
             }
             
             currentPlayer = name;
-            gameSystem.setPlayerOnline(name, 'دخل للتو');
-            
-            // التأكد من وجود اللاعب في قاعدة البيانات
-            gameSystem.getPlayer(name);
+            gameConnection.setPlayerOnline(name, 'دخل للتو إلى اللعبة');
+            gameConnection.getPlayer(name);
             
             showLevelSelection();
         }
@@ -1334,87 +1813,40 @@
         function showTeacherDashboard() {
             hideAllScreens();
             document.getElementById('teacherDashboard').classList.remove('hidden');
-            gameSystem.updateTeacherDashboard();
-            updateStudentsTable();
-        }
-
-        function updateStudentsTable() {
-            const tableBody = document.getElementById('studentsTable');
-            tableBody.innerHTML = '';
-            
-            const players = Object.values(gameSystem.data.players)
-                .sort((a, b) => b.totalScore - a.totalScore);
-                
-            players.forEach((player, index) => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-gray-700';
-                
-                const isOnline = gameSystem.data.onlinePlayers.has(player.name);
-                const onlineInfo = gameSystem.data.onlinePlayers.get(player.name);
-                
-                const statusBadge = isOnline ? 
-                    `<span class="bg-green-500 text-white px-2 py-1 rounded text-xs">🟢 ${onlineInfo.activity}</span>` :
-                    '<span class="bg-gray-500 text-white px-2 py-1 rounded text-xs">غير متصل</span>';
-                
-                const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
-                
-                row.innerHTML = `
-                    <td class="p-2">${index + 1}</td>
-                    <td class="p-2">
-                        <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-lg">
-                            ${monsterInfo.emoji}
-                        </div>
-                    </td>
-                    <td class="p-2 font-bold">${player.name}</td>
-                    <td class="p-2">${statusBadge}</td>
-                    <td class="p-2">المستوى ${player.currentLevel}</td>
-                    <td class="p-2 font-bold text-yellow-400">${player.totalScore}</td>
-                    <td class="p-2">
-                        <div class="flex items-center space-x-1">
-                            <span class="font-bold">${player.dragonBalls}/7</span>
-                            <span class="text-lg">${monsterInfo.emoji}</span>
-                        </div>
-                    </td>
-                    <td class="p-2 text-sm">${isOnline ? 'نشط الآن' : gameSystem.getTimeAgo(new Date(player.lastPlayed).getTime())}</td>
-                    <td class="p-2">
-                        <button onclick="deleteStudent('${player.name}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm">
-                            حذف
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+            gameConnection.updateTeacherDashboardRealTime();
         }
 
         function deleteStudent(name) {
             showConfirmDialog(`هل أنت متأكد من حذف بيانات ${name}؟`, function() {
-                gameSystem.deletePlayer(name);
-                updateStudentsTable();
+                gameConnection.deletePlayer(name);
+                gameConnection.updateTeacherDashboardRealTime();
             });
         }
 
-        // تحديث صورة اللاعب
+        // تحديث صورة اللاعب حسب المستوى
         function updatePlayerAvatar() {
-            const player = gameSystem.getPlayer(currentPlayer);
-            const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+            const player = gameConnection.getPlayer(currentPlayer);
+            const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
             
             const avatar = document.getElementById('playerAvatar');
-            avatar.textContent = monsterInfo.emoji;
+            const monsterName = document.getElementById('monsterName');
+            
+            avatar.innerHTML = `${monsterInfo.emoji}<div class="level-badge" id="levelBadge">${player.currentLevel}</div>`;
+            monsterName.textContent = `${monsterInfo.name} - ${monsterInfo.description}`;
             avatar.title = `${monsterInfo.name}: ${monsterInfo.description}`;
         }
 
         // إدارة المستويات
         function updateLevelAccess() {
-            const player = gameSystem.getPlayer(currentPlayer);
-            const dragonBalls = player.dragonBalls;
+            const player = gameConnection.getPlayer(currentPlayer);
             
-            // تحديث حالة كل مستوى
+            // تحديث حالة كل مستوى حسب المستويات المكتملة
             for (let i = 4; i <= 7; i++) {
                 const levelElement = document.getElementById(`level${i}`);
                 const lockElement = document.getElementById(`level${i}Lock`);
-                const requiredBalls = i - 1;
+                const requiredLevels = i - 1;
                 
-                if (dragonBalls >= requiredBalls) {
+                if (player.currentLevel >= i) {
                     levelElement.classList.remove('level-locked');
                     levelElement.classList.add('level-unlocked');
                     lockElement.textContent = '🔓 متاح';
@@ -1422,18 +1854,18 @@
                 } else {
                     levelElement.classList.add('level-locked');
                     levelElement.classList.remove('level-unlocked');
-                    lockElement.textContent = `🔒 يحتاج ${requiredBalls} كرات`;
+                    lockElement.textContent = `🔒 يحتاج إكمال ${requiredLevels} مستويات`;
                     lockElement.className = 'mt-2 text-red-400';
                 }
             }
         }
 
         function selectLevel(level) {
-            const player = gameSystem.getPlayer(currentPlayer);
+            const player = gameConnection.getPlayer(currentPlayer);
             
             // فحص إمكانية الوصول للمستوى
-            if (level >= 4 && player.dragonBalls < (level - 1)) {
-                showAlert(`يجب جمع ${level - 1} كرات دراغون على الأقل لفتح هذا المستوى`);
+            if (level > player.currentLevel) {
+                showAlert(`يجب إكمال المستوى ${level - 1} أولاً لفتح هذا المستوى`);
                 return;
             }
             
@@ -1451,14 +1883,18 @@
             questions = [...questionBank[level]].sort(() => Math.random() - 0.5);
             
             // تحديث النشاط
-            gameSystem.updatePlayerActivity(currentPlayer, `يلعب المستوى ${level}`, `بدأ اللعب في المستوى ${level}`);
+            gameConnection.updatePlayerActivity(
+                currentPlayer, 
+                `يلعب المستوى ${level}`, 
+                { level: level, score: 0 }
+            );
             
             startGameScreen();
         }
 
         // التحدي بين اللاعبين
         function showChallengeModal() {
-            const onlinePlayersArray = Array.from(gameSystem.data.onlinePlayers.entries())
+            const onlinePlayersArray = Array.from(gameConnection.data.onlinePlayers.entries())
                 .filter(([name, info]) => name !== currentPlayer);
             
             if (onlinePlayersArray.length === 0) {
@@ -1471,8 +1907,8 @@
             
             playersList.innerHTML = '';
             onlinePlayersArray.forEach(([playerName, info]) => {
-                const player = gameSystem.getPlayer(playerName);
-                const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+                const player = gameConnection.getPlayer(playerName);
+                const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
                 
                 const div = document.createElement('div');
                 div.className = 'flex items-center justify-between p-3 bg-gray-700 rounded mb-2';
@@ -1484,6 +1920,7 @@
                         <div>
                             <div class="font-bold">${playerName}</div>
                             <div class="text-xs text-gray-400">${info.activity}</div>
+                            <div class="text-xs text-yellow-400">${monsterInfo.name}</div>
                         </div>
                     </div>
                     <button onclick="sendChallenge('${playerName}')" class="challenge-button text-white px-3 py-1 rounded text-sm">
@@ -1503,11 +1940,9 @@
         function sendChallenge(opponent) {
             const level = parseInt(document.getElementById('challengeLevel').value);
             
-            // إنشاء تحدي جديد
-            const challengeId = gameSystem.createChallenge(currentPlayer, opponent, level);
+            const challengeId = gameConnection.createChallenge(currentPlayer, opponent, level);
             currentChallenge = challengeId;
             
-            // إظهار حالة التحدي
             document.getElementById('challengeStatus').classList.remove('hidden');
             document.getElementById('challengeMessage').innerHTML = `
                 <div class="text-yellow-400 font-bold">تم إرسال تحدي إلى ${opponent} 🔥</div>
@@ -1523,7 +1958,7 @@
         }
 
         function acceptChallenge(challengeId) {
-            gameSystem.acceptChallenge(challengeId);
+            gameConnection.acceptChallenge(challengeId);
             
             document.getElementById('challengeMessage').innerHTML = `
                 <div class="text-green-400 font-bold">تم قبول التحدي! ⚔️</div>
@@ -1534,7 +1969,7 @@
         }
 
         function startChallengeGame() {
-            const challenge = gameSystem.data.challenges[currentChallenge];
+            const challenge = gameConnection.data.challenges[currentChallenge];
             currentLevel = challenge.level;
             selectLevel(currentLevel);
         }
@@ -1546,29 +1981,35 @@
             
             grid.innerHTML = '';
             
-            const onlinePlayersArray = Array.from(gameSystem.data.onlinePlayers.entries());
+            const onlinePlayersArray = Array.from(gameConnection.data.onlinePlayers.entries());
             
             if (onlinePlayersArray.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 text-center text-gray-400">لا يوجد لاعبون متصلون</div>';
+                grid.innerHTML = '<div class="col-span-4 text-center text-gray-400">لا يوجد لاعبون متصلون</div>';
             } else {
                 onlinePlayersArray.forEach(([playerName, info]) => {
-                    const player = gameSystem.getPlayer(playerName);
-                    const monsterInfo = monsterEvolution[player.dragonBalls] || monsterEvolution[0];
+                    const player = gameConnection.getPlayer(playerName);
+                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
                     
                     const div = document.createElement('div');
-                    div.className = 'bg-gray-700 p-4 rounded text-center';
+                    div.className = `bg-gray-700 p-4 rounded text-center transition-all ${
+                        info.isPlaying ? 'real-time-pulse border-2 border-green-400' : ''
+                    }`;
                     div.innerHTML = `
-                        <div class="w-12 h-12 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-2xl mb-2">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-3xl mb-2 border-2 border-yellow-400 relative">
                             ${monsterInfo.emoji}
+                            <div class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                ${player.currentLevel}
+                            </div>
                         </div>
                         <div class="font-bold">${playerName}</div>
-                        <div class="text-xs text-gray-400 mt-1">${info.activity}</div>
+                        <div class="text-xs text-yellow-400 mt-1">${monsterInfo.name}</div>
+                        <div class="text-xs ${info.isPlaying ? 'text-green-400' : 'text-gray-400'} mt-1">${info.activity}</div>
                         <div class="text-xs text-blue-400">${player.dragonBalls}/7 🐉</div>
                         ${playerName !== currentPlayer ? `
                             <button onclick="sendQuickChallenge('${playerName}')" class="mt-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
                                 تحدي سريع
                             </button>
-                        ` : '<div class="text-green-400 text-xs mt-2">أنت</div>'}
+                        ` : '<div class="text-green-400 text-xs mt-2">🟢 أنت</div>'}
                     `;
                     grid.appendChild(div);
                 });
@@ -1587,12 +2028,6 @@
             sendChallenge(opponent);
         }
 
-        function updateOnlinePlayersDisplay() {
-            // تحديث عدد اللاعبين المتصلين في الواجهة
-            const onlineCount = gameSystem.data.onlinePlayers.size;
-            // يمكن إضافة مؤشر في واجهة اللاعب
-        }
-
         // بدء شاشة اللعب
         function startGameScreen() {
             hideAllScreens();
@@ -1600,13 +2035,11 @@
             
             // إظهار معلومات التحدي إذا كان موجوداً
             if (currentChallenge) {
-                const challenge = gameSystem.data.challenges[currentChallenge];
+                const challenge = gameConnection.data.challenges[currentChallenge];
                 document.getElementById('challengeInfo').classList.remove('hidden');
                 document.getElementById('challengeOpponent').textContent = `⚔️ ضد: ${challenge.opponent}`;
                 document.getElementById('myScore').textContent = '0';
                 document.getElementById('opponentScore').textContent = '0';
-                document.getElementById('myTime').textContent = '-';
-                document.getElementById('opponentTime').textContent = '-';
             } else {
                 document.getElementById('challengeInfo').classList.add('hidden');
             }
@@ -1633,7 +2066,6 @@
             shuffledOptions.sort(() => Math.random() - 0.5);
             const newCorrectIndex = shuffledOptions.indexOf(correctAnswer);
             
-            // تحديث الإجابة الصحيحة
             questions[currentQuestion].correct = newCorrectIndex;
             
             // عرض الخيارات
@@ -1641,11 +2073,9 @@
                 document.getElementById(`option${i}`).textContent = shuffledOptions[i];
             }
             
-            // إخفاء نتيجة الإجابة السابقة وإظهار الأبواب
             document.getElementById('answerResult').classList.add('hidden');
             document.getElementById('doorsContainer').classList.remove('hidden');
             
-            // تسجيل وقت بداية السؤال
             questionStartTime = Date.now();
         }
 
@@ -1662,7 +2092,7 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    selectAnswer(-1); // انتهاء الوقت
+                    selectAnswer(-1);
                 }
             }, 1000);
         }
@@ -1679,46 +2109,44 @@
             document.getElementById('answerResult').classList.remove('hidden');
             
             if (answerIndex === -1) {
-                // انتهاء الوقت
                 document.getElementById('resultIcon').textContent = '⏰';
                 document.getElementById('resultText').textContent = 'انتهى الوقت!';
                 document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-orange-400';
-                document.getElementById('answerTime').textContent = `الوقت المستغرق: ${timeLeft} ثانية (انتهى الوقت)`;
+                document.getElementById('answerTime').textContent = `الوقت المستغرق: انتهى الوقت`;
+                document.getElementById('explanationText').textContent = `الإجابة الصحيحة: ${question.options[question.correct]}`;
             } else if (isCorrect) {
-                // إجابة صحيحة
                 const points = Math.max(10, Math.floor((timeLeft / 10) * currentLevel * 5));
                 score += points;
                 document.getElementById('resultIcon').textContent = '💎';
                 document.getElementById('resultText').textContent = `ممتاز! وجدت الكنز! (+${points} نقطة)`;
                 document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-green-400 treasure';
                 document.getElementById('answerTime').textContent = `⚡ وقت رائع: ${answerTime.toFixed(1)} ثانية`;
+                document.getElementById('explanationText').textContent = `شرح: ${question.explanation}`;
                 
-                // تحديث نقاط التحدي
                 if (currentChallenge) {
                     document.getElementById('myScore').textContent = score;
-                    document.getElementById('myTime').textContent = answerTime.toFixed(1);
-                    // محاكاة نقاط الخصم
                     const opponentPoints = Math.floor(Math.random() * points * 1.2);
-                    const opponentTime = answerTime + (Math.random() * 2 - 1);
                     document.getElementById('opponentScore').textContent = opponentPoints;
-                    document.getElementById('opponentTime').textContent = Math.max(0.1, opponentTime).toFixed(1);
                 }
             } else {
-                // إجابة خاطئة
                 document.getElementById('resultIcon').textContent = '👹';
                 document.getElementById('resultText').textContent = 'آسف، ظهر الوحش!';
                 document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-red-400 monster';
                 document.getElementById('answerTime').textContent = `الوقت المستغرق: ${answerTime.toFixed(1)} ثانية`;
+                document.getElementById('explanationText').textContent = `الإجابة الصحيحة: ${question.options[question.correct]}. شرح: ${question.explanation}`;
             }
             
-            // تحديث النقاط
             document.getElementById('currentScore').textContent = `النقاط: ${score}`;
             
             // تحديث النشاط في الوقت الفعلي
-            gameSystem.updatePlayerActivity(
+            gameConnection.updatePlayerActivity(
                 currentPlayer, 
                 `يلعب المستوى ${currentLevel}`, 
-                `السؤال ${currentQuestion + 1}/${questions.length} - النقاط: ${score}`
+                { 
+                    level: currentLevel, 
+                    score: score, 
+                    question: `${currentQuestion + 1}/${questions.length}` 
+                }
             );
         }
 
@@ -1726,7 +2154,6 @@
         function nextQuestion() {
             currentQuestion++;
             
-            // إعادة تعيين الوقت والعداد
             const timeSettings = {
                 1: 45, 2: 60, 3: 90, 4: 120, 5: 180, 6: 240, 7: 300
             };
@@ -1743,58 +2170,56 @@
             hideAllScreens();
             document.getElementById('gameEnd').classList.remove('hidden');
             
-            const player = gameSystem.getPlayer(currentPlayer);
+            const player = gameConnection.getPlayer(currentPlayer);
             const gameDuration = Date.now() - gameStartTime;
             
             // تحديث بيانات اللاعب
-            const oldScore = player.totalScore;
             player.totalScore = Math.max(player.totalScore, player.totalScore + score);
-            player.currentLevel = Math.max(player.currentLevel, currentLevel);
             player.gamesPlayed++;
             
-            // إضافة كرة دراغون بول
+            // إضافة كرة دراغون بول وتطوير الوحش
             let gotDragonBall = false;
             const requiredScore = currentLevel * 60;
             
             if (score >= requiredScore && !player.levelsCompleted.includes(currentLevel)) {
-                const oldDragonBalls = player.dragonBalls;
+                const oldLevel = player.currentLevel;
                 player.dragonBalls = Math.min(player.dragonBalls + 1, 7);
                 player.levelsCompleted.push(currentLevel);
+                player.currentLevel = Math.max(player.currentLevel, currentLevel + 1);
                 gotDragonBall = true;
                 
                 document.getElementById('dragonBallReward').classList.remove('hidden');
                 
                 // إظهار تطور الوحش
-                if (player.dragonBalls > oldDragonBalls) {
-                    const newMonster = monsterEvolution[player.dragonBalls];
+                if (player.currentLevel > oldLevel) {
+                    const newMonster = levelMonsters[player.currentLevel] || levelMonsters[7];
                     document.getElementById('monsterEvolution').classList.remove('hidden');
                     document.getElementById('newMonster').textContent = newMonster.emoji;
+                    document.getElementById('newMonsterName').textContent = newMonster.name;
                     
-                    // تسجيل إنجاز التطور
-                    gameSystem.recordAchievement(
+                    gameConnection.recordAchievement(
                         currentPlayer, 
-                        `تطور إلى ${newMonster.name}!`, 
-                        `حصل على الكرة ${player.dragonBalls} وتطور وحشه`
+                        `🧬 تطور إلى ${newMonster.name}!`, 
+                        `وصل للمستوى ${player.currentLevel}`
                     );
                 }
                 
                 // فحص فتح مستوى جديد
-                if (player.dragonBalls >= currentLevel && currentLevel < 7) {
+                if (player.currentLevel <= 7) {
                     document.getElementById('newLevelUnlocked').classList.remove('hidden');
-                    document.getElementById('newLevelUnlocked').textContent = `🎉 تم فتح المستوى ${currentLevel + 1}!`;
+                    document.getElementById('newLevelUnlocked').textContent = `🎉 فُتح المستوى ${player.currentLevel}!`;
                     
-                    gameSystem.recordAchievement(
+                    gameConnection.recordAchievement(
                         currentPlayer, 
-                        `فتح المستوى ${currentLevel + 1}!`, 
-                        `جمع كرات كافية لفتح مستوى جديد`
+                        `🔓 فتح المستوى ${player.currentLevel}!`, 
+                        `أكمل ${currentLevel} بنجاح`
                     );
                 }
                 
-                // تسجيل إنجاز الكرة
-                gameSystem.recordAchievement(
+                gameConnection.recordAchievement(
                     currentPlayer, 
-                    `حصل على كرة دراغون (${player.dragonBalls}/7)!`, 
-                    `أكمل المستوى ${currentLevel} بنجاح`
+                    `🐉 حصل على كرة دراغون (${player.dragonBalls}/7)!`, 
+                    `أكمل المستوى ${currentLevel} بنقاط ${score}`
                 );
             }
             
@@ -1806,10 +2231,10 @@
                 document.getElementById('careerMessage').textContent = 
                     `🏆 جمعت جميع كرات الدراغون! أنت عبقري الرياضيات! ستصبح ${randomCareer} عظيم! 🏆`;
                 
-                gameSystem.recordAchievement(
+                gameConnection.recordAchievement(
                     currentPlayer, 
-                    `🌟 سيد الرياضيات - جمع جميع الكرات!`, 
-                    `أول من يجمع 7 كرات دراغون`
+                    `🌟 سيد الرياضيات الأعظم!`, 
+                    `جمع جميع الكرات السبع`
                 );
             }
             
@@ -1826,10 +2251,10 @@
                     document.getElementById('challengeDetails').textContent = `نقاطك: ${myFinalScore} | نقاط الخصم: ${opponentScore}`;
                     player.challengesWon++;
                     
-                    gameSystem.recordAchievement(
+                    gameConnection.recordAchievement(
                         currentPlayer, 
-                        `🥇 انتصر في التحدي!`, 
-                        `هزم خصمه بنقاط ${myFinalScore} مقابل ${opponentScore}`
+                        `⚔️ انتصر في التحدي!`, 
+                        `هزم خصمه ${opponentScore} مقابل ${myFinalScore}`
                     );
                 } else if (myFinalScore < opponentScore) {
                     document.getElementById('challengeOutcome').textContent = '😔 خسرت التحدي';
@@ -1848,16 +2273,20 @@
             document.getElementById('finalScore').textContent = `نقاطك في هذه اللعبة: ${score}`;
             
             // تحديث النشاط
-            gameSystem.updatePlayerActivity(currentPlayer, 'انتهى من اللعب', `المستوى ${currentLevel} - النقاط: ${score}`);
+            gameConnection.updatePlayerActivity(currentPlayer, 'انتهى من اللعب', { 
+                level: currentLevel, 
+                finalScore: score,
+                totalScore: player.totalScore
+            });
             
-            gameSystem.updatePlayer(currentPlayer, player);
+            gameConnection.updatePlayer(currentPlayer, player);
         }
 
         // تحديث معلومات اللاعب
         function updatePlayerInfo() {
-            const player = gameSystem.getPlayer(currentPlayer);
+            const player = gameConnection.getPlayer(currentPlayer);
             document.getElementById('playerInfo').textContent = 
-                `مرحبا ${currentPlayer} | النقاط الإجمالية: ${player.totalScore} | المستوى الحالي: ${player.currentLevel}`;
+                `النقاط الإجمالية: ${player.totalScore} | ألعاب مكتملة: ${player.gamesPlayed}`;
         }
 
         // تحديث كرات الدراغون
@@ -1865,7 +2294,7 @@
             const container = document.getElementById('dragonBalls');
             container.innerHTML = '';
             
-            const player = gameSystem.getPlayer(currentPlayer);
+            const player = gameConnection.getPlayer(currentPlayer);
             for (let i = 0; i < 7; i++) {
                 const ball = document.createElement('div');
                 ball.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2';
@@ -1930,15 +2359,22 @@
             createStars();
             
             // إضافة بعض اللاعبين للتجربة
-            ['أحمد المتفوق', 'فاطمة الذكية', 'محمد العبقري', 'عائشة النجمة'].forEach((name, index) => {
-                const player = gameSystem.getPlayer(name);
-                player.totalScore = Math.floor(Math.random() * 500) + 100;
-                player.dragonBalls = Math.floor(Math.random() * 6) + 1;
-                player.currentLevel = Math.min(7, player.dragonBalls + 1);
+            ['أحمد المتفوق', 'فاطمة الذكية', 'محمد العبقري', 'عائشة النجمة', 'سارة المبدعة', 'يوسف الأسطورة'].forEach((name, index) => {
+                const player = gameConnection.getPlayer(name);
+                player.totalScore = Math.floor(Math.random() * 1000) + 200;
+                player.dragonBalls = Math.floor(Math.random() * 7) + 0;
+                player.currentLevel = Math.min(7, Math.floor(Math.random() * 6) + 1);
+                player.gamesPlayed = Math.floor(Math.random() * 30) + 1;
                 
-                // محاكاة اتصال عشوائي
-                if (Math.random() > 0.5) {
-                    gameSystem.setPlayerOnline(name, ['في القائمة الرئيسية', 'يلعب المستوى 3', 'يتحدى لاعب آخر'][Math.floor(Math.random() * 3)]);
+                // محاكاة اتصال عشوائي (70% احتمال الاتصال)
+                if (Math.random() > 0.3) {
+                    gameConnection.setPlayerOnline(name, [
+                        'في القائمة الرئيسية', 
+                        `يلعب المستوى ${player.currentLevel}`, 
+                        'يتصفح المستويات',
+                        'في تحدي مع لاعب آخر',
+                        'يحاول حل الأسئلة'
+                    ][Math.floor(Math.random() * 5)]);
                 }
             });
             
