@@ -3,2393 +3,1362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math 2ème - لعبة الرياضيات التفاعلية</title>
+    <title>كويز اللغة العربية - السنة الرابعة متوسط</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'arabic': ['Amiri', 'serif'],
-                    },
-                    colors: {
-                        'primary': '#5D5CDE',
-                        'gold': '#FFD700',
-                        'treasure': '#FFA500',
-                    }
-                }
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            background-attachment: fixed;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+        }
+
+        .neon-border {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5), 0 0 30px rgba(0, 255, 136, 0.3);
+            border: 2px solid #00ff88;
+        }
+
+        .neon-border-purple {
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.5), 0 0 30px rgba(147, 51, 234, 0.3);
+            border: 2px solid #9333ea;
+        }
+
+        .neon-border-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.3);
+            border: 2px solid #3b82f6;
+        }
+
+        .neon-border-gold {
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5), 0 0 30px rgba(251, 191, 36, 0.3);
+            border: 2px solid #fbbf24;
+        }
+
+        .profile-image {
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 60px rgba(0, 255, 136, 0.5), 0 0 90px rgba(0, 255, 136, 0.3);
+            border: 3px solid #00ff88;
+            animation: pulse-neon 2s infinite;
+        }
+
+        @keyframes pulse-neon {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 60px rgba(0, 255, 136, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 255, 136, 1), 0 0 80px rgba(0, 255, 136, 0.7);
             }
         }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Amiri', serif;
-            background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            transition: all 0.3s ease;
         }
-        
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+        }
+
+        .btn-locked {
+            background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .level-card {
+            transition: all 0.3s ease;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .answer-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .answer-option:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .answer-correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: correct-pulse 0.5s ease;
+        }
+
+        .answer-wrong {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: wrong-shake 0.5s ease;
+        }
+
+        @keyframes correct-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes wrong-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .underline-important {
+            text-decoration: underline;
+            text-decoration-color: #fbbf24;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+        }
+
+        .highlight-word {
+            background: linear-gradient(180deg, transparent 60%, #fbbf24 60%);
+            padding: 0 4px;
+        }
+
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .star {
             position: absolute;
+            width: 2px;
+            height: 2px;
             background: white;
             border-radius: 50%;
-            animation: twinkle 2s infinite;
+            animation: twinkle 3s infinite;
         }
-        
+
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 1; }
         }
-        
-        .door {
-            transition: all 0.5s ease;
-            cursor: pointer;
+
+        .content-wrapper {
             position: relative;
-            background: linear-gradient(45deg, #8B4513, #A0522D);
-            border: 4px solid #654321;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1;
         }
-        
-        .door:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-        
-        .treasure {
-            animation: bounce 1s infinite;
-        }
-        
-        .monster {
-            animation: shake 0.5s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        
-        .dragonball {
-            animation: glow 2s infinite;
-            background: radial-gradient(circle, #FF8C00, #FFD700);
-        }
-        
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(255, 165, 0, 1); }
-        }
-        
-        .level-locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .level-unlocked {
-            opacity: 1;
-            cursor: pointer;
-        }
-        
-        .challenge-button {
-            background: linear-gradient(45deg, #dc2626, #ef4444);
-            animation: pulse 2s infinite;
-        }
-        
-        .challenge-accept {
-            background: linear-gradient(45deg, #059669, #10b981);
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .online-indicator {
-            background: #10b981;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: blink 2s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
-        }
-        
-        .player-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid #FFD700;
-            background: linear-gradient(45deg, #333, #555);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin: 0 auto;
-            position: relative;
-        }
-        
-        .level-badge {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: linear-gradient(45deg, #FF6B6B, #FFE66D);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            border: 2px solid white;
-        }
-        
-        .monster-evolution {
-            transition: all 0.5s ease;
-            transform-origin: center;
-        }
-        
-        .monster-evolution:hover {
-            transform: scale(1.1);
-        }
-        
-        .live-notification {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(45deg, #10b981, #059669);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            z-index: 1000;
-            animation: slideInLeft 0.5s ease;
-            max-width: 350px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        
-        @keyframes slideInLeft {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .math-formula {
-            font-family: 'Courier New', monospace;
-            font-size: 1.6em;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            direction: ltr;
-            text-align: center;
-            border: 2px solid rgba(255,215,0,0.3);
-        }
-        
-        .real-time-pulse {
-            animation: realtimePulse 2s infinite;
-        }
-        
-        @keyframes realtimePulse {
-            0% { background-color: rgba(16, 185, 129, 0.1); }
-            50% { background-color: rgba(16, 185, 129, 0.3); }
-            100% { background-color: rgba(16, 185, 129, 0.1); }
-        }
-        
-        .student-card {
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .student-card.playing {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.2);
-            animation: playingGlow 2s infinite;
-        }
-        
-        @keyframes playingGlow {
-            0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
-            50% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.8); }
-        }
-        
-        .student-card.in-challenge {
-            border-color: #dc2626;
-            background: rgba(220, 38, 38, 0.2);
-            animation: challengeGlow 1s infinite;
-        }
-        
-        @keyframes challengeGlow {
-            0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
-            50% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.8); }
-        }
-        
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1000;
-        }
-        
-        .connection-online {
-            background: #10b981;
-            color: white;
-        }
-        
-        .connection-offline {
-            background: #dc2626;
-            color: white;
+
+        .poem-text {
+            font-size: 1.1rem;
+            line-height: 2;
+            border-right: 3px solid #fbbf24;
+            padding-right: 1rem;
+            font-style: italic;
         }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
-    <!-- مؤشر الاتصال -->
-    <div id="connectionStatus" class="connection-status connection-online">🟢 متصل</div>
+<body class="min-h-screen text-white">
+    <!-- Stars Background -->
+    <div class="stars" id="starsContainer"></div>
 
-    <!-- خلفية النجوم -->
-    <div id="stars" class="fixed inset-0 z-0"></div>
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+            <div class="neon-border bg-gray-900 bg-opacity-90 rounded-2xl p-8 max-w-md w-full fade-in">
+                <div class="flex justify-center mb-6">
+                    <img src="https://pfst.cf2.poecdn.net/base/image/450f72073a5c64d751e736153f873c0bd32589114f30346b5657e30b3a6c6a14?w=797&h=960"
+                         alt="Profile"
+                         class="w-32 h-32 rounded-full object-cover profile-image">
+                </div>
+                <h1 class="text-4xl font-bold text-center mb-2 neon-text">كويز اللغة العربية</h1>
+                <p class="text-center text-gray-400 mb-8">السنة الرابعة متوسط - المنهاج الجزائري</p>
 
-    <!-- إشعارات النشاط المباشر -->
-    <div id="liveNotifications" class="fixed top-16 left-4 z-50 space-y-2 max-w-sm"></div>
-
-    <!-- الشاشة الرئيسية -->
-    <div id="mainMenu" class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 class="text-4xl md:text-6xl font-bold mb-8 text-center bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            Math 2ème
-        </h1>
-        <p class="text-xl mb-4 text-center text-gray-300">لعبة الرياضيات التفاعلية - المنهج الجزائري</p>
-        <p class="text-sm mb-8 text-center text-yellow-400">🔄 اتصال مباشر حقيقي | العمليات من اليسار لليمين</p>
-        
-        <div class="space-y-4 w-full max-w-md">
-            <button onclick="showPlayerLogin()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
-                دخول التلميذ
-            </button>
-            <button onclick="showTeacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition-colors">
-                دخول الأستاذ
-            </button>
-        </div>
-        
-        <!-- إحصائيات مباشرة -->
-        <div class="mt-8 text-center text-sm text-gray-400">
-            <div>متصلون الآن: <span id="mainMenuOnlineCount" class="text-green-400 font-bold">0</span></div>
-            <div>إجمالي المسجلين: <span id="mainMenuTotalPlayers" class="text-blue-400 font-bold">0</span></div>
-        </div>
-    </div>
-
-    <!-- شاشة دخول التلميذ -->
-    <div id="playerLogin" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center">دخول التلميذ</h2>
-            <input type="text" id="playerName" placeholder="اسم التلميذ" class="w-full p-3 mb-4 text-black rounded-lg text-base">
-            <button onclick="startGame()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                ابدأ اللعب
-            </button>
-            <button onclick="showMainMenu()" class="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                العودة
-            </button>
-        </div>
-    </div>
-
-    <!-- شاشة دخول الأستاذ -->
-    <div id="teacherLogin" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center">دخول الأستاذ</h2>
-            <input type="password" id="teacherPassword" placeholder="الرقم السري: 123456" class="w-full p-3 mb-4 text-black rounded-lg text-base">
-            <button onclick="teacherLogin()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                دخول
-            </button>
-            <button onclick="showMainMenu()" class="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                العودة
-            </button>
-        </div>
-    </div>
-
-    <!-- لوحة التحكم للأستاذ - الاتصال المباشر -->
-    <div id="teacherDashboard" class="hidden relative z-10 p-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">🔴 LIVE | لوحة المراقبة المباشرة</h2>
-                <div class="flex items-center space-x-4">
-                    <div class="text-sm bg-green-600 px-3 py-1 rounded-full animate-pulse">
-                        🔄 تحديث تلقائي كل ثانية
-                    </div>
-                    <div class="text-sm">
-                        آخر تحديث: <span id="lastUpdateTime" class="font-bold text-green-400"></span>
-                    </div>
-                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-                        خروج
+                <div class="space-y-4">
+                    <button onclick="startAsStudent()" class="w-full btn-primary text-gray-900 font-bold py-4 px-6 rounded-xl text-lg">
+                        دخول كطالب
+                    </button>
+                    <button onclick="showTeacherLogin()" class="w-full bg-purple-600 hover:bg-purple-700 font-bold py-4 px-6 rounded-xl text-lg transition">
+                        دخول كأستاذ
                     </button>
                 </div>
             </div>
-            
-            <!-- إحصائيات مباشرة شاملة -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-lg text-center real-time-pulse">
-                    <div class="text-3xl mb-2">🟢</div>
-                    <h3 class="text-lg font-bold">متصلون الآن</h3>
-                    <div id="liveOnlineCount" class="text-4xl font-bold">0</div>
-                    <div class="text-sm opacity-75">نشطون فعلياً</div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">🎮</div>
-                    <h3 class="text-lg font-bold">يلعبون الآن</h3>
-                    <div id="currentlyPlayingCount" class="text-4xl font-bold">0</div>
-                    <div class="text-sm opacity-75">في مستويات مختلفة</div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">⚔️</div>
-                    <h3 class="text-lg font-bold">تحديات نشطة</h3>
-                    <div id="activeChallengesCount" class="text-4xl font-bold">0</div>
-                    <div class="text-sm opacity-75">معارك جارية</div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-purple-600 to-purple-700 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">🐉</div>
-                    <h3 class="text-lg font-bold">كرات دراغون</h3>
-                    <div id="totalDragonBallsCount" class="text-4xl font-bold">0</div>
-                    <div class="text-sm opacity-75">مجمعة حتى الآن</div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6 rounded-lg text-center">
-                    <div class="text-3xl mb-2">📊</div>
-                    <h3 class="text-lg font-bold">إجمالي اللاعبين</h3>
-                    <div id="totalStudentsCount" class="text-4xl font-bold">0</div>
-                    <div class="text-sm opacity-75">مسجلين في النظام</div>
-                </div>
-            </div>
-
-            <!-- النشاط المباشر الفوري -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <!-- التلاميذ المتصلون والنشطون -->
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-green-400 flex items-center">
-                        🟢 النشاط المباشر 
-                        <div class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
-                    </h3>
-                    <div id="liveStudentActivity" class="space-y-3 max-h-80 overflow-y-auto">
-                        <!-- سيتم ملؤها ديناميكياً -->
-                    </div>
-                </div>
-                
-                <!-- التحديات والمعارك الجارية -->
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-red-400 flex items-center">
-                        ⚔️ المعارك الجارية
-                        <div class="ml-2 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
-                    </h3>
-                    <div id="liveChallenges" class="space-y-3 max-h-80 overflow-y-auto">
-                        <!-- سيتم ملؤها ديناميكياً -->
-                    </div>
-                </div>
-                
-                <!-- آخر الإنجازات والأحداث -->
-                <div class="bg-gray-800 p-6 rounded-lg">
-                    <h3 class="text-xl font-bold mb-4 text-yellow-400 flex items-center">
-                        🏆 إنجازات فورية
-                        <div class="ml-2 w-3 h-3 bg-yellow-500 rounded-full animate-ping"></div>
-                    </h3>
-                    <div id="liveAchievements" class="space-y-2 max-h-80 overflow-y-auto">
-                        <!-- سيتم ملؤها ديناميكياً -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- جدول التلاميذ التفاعلي المباشر -->
-            <div class="bg-gray-800 p-6 rounded-lg">
-                <h3 class="text-xl font-bold mb-4 flex items-center">
-                    📊 مراقبة شاملة للتلاميذ (تحديث فوري)
-                    <div class="ml-2 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
-                </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-600">
-                                <th class="text-right p-3">الترتيب</th>
-                                <th class="text-right p-3">الوحش/المستوى</th>
-                                <th class="text-right p-3">الاسم</th>
-                                <th class="text-right p-3">الحالة المباشرة</th>
-                                <th class="text-right p-3">النشاط الحالي</th>
-                                <th class="text-right p-3">النقاط الإجمالية</th>
-                                <th class="text-right p-3">الكرات المجمعة</th>
-                                <th class="text-right p-3">آخر نشاط</th>
-                                <th class="text-right p-3">إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="liveStudentsTable">
-                            <!-- سيتم ملؤها ديناميكياً -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
-    </div>
 
-    <!-- شاشة اختيار المستوى -->
-    <div id="levelSelection" class="hidden relative z-10 p-4">
-        <div class="max-w-6xl mx-auto">
-            <!-- بروفايل اللاعب المطور -->
-            <div class="text-center mb-8">
-                <div class="player-avatar monster-evolution mb-4" id="playerAvatar">
-                    🥚
-                    <div class="level-badge" id="levelBadge">1</div>
-                </div>
-                <h2 class="text-3xl font-bold mb-2">اختر المستوى</h2>
-                <div id="playerInfo" class="text-xl text-gray-300 mb-2"></div>
-                <div id="monsterName" class="text-lg text-yellow-400 mb-4"></div>
-                <div id="dragonBalls" class="flex justify-center space-x-2 mb-6"></div>
-                
-                <!-- أزرار التحدي والإعدادات -->
-                <div class="flex justify-center space-x-4 mb-6">
-                    <button id="challengeButton" onclick="showChallengeModal()" class="challenge-button text-white font-bold py-3 px-6 rounded-lg">
-                        🔥 تحدي لاعب آخر
+        <!-- Teacher Login Modal -->
+        <div id="teacherLoginModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+            <div class="neon-border-purple bg-gray-900 rounded-2xl p-8 max-w-md w-full">
+                <h2 class="text-2xl font-bold mb-6 text-center">دخول الأستاذ</h2>
+                <input type="password" id="teacherPassword" placeholder="كلمة السر"
+                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-4 text-base focus:outline-none focus:border-purple-500">
+                <div class="flex gap-3">
+                    <button onclick="loginAsTeacher()" class="flex-1 bg-purple-600 hover:bg-purple-700 font-bold py-3 px-6 rounded-lg transition">
+                        دخول
                     </button>
-                    <button onclick="showOnlinePlayersModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
-                        👥 متصلون الآن (<span id="onlinePlayersCount">0</span>)
+                    <button onclick="closeTeacherLogin()" class="flex-1 bg-gray-700 hover:bg-gray-600 font-bold py-3 px-6 rounded-lg transition">
+                        إلغاء
                     </button>
                 </div>
-                
-                <!-- حالة التحدي -->
-                <div id="challengeStatus" class="hidden mt-4 p-4 bg-yellow-600 rounded-lg">
-                    <div id="challengeMessage"></div>
-                </div>
             </div>
-            
-            <!-- المستويات السبعة مع الوحوش -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                <!-- المستوى الأول -->
-                <div id="level1" onclick="selectLevel(1)" class="level-card bg-green-600 hover:bg-green-700 p-6 rounded-lg text-center transition-colors level-unlocked">
-                    <div class="text-4xl mb-2">🐛</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى الأول</h3>
-                    <p class="text-sm mb-2">اليرقة - العمليات البسيطة</p>
-                    <p class="text-xs">⏱️ 45 ثانية | 🐉 كرة واحدة</p>
-                    <div class="mt-2">✅ متاح</div>
-                </div>
-                
-                <!-- المستوى الثاني -->
-                <div id="level2" onclick="selectLevel(2)" class="level-card bg-blue-600 hover:bg-blue-700 p-6 rounded-lg text-center transition-colors level-unlocked">
-                    <div class="text-4xl mb-2">🐣</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى الثاني</h3>
-                    <p class="text-sm mb-2">الفرخ - الأقواس</p>
-                    <p class="text-xs">⏱️ 60 ثانية | 🐉 كرة واحدة</p>
-                    <div class="mt-2">✅ متاح</div>
-                </div>
-                
-                <!-- المستوى الثالث -->
-                <div id="level3" onclick="selectLevel(3)" class="level-card bg-yellow-600 hover:bg-yellow-700 p-6 rounded-lg text-center transition-colors level-unlocked">
-                    <div class="text-4xl mb-2">🦋</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى الثالث</h3>
-                    <p class="text-sm mb-2">الفراشة - الكسور الأساسية</p>
-                    <p class="text-xs">⏱️ 90 ثانية | 🐉 كرة واحدة</p>
-                    <div class="mt-2">✅ متاح</div>
-                </div>
-                
-                <!-- المستوى الرابع -->
-                <div id="level4" onclick="selectLevel(4)" class="level-card bg-orange-600 hover:bg-orange-700 p-6 rounded-lg text-center transition-colors level-locked">
-                    <div class="text-4xl mb-2">🐉</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى الرابع</h3>
-                    <p class="text-sm mb-2">التنين الصغير - كسور معقدة</p>
-                    <p class="text-xs">⏱️ 2 دقيقة | 🐉 كرة واحدة</p>
-                    <div id="level4Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 3 مستويات</div>
-                </div>
-                
-                <!-- المستوى الخامس -->
-                <div id="level5" onclick="selectLevel(5)" class="level-card bg-purple-600 hover:bg-purple-700 p-6 rounded-lg text-center transition-colors level-locked">
-                    <div class="text-4xl mb-2">🔥</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى الخامس</h3>
-                    <p class="text-sm mb-2">التنين الناري - مسائل مركبة</p>
-                    <p class="text-xs">⏱️ 3 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level5Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 4 مستويات</div>
-                </div>
-                
-                <!-- المستوى السادس -->
-                <div id="level6" onclick="selectLevel(6)" class="level-card bg-red-600 hover:bg-red-700 p-6 rounded-lg text-center transition-colors level-locked">
-                    <div class="text-4xl mb-2">⚡</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى السادس</h3>
-                    <p class="text-sm mb-2">التنين البرقي - تمارين نصية</p>
-                    <p class="text-xs">⏱️ 4 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level6Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 5 مستويات</div>
-                </div>
-                
-                <!-- المستوى السابع -->
-                <div id="level7" onclick="selectLevel(7)" class="level-card bg-pink-600 hover:bg-pink-700 p-6 rounded-lg text-center transition-colors level-locked">
-                    <div class="text-4xl mb-2">🌟</div>
-                    <h3 class="text-xl font-bold mb-2">المستوى السابع</h3>
-                    <p class="text-sm mb-2">سيد الرياضيات - أعداد عشرية</p>
-                    <p class="text-xs">⏱️ 5 دقائق | 🐉 كرة واحدة</p>
-                    <div id="level7Lock" class="mt-2 text-red-400">🔒 يحتاج إكمال 6 مستويات</div>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <button onclick="showMainMenu()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    العودة للقائمة الرئيسية
+        </div>
+
+        <!-- Student Name Input -->
+        <div id="studentNameScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+            <div class="neon-border bg-gray-900 bg-opacity-90 rounded-2xl p-8 max-w-md w-full fade-in">
+                <h2 class="text-3xl font-bold text-center mb-6 neon-text">مرحباً بك!</h2>
+                <p class="text-center text-gray-400 mb-6">الرجاء إدخال اسمك للمتابعة</p>
+                <input type="text" id="studentNameInput" placeholder="اسمك الكامل"
+                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-6 text-base focus:outline-none focus:border-green-500">
+                <button onclick="saveStudentName()" class="w-full btn-primary text-gray-900 font-bold py-4 px-6 rounded-xl text-lg">
+                    ابدأ الرحلة
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- مودال التحدي -->
-    <div id="challengeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h3 class="text-2xl font-bold mb-4 text-center">⚔️ تحدي لاعب</h3>
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-2">اختر المستوى للتحدي:</label>
-                <select id="challengeLevel" class="w-full p-2 text-black rounded">
-                    <option value="1">المستوى الأول - اليرقة</option>
-                    <option value="2">المستوى الثاني - الفرخ</option>
-                    <option value="3">المستوى الثالث - الفراشة</option>
-                    <option value="4">المستوى الرابع - التنين الصغير</option>
-                    <option value="5">المستوى الخامس - التنين الناري</option>
-                    <option value="6">المستوى السادس - التنين البرقي</option>
-                    <option value="7">المستوى السابع - سيد الرياضيات</option>
-                </select>
+        <!-- Main Menu -->
+        <div id="mainMenu" class="hidden min-h-screen p-4 py-8">
+            <div class="max-w-6xl mx-auto">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="https://pfst.cf2.poecdn.net/base/image/450f72073a5c64d751e736153f873c0bd32589114f30346b5657e30b3a6c6a14?w=797&h=960"
+                             alt="Profile"
+                             class="w-16 h-16 rounded-full object-cover profile-image">
+                        <div>
+                            <h2 class="text-2xl font-bold neon-text" id="studentNameDisplay"></h2>
+                            <p class="text-gray-400">المجموع الكلي: <span id="totalScore">0</span> نقطة</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg transition">
+                        تسجيل الخروج
+                    </button>
+                </div>
+
+                <!-- Levels Grid -->
+                <h1 class="text-4xl font-bold text-center mb-8 neon-text">اختر المستوى</h1>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="levelsGrid">
+                    <!-- Levels will be generated here -->
+                </div>
             </div>
-            <div id="onlinePlayersList" class="space-y-2 mb-4 max-h-40 overflow-y-auto">
-                <!-- سيتم ملؤها ديناميكياً -->
-            </div>
-            <div class="flex justify-center space-x-3">
-                <button onclick="closeChallengeModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
-                    إلغاء
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden min-h-screen p-4 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Quiz Header -->
+                <div class="neon-border bg-gray-900 bg-opacity-90 rounded-2xl p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+                        <h2 class="text-2xl font-bold neon-text">المستوى <span id="currentLevelDisplay"></span></h2>
+                        <div class="text-xl">السؤال <span id="currentQuestionNum"></span> من <span id="totalQuestionsNum"></span></div>
+                    </div>
+                    <div class="bg-gray-800 rounded-full h-4 overflow-hidden">
+                        <div id="progressBar" class="progress-bar bg-gradient-to-r from-green-500 to-blue-500 h-full" style="width: 0%"></div>
+                    </div>
+                    <div class="mt-4 text-center text-xl">النقاط: <span id="quizScore">0</span></div>
+                </div>
+
+                <!-- Question Card -->
+                <div id="questionCard" class="neon-border-blue bg-gray-900 bg-opacity-90 rounded-2xl p-8 mb-6 fade-in">
+                    <div class="mb-2 text-sm text-gray-400" id="questionCategory"></div>
+                    <div class="text-2xl mb-8 leading-relaxed" id="questionText"></div>
+                    <div class="space-y-4" id="answersContainer">
+                        <!-- Answers will be generated here -->
+                    </div>
+                </div>
+
+                <button onclick="returnToMenu()" class="bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-lg transition">
+                    العودة للقائمة
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- مودال اللاعبين المتصلين -->
-    <div id="onlinePlayersModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-4xl">
-            <h3 class="text-2xl font-bold mb-4 text-center">👥 اللاعبون المتصلون الآن</h3>
-            <div id="onlinePlayersGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 max-h-80 overflow-y-auto">
-                <!-- سيتم ملؤها ديناميكياً -->
-            </div>
-            <div class="text-center">
-                <button onclick="closeOnlinePlayersModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
-                    إغلاق
-                </button>
-            </div>
-        </div>
-    </div>
+        <!-- Teacher Dashboard -->
+        <div id="teacherDashboard" class="hidden min-h-screen p-4 py-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                    <h1 class="text-4xl font-bold neon-text">لوحة تحكم الأستاذ</h1>
+                    <div class="flex gap-3">
+                        <button onclick="exportStudentData()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition">
+                            📥 تصدير البيانات
+                        </button>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg transition">
+                            تسجيل الخروج
+                        </button>
+                    </div>
+                </div>
 
-    <!-- شاشة اللعب -->
-    <div id="gameScreen" class="hidden relative z-10 p-4">
-        <div class="max-w-4xl mx-auto">
-            <!-- معلومات اللعبة -->
-            <div class="flex justify-between items-center mb-6 bg-gray-800 p-4 rounded-lg">
-                <div class="text-lg font-bold">
-                    <span id="currentScore">النقاط: 0</span>
+                <!-- Statistics -->
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="neon-border bg-gray-900 bg-opacity-90 rounded-xl p-6 text-center">
+                        <div class="text-4xl font-bold neon-text mb-2" id="totalStudents">0</div>
+                        <div class="text-gray-400">عدد الطلاب</div>
+                    </div>
+                    <div class="neon-border-gold bg-gray-900 bg-opacity-90 rounded-xl p-6 text-center">
+                        <div class="text-4xl font-bold text-yellow-400 mb-2" id="avgScore">0</div>
+                        <div class="text-gray-400">متوسط النقاط</div>
+                    </div>
+                    <div class="neon-border-purple bg-gray-900 bg-opacity-90 rounded-xl p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-400 mb-2" id="excellentStudents">0</div>
+                        <div class="text-gray-400">طلاب ممتازون (90%+)</div>
+                    </div>
                 </div>
-                <div class="text-lg font-bold">
-                    <span id="timer" class="text-yellow-400">⏱️ 45</span>
-                </div>
-                <div class="text-lg font-bold">
-                    <span id="questionNumber">السؤال: 1/8</span>
-                </div>
-            </div>
 
-            <!-- معلومات التحدي (إن وجد) -->
-            <div id="challengeInfo" class="hidden bg-red-800 p-4 rounded-lg mb-6">
-                <div class="text-center">
-                    <h3 class="text-xl font-bold mb-2">🔥 تحدي مباشر</h3>
-                    <div id="challengeOpponent" class="text-lg"></div>
-                    <div class="flex justify-center space-x-8 mt-2">
-                        <div>أنت: <span id="myScore" class="font-bold">0</span></div>
-                        <div>الخصم: <span id="opponentScore" class="font-bold">0</span></div>
+                <!-- Students Table -->
+                <div class="neon-border bg-gray-900 bg-opacity-90 rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                        <h2 class="text-2xl font-bold">نتائج الطلاب</h2>
+                        <div class="text-sm text-gray-400">
+                            📊 التحديث الفوري: البيانات تُحدث تلقائياً عند إنجاز الطلاب للاختبارات
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-right p-4">الاسم</th>
+                                    <th class="text-center p-4">المجموع الكلي</th>
+                                    <th class="text-center p-4">المستوى 1</th>
+                                    <th class="text-center p-4">المستوى 2</th>
+                                    <th class="text-center p-4">المستوى 3</th>
+                                    <th class="text-center p-4">المستوى 4</th>
+                                    <th class="text-center p-4">المستوى 5</th>
+                                    <th class="text-center p-4">آخر محاولة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Student data will be generated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
-            <!-- السؤال -->
-            <div class="text-center mb-8">
-                <div id="questionText" class="text-2xl md:text-3xl font-bold mb-4 bg-gray-800 p-6 rounded-lg math-formula"></div>
-                <div class="text-sm text-yellow-400 bg-blue-900 p-2 rounded">
-                    💡 العمليات من اليسار إلى اليمين (مثل الفرنسية): 2 + 3 × 4 = (2 + 3) × 4 = 20
-                </div>
-            </div>
-
-            <!-- الأبواب الثلاثة -->
-            <div id="doorsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(0)">
-                    <div class="text-xl font-bold mb-2">🚪 الباب الأول</div>
-                    <div id="option0" class="text-lg"></div>
-                </div>
-                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(1)">
-                    <div class="text-xl font-bold mb-2">🚪 الباب الثاني</div>
-                    <div id="option1" class="text-lg"></div>
-                </div>
-                <div class="door rounded-lg p-8 text-center min-h-32 flex flex-col justify-center" onclick="selectAnswer(2)">
-                    <div class="text-xl font-bold mb-2">🚪 الباب الثالث</div>
-                    <div id="option2" class="text-lg"></div>
-                </div>
-            </div>
-
-            <!-- نتيجة الإجابة -->
-            <div id="answerResult" class="hidden text-center">
-                <div id="resultIcon" class="text-6xl mb-4"></div>
-                <div id="resultText" class="text-2xl font-bold mb-4"></div>
-                <div id="answerTime" class="text-lg mb-4"></div>
-                <div id="explanationText" class="text-sm bg-blue-900 p-3 rounded mb-4"></div>
-                <button id="nextQuestion" onclick="nextQuestion()" class="bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    السؤال التالي
-                </button>
-            </div>
         </div>
-    </div>
 
-    <!-- شاشة انتهاء اللعبة -->
-    <div id="gameEnd" class="hidden relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
-            <h2 class="text-3xl font-bold mb-4">🎉 انتهت اللعبة!</h2>
-            <div id="finalScore" class="text-2xl mb-4"></div>
-            
-            <!-- مكافأة كرة الدراغون -->
-            <div id="dragonBallReward" class="hidden mb-6">
-                <div class="dragonball w-20 h-20 mx-auto rounded-full flex items-center justify-center text-2xl font-bold mb-4">
-                    🐉
+        <!-- Result Modal -->
+        <div id="resultModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+            <div class="neon-border-gold bg-gray-900 rounded-2xl p-8 max-w-md w-full text-center">
+                <div class="text-6xl mb-4" id="resultEmoji"></div>
+                <h2 class="text-3xl font-bold mb-4 neon-text" id="resultTitle"></h2>
+                <p class="text-xl mb-6" id="resultMessage"></p>
+                <div class="text-4xl font-bold mb-6 text-yellow-400">
+                    النتيجة: <span id="finalScore"></span>/100
                 </div>
-                <div class="text-xl font-bold text-yellow-400">حصلت على كرة دراغون بول!</div>
-                <div id="monsterEvolution" class="hidden mt-4">
-                    <div class="text-lg text-green-400">وحشك تطور! 🧬</div>
-                    <div id="newMonster" class="text-6xl mt-2"></div>
-                    <div id="newMonsterName" class="text-lg text-yellow-400 mt-2"></div>
-                </div>
-                <div id="newLevelUnlocked" class="hidden mt-2 text-green-400"></div>
-            </div>
-            
-            <!-- رسالة تشجيعية لجمع 7 كرات -->
-            <div id="encouragementMessage" class="hidden mb-6 p-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg">
-                <div class="text-2xl font-bold mb-2">🎊 تهانينا! 🎊</div>
-                <div id="careerMessage" class="text-lg"></div>
-                <div class="mt-4 text-6xl">👨‍⚕️</div>
-            </div>
-            
-            <!-- نتيجة التحدي -->
-            <div id="challengeResult" class="hidden mb-6 p-4 rounded-lg">
-                <div id="challengeOutcome" class="text-xl font-bold mb-2"></div>
-                <div id="challengeDetails" class="text-sm"></div>
-            </div>
-            
-            <div class="space-y-3">
-                <button onclick="showLevelSelection()" class="w-full bg-primary hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    العب مرة أخرى
-                </button>
-                <button onclick="showMainMenu()" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    القائمة الرئيسية
+                <div class="text-lg mb-8 text-gray-300" id="motivationalMessage"></div>
+                <button onclick="closeResultModal()" class="w-full btn-primary text-gray-900 font-bold py-4 px-6 rounded-xl text-lg">
+                    العودة للقائمة
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔄 نظام الاتصال الحقيقي المباشر - كل شيء في الكود
-        class RealTimeGameConnection {
-            constructor() {
-                this.data = {
-                    players: {},
-                    onlinePlayers: new Map(),
-                    challenges: {},
-                    gameHistory: [],
-                    liveActivity: [],
-                    systemStats: {
-                        totalConnections: 0,
-                        peakOnline: 0,
-                        lastUpdate: Date.now()
-                    }
-                };
-                
-                this.myPlayerId = null;
-                this.mySessionId = this.generateSessionId();
-                this.isConnected = true;
-                this.lastHeartbeat = Date.now();
-                this.syncInterval = null;
-                this.connectionCheckInterval = null;
-                
-                this.loadData();
-                this.startRealTimeConnection();
-                this.startConnectionMonitoring();
-            }
-            
-            // توليد معرف جلسة فريد
-            generateSessionId() {
-                return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-            }
-            
-            // تحميل البيانات من التخزين المشترك
-            loadData() {
-                try {
-                    // استخدام localStorage للمشاركة بين الجلسات
-                    const saved = localStorage.getItem('mathGameRealTimeData');
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        this.data.players = parsed.players || {};
-                        this.data.gameHistory = parsed.gameHistory || [];
-                        this.data.liveActivity = parsed.liveActivity || [];
-                        this.data.challenges = parsed.challenges || {};
-                        this.data.systemStats = parsed.systemStats || this.data.systemStats;
-                    }
-                } catch (e) {
-                    console.warn('Could not load shared data:', e);
-                }
-            }
-            
-            // حفظ البيانات للمشاركة
-            saveData() {
-                try {
-                    const dataToSave = {
-                        players: this.data.players,
-                        gameHistory: this.data.gameHistory,
-                        liveActivity: this.data.liveActivity,
-                        challenges: this.data.challenges,
-                        systemStats: {
-                            ...this.data.systemStats,
-                            lastUpdate: Date.now()
-                        },
-                        lastSyncTime: Date.now()
-                    };
-                    localStorage.setItem('mathGameRealTimeData', JSON.stringify(dataToSave));
-                    
-                    // تحديث إحصائيات النظام
-                    this.data.systemStats.totalConnections = Math.max(
-                        this.data.systemStats.totalConnections,
-                        this.data.onlinePlayers.size
-                    );
-                    this.data.systemStats.peakOnline = Math.max(
-                        this.data.systemStats.peakOnline,
-                        this.data.onlinePlayers.size
-                    );
-                    
-                    this.broadcastToSystem();
-                } catch (e) {
-                    console.warn('Could not save shared data:', e);
-                    this.setConnectionStatus(false);
-                }
-            }
-            
-            // بدء الاتصال المباشر
-            startRealTimeConnection() {
-                // تحديث سريع جداً - كل 500ms للاتصال الحقيقي
-                this.syncInterval = setInterval(() => {
-                    this.syncWithOtherSessions();
-                    this.updateOnlineStatus();
-                    this.cleanupOldData();
-                    this.processActiveChallenges();
-                    
-                    // تحديث واجهات المستخدم
-                    if (isTeacher) {
-                        this.updateTeacherDashboardRealTime();
-                    }
-                    this.updateMainMenuStats();
-                    this.updateOnlineCounters();
-                }, 500);
-                
-                // نبضة حياة كل ثانيتين
-                setInterval(() => {
-                    if (this.myPlayerId) {
-                        this.sendHeartbeat();
-                    }
-                }, 2000);
-            }
-            
-            // مراقبة حالة الاتصال
-            startConnectionMonitoring() {
-                this.connectionCheckInterval = setInterval(() => {
-                    this.checkConnectionHealth();
-                }, 3000);
-            }
-            
-            // فحص صحة الاتصال
-            checkConnectionHealth() {
-                try {
-                    // محاولة قراءة/كتابة للتحقق من الاتصال
-                    const testKey = 'mathGame_connectionTest';
-                    const testValue = Date.now().toString();
-                    localStorage.setItem(testKey, testValue);
-                    const retrieved = localStorage.getItem(testKey);
-                    
-                    if (retrieved === testValue) {
-                        this.setConnectionStatus(true);
-                        localStorage.removeItem(testKey);
-                    } else {
-                        this.setConnectionStatus(false);
-                    }
-                } catch (e) {
-                    this.setConnectionStatus(false);
-                }
-            }
-            
-            // تحديث حالة الاتصال
-            setConnectionStatus(isOnline) {
-                this.isConnected = isOnline;
-                const statusElement = document.getElementById('connectionStatus');
-                if (statusElement) {
-                    if (isOnline) {
-                        statusElement.className = 'connection-status connection-online';
-                        statusElement.textContent = '🟢 متصل';
-                    } else {
-                        statusElement.className = 'connection-status connection-offline';
-                        statusElement.textContent = '🔴 انقطع الاتصال';
-                    }
-                }
-            }
-            
-            // مزامنة مع الجلسات الأخرى
-            syncWithOtherSessions() {
-                try {
-                    const currentData = localStorage.getItem('mathGameRealTimeData');
-                    if (currentData) {
-                        const parsed = JSON.parse(currentData);
-                        
-                        // دمج البيانات الجديدة
-                        this.mergeExternalData(parsed);
-                    }
-                } catch (e) {
-                    console.warn('Sync error:', e);
-                }
-            }
-            
-            // دمج البيانات الخارجية
-            mergeExternalData(externalData) {
-                // دمج اللاعبين
-                Object.keys(externalData.players || {}).forEach(playerName => {
-                    if (!this.data.players[playerName] || 
-                        externalData.players[playerName].lastPlayed > this.data.players[playerName].lastPlayed) {
-                        this.data.players[playerName] = externalData.players[playerName];
-                    }
-                });
-                
-                // دمج الأنشطة الحديثة
-                if (externalData.liveActivity) {
-                    externalData.liveActivity.forEach(activity => {
-                        if (!this.data.liveActivity.find(a => a.id === activity.id)) {
-                            this.data.liveActivity.unshift(activity);
-                        }
-                    });
-                    this.data.liveActivity = this.data.liveActivity
-                        .sort((a, b) => b.timestamp - a.timestamp)
-                        .slice(0, 100);
-                }
-                
-                // دمج التحديات
-                Object.keys(externalData.challenges || {}).forEach(challengeId => {
-                    if (!this.data.challenges[challengeId]) {
-                        this.data.challenges[challengeId] = externalData.challenges[challengeId];
-                    }
-                });
-            }
-            
-            // تسجيل لاعب كمتصل
-            setPlayerOnline(playerName, activity = 'في القائمة الرئيسية') {
-                this.myPlayerId = playerName;
-                this.data.onlinePlayers.set(playerName, {
-                    sessionId: this.mySessionId,
-                    name: playerName,
-                    activity: activity,
-                    lastSeen: Date.now(),
-                    connectedAt: Date.now(),
-                    isPlaying: false,
-                    inChallenge: false,
-                    currentLevel: null,
-                    currentScore: 0
-                });
-                
-                this.logActivity(playerName, `🟢 دخل إلى اللعبة`, 'connection');
-                this.saveData();
-                
-                // إشعار للأستاذ
-                if (isTeacher) {
-                    this.showLiveNotification(`🟢 ${playerName} انضم للعبة`, 'success');
-                }
-            }
-            
-            // تحديث نشاط اللاعب
-            updatePlayerActivity(playerName, activity, details = null) {
-                if (this.data.onlinePlayers.has(playerName)) {
-                    const playerInfo = this.data.onlinePlayers.get(playerName);
-                    playerInfo.activity = activity;
-                    playerInfo.lastSeen = Date.now();
-                    playerInfo.isPlaying = activity.includes('يلعب');
-                    playerInfo.inChallenge = activity.includes('تحدي');
-                    
-                    if (details) {
-                        if (details.level) playerInfo.currentLevel = details.level;
-                        if (details.score !== undefined) playerInfo.currentScore = details.score;
-                    }
-                    
-                    this.logActivity(playerName, activity, 'activity', details);
-                    this.saveData();
-                }
-            }
-            
-            // إرسال نبضة حياة
-            sendHeartbeat() {
-                if (this.data.onlinePlayers.has(this.myPlayerId)) {
-                    const playerInfo = this.data.onlinePlayers.get(this.myPlayerId);
-                    playerInfo.lastSeen = Date.now();
-                    this.lastHeartbeat = Date.now();
-                    this.saveData();
-                }
-            }
-            
-            // تحديث حالة اللاعبين المتصلين
-            updateOnlineStatus() {
-                const now = Date.now();
-                const timeout = 10000; // 10 ثوان انقطاع
-                
-                for (let [playerName, info] of this.data.onlinePlayers) {
-                    if (now - info.lastSeen > timeout) {
-                        this.setPlayerOffline(playerName);
-                    }
-                }
-            }
-            
-            // تسجيل لاعب كغير متصل
-            setPlayerOffline(playerName) {
-                if (this.data.onlinePlayers.has(playerName)) {
-                    this.logActivity(playerName, `🔴 خرج من اللعبة`, 'connection');
-                    this.data.onlinePlayers.delete(playerName);
-                    this.saveData();
-                    
-                    // إشعار للأستاذ
-                    if (isTeacher) {
-                        this.showLiveNotification(`🔴 ${playerName} غادر اللعبة`, 'warning');
-                    }
-                }
-            }
-            
-            // تسجيل النشاط
-            logActivity(playerName, activity, type = 'activity', details = null) {
-                const activityEntry = {
-                    id: Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-                    player: playerName,
-                    activity: activity,
-                    type: type,
-                    details: details,
-                    timestamp: Date.now(),
-                    sessionId: this.mySessionId
-                };
-                
-                this.data.liveActivity.unshift(activityEntry);
-                this.data.liveActivity = this.data.liveActivity.slice(0, 100);
-            }
-            
-            // تسجيل إنجاز
-            recordAchievement(playerName, achievement, details = null) {
-                this.logActivity(playerName, achievement, 'achievement', details);
-                
-                // إشعار فوري للأستاذ
-                if (isTeacher) {
-                    this.showLiveNotification(`🏆 ${playerName}: ${achievement}`, 'achievement');
-                }
-                
-                this.saveData();
-            }
-            
-            // تنظيف البيانات القديمة
-            cleanupOldData() {
-                const oneHourAgo = Date.now() - (60 * 60 * 1000);
-                this.data.liveActivity = this.data.liveActivity.filter(
-                    activity => activity.timestamp > oneHourAgo
-                );
-                
-                // تنظيف التحديات القديمة
-                Object.keys(this.data.challenges).forEach(challengeId => {
-                    const challenge = this.data.challenges[challengeId];
-                    if (Date.now() - challenge.createdAt > 300000) { // 5 دقائق
-                        delete this.data.challenges[challengeId];
-                    }
-                });
-            }
-            
-            // معالجة التحديات النشطة
-            processActiveChallenges() {
-                Object.values(this.data.challenges).forEach(challenge => {
-                    if (challenge.status === 'pending' && 
-                        Date.now() - challenge.createdAt > 5000) {
-                        this.acceptChallenge(challenge.id);
-                    }
-                });
-            }
-            
-            // بث التحديث للنظام
-            broadcastToSystem() {
-                // تحديث إضافي للتأكد من المزامنة
-                if (Math.random() < 0.1) { // 10% من الوقت
-                    this.syncWithOtherSessions();
-                }
-            }
-            
-            // تحديث لوحة الأستاذ في الوقت الفعلي
-            updateTeacherDashboardRealTime() {
-                if (!isTeacher) return;
-                
-                const onlinePlayersArray = Array.from(this.data.onlinePlayers.entries());
-                const playingCount = onlinePlayersArray.filter(([name, info]) => info.isPlaying).length;
-                const challengeCount = Object.keys(this.data.challenges).length;
-                
-                // تحديث العدادات
-                this.updateElement('liveOnlineCount', onlinePlayersArray.length);
-                this.updateElement('currentlyPlayingCount', playingCount);
-                this.updateElement('activeChallengesCount', challengeCount);
-                this.updateElement('totalStudentsCount', Object.keys(this.data.players).length);
-                
-                // حساب مجموع كرات الدراغون
-                const totalDragonBalls = Object.values(this.data.players)
-                    .reduce((sum, player) => sum + (player.dragonBalls || 0), 0);
-                this.updateElement('totalDragonBallsCount', totalDragonBalls);
-                
-                // تحديث وقت آخر تحديث
-                this.updateElement('lastUpdateTime', new Date().toLocaleTimeString('ar-DZ'));
-                
-                // تحديث الأقسام المختلفة
-                this.updateLiveStudentActivity();
-                this.updateLiveChallenges();
-                this.updateLiveAchievements();
-                this.updateLiveStudentsTable();
-            }
-            
-            // تحديث النشاط المباشر للطلاب
-            updateLiveStudentActivity() {
-                const container = document.getElementById('liveStudentActivity');
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                const onlinePlayersArray = Array.from(this.data.onlinePlayers.entries());
-                
-                if (onlinePlayersArray.length === 0) {
-                    container.innerHTML = '<div class="text-gray-400 text-sm">لا يوجد تلاميذ متصلون</div>';
-                    return;
-                }
-                
-                onlinePlayersArray.forEach(([name, info]) => {
-                    const player = this.data.players[name] || {};
-                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
-                    
-                    const div = document.createElement('div');
-                    div.className = `p-3 rounded flex items-center justify-between transition-all ${
-                        info.isPlaying ? 'bg-green-900 real-time-pulse' : 'bg-gray-700'
-                    }`;
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <div class="text-2xl">${monsterInfo.emoji}</div>
-                            <div>
-                                <div class="font-bold">${name}</div>
-                                <div class="text-sm ${info.isPlaying ? 'text-green-400' : 'text-gray-400'}">${info.activity}</div>
-                                ${info.currentLevel ? `<div class="text-xs text-blue-400">المستوى ${info.currentLevel} | ${info.currentScore} نقطة</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="online-indicator"></div>
-                            <div class="text-xs text-gray-400">${this.getTimeAgo(info.lastSeen)}</div>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-            
-            // تحديث التحديات المباشرة
-            updateLiveChallenges() {
-                const container = document.getElementById('liveChallenges');
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                const challenges = Object.values(this.data.challenges)
-                    .filter(c => c.status !== 'completed');
-                
-                if (challenges.length === 0) {
-                    container.innerHTML = '<div class="text-gray-400 text-sm">لا توجد تحديات نشطة</div>';
-                    return;
-                }
-                
-                challenges.forEach(challenge => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-red-900 p-3 rounded real-time-pulse';
-                    div.innerHTML = `
-                        <div class="font-bold text-red-400">⚔️ ${challenge.challenger} ضد ${challenge.opponent}</div>
-                        <div class="text-sm text-gray-400">المستوى ${challenge.level} | ${challenge.status}</div>
-                        <div class="text-xs text-gray-400">${this.getTimeAgo(challenge.createdAt)}</div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-            
-            // تحديث الإنجازات المباشرة
-            updateLiveAchievements() {
-                const container = document.getElementById('liveAchievements');
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                const achievements = this.data.liveActivity
-                    .filter(activity => activity.type === 'achievement')
-                    .slice(0, 10);
-                
-                if (achievements.length === 0) {
-                    container.innerHTML = '<div class="text-gray-400 text-sm">لا توجد إنجازات حديثة</div>';
-                    return;
-                }
-                
-                achievements.forEach(achievement => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-yellow-900 p-2 rounded text-sm real-time-pulse';
-                    div.innerHTML = `
-                        <div class="font-bold text-yellow-400">${achievement.player}</div>
-                        <div class="text-yellow-200">${achievement.activity}</div>
-                        <div class="text-xs text-gray-400">${this.getTimeAgo(achievement.timestamp)}</div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-            
-            // تحديث جدول الطلاب المباشر
-            updateLiveStudentsTable() {
-                const tableBody = document.getElementById('liveStudentsTable');
-                if (!tableBody) return;
-                
-                tableBody.innerHTML = '';
-                
-                const players = Object.values(this.data.players)
-                    .sort((a, b) => b.totalScore - a.totalScore);
-                    
-                players.forEach((player, index) => {
-                    const row = document.createElement('tr');
-                    const isOnline = this.data.onlinePlayers.has(player.name);
-                    const onlineInfo = this.data.onlinePlayers.get(player.name);
-                    
-                    row.className = `border-b border-gray-700 student-card transition-all ${
-                        isOnline && onlineInfo.isPlaying ? 'playing' : 
-                        isOnline && onlineInfo.inChallenge ? 'in-challenge' : ''
-                    }`;
-                    
-                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
-                    
-                    const statusBadge = isOnline ? 
-                        `<div class="flex items-center space-x-2">
-                            <div class="online-indicator"></div>
-                            <span class="text-xs ${onlineInfo.isPlaying ? 'text-green-400' : 'text-blue-400'}">${onlineInfo.activity}</span>
-                        </div>` :
-                        '<span class="bg-gray-500 text-white px-2 py-1 rounded text-xs">غير متصل</span>';
-                    
-                    row.innerHTML = `
-                        <td class="p-3 font-bold text-center">${index + 1}</td>
-                        <td class="p-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-2xl border-2 border-yellow-400 relative">
-                                    ${monsterInfo.emoji}
-                                    <div class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                        ${player.currentLevel}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-yellow-400">${monsterInfo.name}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-3 font-bold">${player.name}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-sm">${isOnline ? onlineInfo.activity : 'غير متصل'}</td>
-                        <td class="p-3 font-bold text-yellow-400 text-center">${player.totalScore}</td>
-                        <td class="p-3 text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                <span class="font-bold">${player.dragonBalls}/7</span>
-                                <div class="flex space-x-1">
-                                    ${Array.from({length: 7}, (_, i) => 
-                                        i < player.dragonBalls ? '🐉' : '⚫'
-                                    ).join('')}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-3 text-sm text-center">${isOnline ? `نشط الآن` : this.getTimeAgo(new Date(player.lastPlayed).getTime())}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="deleteStudent('${player.name}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm">
-                                حذف
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-            
-            // تحديث إحصائيات القائمة الرئيسية
-            updateMainMenuStats() {
-                this.updateElement('mainMenuOnlineCount', this.data.onlinePlayers.size);
-                this.updateElement('mainMenuTotalPlayers', Object.keys(this.data.players).length);
-            }
-            
-            // تحديث عدادات الاتصال
-            updateOnlineCounters() {
-                this.updateElement('onlinePlayersCount', this.data.onlinePlayers.size);
-            }
-            
-            // دالة مساعدة لتحديث العناصر
-            updateElement(id, value) {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
-            }
-            
-            // إظهار إشعار مباشر
-            showLiveNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                const colors = {
-                    success: 'bg-green-600',
-                    warning: 'bg-yellow-600',
-                    info: 'bg-blue-600',
-                    achievement: 'bg-purple-600'
-                };
-                
-                notification.className = `live-notification ${colors[type]}`;
-                notification.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold">${message}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" class="text-lg font-bold ml-2">&times;</button>
-                    </div>
-                    <div class="text-xs mt-1">${new Date().toLocaleTimeString('ar-DZ')}</div>
-                `;
-                
-                document.getElementById('liveNotifications').appendChild(notification);
-                
-                // إزالة تلقائية بعد 4 ثوان
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, 4000);
-            }
-            
-            // حساب الوقت المنقضي
-            getTimeAgo(timestamp) {
-                const seconds = Math.floor((Date.now() - timestamp) / 1000);
-                if (seconds < 60) return `${seconds} ثانية`;
-                const minutes = Math.floor(seconds / 60);
-                if (minutes < 60) return `${minutes} دقيقة`;
-                const hours = Math.floor(minutes / 60);
-                return `${hours} ساعة`;
-            }
-            
-            // إدارة اللاعبين
-            createPlayer(name) {
-                this.data.players[name] = {
-                    name: name,
-                    totalScore: 0,
-                    currentLevel: 1,
-                    dragonBalls: 0,
-                    levelsCompleted: [],
-                    lastPlayed: new Date().toISOString(),
-                    gamesPlayed: 0,
-                    challengesWon: 0,
-                    challengesLost: 0,
-                    createdAt: Date.now()
-                };
-                this.saveData();
-                return this.data.players[name];
-            }
-            
-            getPlayer(name) {
-                return this.data.players[name] || this.createPlayer(name);
-            }
-            
-            updatePlayer(name, updates) {
-                if (this.data.players[name]) {
-                    Object.assign(this.data.players[name], updates);
-                    this.data.players[name].lastPlayed = new Date().toISOString();
-                    this.saveData();
-                }
-            }
-            
-            deletePlayer(name) {
-                delete this.data.players[name];
-                this.setPlayerOffline(name);
-                this.saveData();
-            }
-            
-            // إدارة التحديات
-            createChallenge(challenger, opponent, level) {
-                const challengeId = Date.now().toString();
-                this.data.challenges[challengeId] = {
-                    id: challengeId,
-                    challenger: challenger,
-                    opponent: opponent,
-                    level: level,
-                    status: 'pending',
-                    createdAt: Date.now()
-                };
-                
-                this.logActivity(challenger, `⚔️ أرسل تحدي إلى ${opponent} في المستوى ${level}`, 'challenge');
-                this.saveData();
-                return challengeId;
-            }
-            
-            acceptChallenge(challengeId) {
-                if (this.data.challenges[challengeId]) {
-                    this.data.challenges[challengeId].status = 'accepted';
-                    this.data.challenges[challengeId].startTime = Date.now();
-                    this.logActivity(
-                        this.data.challenges[challengeId].opponent, 
-                        `✅ قبل تحدي ${this.data.challenges[challengeId].challenger}`, 
-                        'challenge'
-                    );
-                    this.saveData();
-                }
-            }
-        }
-
-        // نظام الوحوش حسب المستوى
-        const levelMonsters = {
-            1: { emoji: '🐛', name: 'اليرقة المتعلمة', description: 'بداية رحلة التعلم' },
-            2: { emoji: '🐣', name: 'الفرخ الذكي', description: 'يكتشف الأقواس' },
-            3: { emoji: '🦋', name: 'الفراشة الحاسبة', description: 'تحلق مع الكسور' },
-            4: { emoji: '🐉', name: 'التنين الصغير', description: 'قوة الكسور المعقدة' },
-            5: { emoji: '🔥', name: 'التنين الناري', description: 'سيد المسائل المركبة' },
-            6: { emoji: '⚡', name: 'التنين البرقي', description: 'سرعة البرق في الحل' },
-            7: { emoji: '🌟', name: 'سيد الرياضيات', description: 'إتقان كامل للرياضيات' }
-        };
-
-        // 🧮 دالة تقييم العمليات من اليسار إلى اليمين (مثل الفرنسية)
-        function evaluateLeftToRight(expression) {
-            // إزالة المسافات
-            expression = expression.replace(/\s/g, '');
-            
-            // معالجة الأقواس أولاً
-            while (expression.includes('(')) {
-                const openIndex = expression.lastIndexOf('(');
-                const closeIndex = expression.indexOf(')', openIndex);
-                const innerExpr = expression.substring(openIndex + 1, closeIndex);
-                const result = evaluateLeftToRight(innerExpr);
-                expression = expression.substring(0, openIndex) + result + expression.substring(closeIndex + 1);
-            }
-            
-            // تقسيم التعبير إلى أرقام وعمليات
-            const tokens = expression.match(/(\d+\.?\d*|[+\-*/])/g);
-            if (!tokens || tokens.length === 0) return 0;
-            
-            // تقييم من اليسار إلى اليمين
-            let result = parseFloat(tokens[0]);
-            
-            for (let i = 1; i < tokens.length; i += 2) {
-                const operator = tokens[i];
-                const operand = parseFloat(tokens[i + 1]);
-                
-                switch (operator) {
-                    case '+':
-                        result += operand;
-                        break;
-                    case '-':
-                        result -= operand;
-                        break;
-                    case '*':
-                    case '×':
-                        result *= operand;
-                        break;
-                    case '/':
-                    case '÷':
-                        result /= operand;
-                        break;
-                }
-            }
-            
-            return Math.round(result * 100) / 100; // تقريب لعدد عشري
-        }
-
-        // بنك الأسئلة المصحح - العمليات من اليسار إلى اليمين (الطريقة الفرنسية)
-        const questionBank = {
-            1: [ // المستوى الأول: العمليات البسيطة من اليسار لليمين
-                {
-                    question: "2 + 3 × 4 = ?",
-                    options: ["20", "14", "24"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 2 + 3 = 5، ثم 5 × 4 = 20"
-                },
-                {
-                    question: "10 - 4 + 6 = ?",
-                    options: ["12", "0", "20"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 10 - 4 = 6، ثم 6 + 6 = 12"
-                },
-                {
-                    question: "3 × 4 + 2 = ?",
-                    options: ["14", "18", "10"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 3 × 4 = 12، ثم 12 + 2 = 14"
-                },
-                {
-                    question: "15 ÷ 3 + 7 = ?",
-                    options: ["12", "5", "22"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 15 ÷ 3 = 5، ثم 5 + 7 = 12"
-                },
-                {
-                    question: "8 + 2 × 3 = ?",
-                    options: ["30", "26", "14"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 8 + 2 = 10، ثم 10 × 3 = 30"
-                },
-                {
-                    question: "20 ÷ 4 - 3 = ?",
-                    options: ["2", "5", "17"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 20 ÷ 4 = 5، ثم 5 - 3 = 2"
-                },
-                {
-                    question: "6 × 2 + 3 × 2 = ?",
-                    options: ["30", "24", "18"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 6 × 2 = 12، ثم 12 + 3 = 15، ثم 15 × 2 = 30"
-                },
-                {
-                    question: "9 + 1 - 5 + 4 = ?",
-                    options: ["9", "5", "19"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 9 + 1 = 10، ثم 10 - 5 = 5، ثم 5 + 4 = 9"
-                }
-            ],
-            2: [ // المستوى الثاني: الأقواس مع التقييم من اليسار لليمين
-                {
-                    question: "(2 + 3) × 4 = ?",
-                    options: ["20", "14", "11"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (2 + 3) = 5، ثم 5 × 4 = 20"
-                },
-                {
-                    question: "2 + (3 × 4) = ?",
-                    options: ["14", "20", "24"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (3 × 4) = 12، ثم 2 + 12 = 14"
-                },
-                {
-                    question: "(8 - 3) + (4 × 2) = ?",
-                    options: ["13", "10", "16"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (8 - 3) = 5، (4 × 2) = 8، ثم 5 + 8 = 13"
-                },
-                {
-                    question: "10 ÷ (2 + 3) = ?",
-                    options: ["2", "5", "8"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (2 + 3) = 5، ثم 10 ÷ 5 = 2"
-                },
-                {
-                    question: "(6 + 4) ÷ 2 × 3 = ?",
-                    options: ["15", "5", "30"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (6 + 4) = 10، ثم من اليسار لليمين: 10 ÷ 2 = 5، ثم 5 × 3 = 15"
-                },
-                {
-                    question: "3 × (5 - 2) + 4 = ?",
-                    options: ["13", "21", "7"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (5 - 2) = 3، ثم من اليسار لليمين: 3 × 3 = 9، ثم 9 + 4 = 13"
-                },
-                {
-                    question: "(12 ÷ 3) + (2 × 4) = ?",
-                    options: ["12", "8", "16"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (12 ÷ 3) = 4، (2 × 4) = 8، ثم 4 + 8 = 12"
-                },
-                {
-                    question: "7 + (9 - 6) × 2 = ?",
-                    options: ["13", "22", "4"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (9 - 6) = 3، ثم من اليسار لليمين: 7 + 3 = 10، ثم 10 × 2 = 20... خطأ في الحساب، الصحيح: 7 + (3 × 2) = 7 + 6 = 13"
-                }
-            ],
-            3: [ // المستوى الثالث: الكسور الأساسية
-                {
-                    question: "1/2 + 1/4 = ?",
-                    options: ["3/4", "2/6", "1/3"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 1/2 = 2/4، ثم → 2/4 + 1/4 = 3/4"
-                },
-                {
-                    question: "3/5 - 1/5 = ?",
-                    options: ["2/5", "2/10", "4/5"],
-                    correct: 0,
-                    explanation: "نفس المقام: 3/5 - 1/5 = (3-1)/5 = 2/5"
-                },
-                {
-                    question: "2/3 × 3/4 = ?",
-                    options: ["1/2", "6/12", "5/7"],
-                    correct: 0,
-                    explanation: "ضرب الكسور: (2×3)/(3×4) = 6/12 = 1/2"
-                },
-                {
-                    question: "أيهما أكبر: 2/3 أم 3/5؟",
-                    options: ["2/3", "3/5", "متساويان"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 2/3 = 10/15، 3/5 = 9/15، إذن 2/3 أكبر"
-                },
-                {
-                    question: "5/6 - 1/3 = ?",
-                    options: ["1/2", "4/3", "2/3"],
-                    correct: 0,
-                    explanation: "نوحد المقامات: 1/3 = 2/6، ثم → 5/6 - 2/6 = 3/6 = 1/2"
-                },
-                {
-                    question: "1/4 + 1/3 = ?",
-                    options: ["7/12", "2/7", "1/2"],
-                    correct: 0,
-                    explanation: "المقام المشترك 12: 1/4 = 3/12، 1/3 = 4/12، ثم → 3/12 + 4/12 = 7/12"
-                },
-                {
-                    question: "4/5 × 2/3 = ?",
-                    options: ["8/15", "6/8", "2/5"],
-                    correct: 0,
-                    explanation: "ضرب الكسور: (4×2)/(5×3) = 8/15"
-                },
-                {
-                    question: "رتب تصاعدياً: 1/4، 1/3، 1/2",
-                    options: ["1/4، 1/3، 1/2", "1/2، 1/3، 1/4", "1/3، 1/4، 1/2"],
-                    correct: 0,
-                    explanation: "نوحد المقامات (12): 1/4=3/12، 1/3=4/12، 1/2=6/12، الترتيب: 3/12 < 4/12 < 6/12"
-                }
-            ],
-            4: [ // المستوى الرابع: عمليات الكسور المعقدة
-                {
-                    question: "(1/2 + 1/3) × 2/5 = ?",
-                    options: ["1/3", "5/6", "2/15"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 1/2 + 1/3 = 3/6 + 2/6 = 5/6، ثم → (5/6) × (2/5) = 10/30 = 1/3"
-                },
-                {
-                    question: "3/4 ÷ 1/2 = ?",
-                    options: ["3/2", "3/8", "1/2"],
-                    correct: 0,
-                    explanation: "القسمة على كسر = الضرب في مقلوبه: 3/4 × 2/1 = 6/4 = 3/2"
-                },
-                {
-                    question: "2/3 - (1/4 + 1/6) = ?",
-                    options: ["1/4", "1/2", "1/3"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 1/4 + 1/6 = 3/12 + 2/12 = 5/12، ثم → 2/3 - 5/12 = 8/12 - 5/12 = 3/12 = 1/4"
-                },
-                {
-                    question: "إذا كان 3/4 من الصف 24 تلميذ، فكم تلميذ في الصف؟",
-                    options: ["32", "18", "36"],
-                    correct: 0,
-                    explanation: "إذا كان 3/4 = 24، فـ 1/4 = 8، إذن العدد الكامل = 4 × 8 = 32"
-                },
-                {
-                    question: "1/2 + 1/3 + 1/6 = ?",
-                    options: ["1", "5/6", "2/3"],
-                    correct: 0,
-                    explanation: "المقام المشترك 6: 3/6 + 2/6 + 1/6 = 6/6 = 1"
-                },
-                {
-                    question: "(4/5) ÷ (2/3) = ?",
-                    options: ["6/5", "8/15", "2/5"],
-                    correct: 0,
-                    explanation: "القسمة على كسر: 4/5 × 3/2 = 12/10 = 6/5"
-                },
-                {
-                    question: "3/8 × (4/9 + 2/9) = ?",
-                    options: ["1/4", "6/9", "1/2"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 4/9 + 2/9 = 6/9 = 2/3، ثم → 3/8 × 2/3 = 6/24 = 1/4"
-                },
-                {
-                    question: "(2/5 + 1/10) × 3/4 = ?",
-                    options: ["3/8", "1/2", "6/20"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 2/5 + 1/10 = 4/10 + 1/10 = 5/10 = 1/2، ثم → 1/2 × 3/4 = 3/8"
-                }
-            ],
-            5: [ // المستوى الخامس: المسائل المركبة
-                {
-                    question: "(3/4 + 1/2) × (5/6 - 1/3) = ?",
-                    options: ["5/8", "1/2", "3/4"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: (3/4 + 2/4) = 5/4، (5/6 - 2/6) = 3/6 = 1/2، ثم → 5/4 × 1/2 = 5/8"
-                },
-                {
-                    question: "أنفق أحمد 2/5 من نقوده على الكتب و1/4 على الطعام. كم بقي معه؟",
-                    options: ["7/20", "3/9", "1/2"],
-                    correct: 0,
-                    explanation: "أنفق: 2/5 + 1/4 = 8/20 + 5/20 = 13/20، بقي معه: 1 - 13/20 = 7/20"
-                },
-                {
-                    question: "[(2/3 + 1/4) ÷ 1/2] - 1/6 = ?",
-                    options: ["5/3", "11/12", "1"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 2/3 + 1/4 = 11/12، ثم 11/12 ÷ 1/2 = 11/12 × 2 = 11/6، أخيراً → 11/6 - 1/6 = 10/6 = 5/3"
-                },
-                {
-                    question: "قطع سائق 3/8 من المسافة في الساعة الأولى و2/5 في الثانية. كم بقي؟",
-                    options: ["9/40", "5/13", "1/8"],
-                    correct: 0,
-                    explanation: "قطع: 3/8 + 2/5 = 15/40 + 16/40 = 31/40، بقي: 1 - 31/40 = 9/40"
-                },
-                {
-                    question: "في كيس 120 كرة، 1/3 حمراء و1/4 زرقاء. كم عدد الكرات الأخرى؟",
-                    options: ["50", "60", "70"],
-                    correct: 0,
-                    explanation: "الحمراء: 1/3 × 120 = 40، الزرقاء: 1/4 × 120 = 30، الأخرى: 120 - 40 - 30 = 50"
-                }
-            ],
-            6: [ // المستوى السادس: التمارين النصية المتقدمة
-                {
-                    question: "خزان يملأ بـ 2/3 في الساعة. كم من الوقت لملئه كاملاً؟",
-                    options: ["1.5 ساعة", "1 ساعة", "2 ساعة"],
-                    correct: 0,
-                    explanation: "إذا كان 2/3 يملأ في ساعة، فالخزان الكامل يحتاج 1 ÷ (2/3) = 1 × 3/2 = 3/2 = 1.5 ساعة"
-                },
-                {
-                    question: "باع تاجر 3/5 من البضاعة صباحاً و1/4 مساءً. كم النسبة المتبقية؟",
-                    options: ["3/20", "4/9", "1/5"],
-                    correct: 0,
-                    explanation: "باع: 3/5 + 1/4 = 12/20 + 5/20 = 17/20، تبقى: 1 - 17/20 = 3/20"
-                },
-                {
-                    question: "مزرعة مساحتها 240 م². زُرع منها 2/3 قمح و1/8 شعير. كم المساحة الفارغة؟",
-                    options: ["50 م²", "60 م²", "40 م²"],
-                    correct: 0,
-                    explanation: "المزروع: 2/3 + 1/8 = 16/24 + 3/24 = 19/24، الفارغ: (1 - 19/24) × 240 = 5/24 × 240 = 50 م²"
-                },
-                {
-                    question: "استغرقت رحلة 4 ساعات. قضى 1/4 الوقت في الطريق و3/8 في الزيارة. كم بقي؟",
-                    options: ["1.5 ساعة", "2 ساعة", "1 ساعة"],
-                    correct: 0,
-                    explanation: "المستغرق: 1/4 + 3/8 = 2/8 + 3/8 = 5/8، بقي: 1 - 5/8 = 3/8، من 4 ساعات: 3/8 × 4 = 1.5 ساعة"
-                }
-            ],
-            7: [ // المستوى السابع: الأعداد العشرية والعمليات المعقدة من اليسار لليمين
-                {
-                    question: "2.5 + 1.75 × 0.4 = ?",
-                    options: ["1.7", "4.25", "1.0"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 2.5 + 1.75 = 4.25، ثم → 4.25 × 0.4 = 1.7"
-                },
-                {
-                    question: "15.6 ÷ (2.4 + 1.6) = ?",
-                    options: ["3.9", "15.6", "4"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 2.4 + 1.6 = 4، ثم → 15.6 ÷ 4 = 3.9"
-                },
-                {
-                    question: "حول إلى كسر: 0.375",
-                    options: ["3/8", "375/100", "3/7"],
-                    correct: 0,
-                    explanation: "0.375 = 375/1000 = 3/8 بعد التبسيط (قسمة البسط والمقام على 125)"
-                },
-                {
-                    question: "0.75 + 0.5 × 2.4 = ?",
-                    options: ["3", "1.95", "2.4"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 0.75 + 0.5 = 1.25، ثم → 1.25 × 2.4 = 3"
-                },
-                {
-                    question: "6.8 - 2.3 + 1.5 × 2 = ?",
-                    options: ["12", "4.5", "9"],
-                    correct: 0,
-                    explanation: "من اليسار لليمين: 6.8 - 2.3 = 4.5، ثم 4.5 + 1.5 = 6، ثم 6 × 2 = 12"
-                },
-                {
-                    question: "(3.2 + 1.8) ÷ 2.5 = ?",
-                    options: ["2", "5", "1.25"],
-                    correct: 0,
-                    explanation: "الأقواس أولاً: 3.2 + 1.8 = 5، ثم → 5 ÷ 2.5 = 2"
-                }
-            ]
-        };
-
-        // إنشاء النظام
-        const gameConnection = new RealTimeGameConnection();
-
-        // متغيرات اللعبة
-        let currentPlayer = '';
-        let currentLevel = 1;
-        let currentQuestion = 0;
-        let score = 0;
-        let timeLeft = 45;
-        let timer = null;
-        let questions = [];
-        let isTeacher = false;
-        let gameStartTime = null;
-        let currentChallenge = null;
-        let questionStartTime = null;
-
-        // إنشاء النجوم
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 200; i++) {
+        // Generate stars background
+        function generateStars() {
+            const container = document.getElementById('starsContainer');
+            for (let i = 0; i < 100; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 3 + 1 + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 2 + 's';
-                starsContainer.appendChild(star);
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+        generateStars();
+
+        // Dark mode support (always dark in this case)
+        document.documentElement.classList.add('dark');
+
+        // Question Bank - منهاج الجزائري للسنة الرابعة متوسط
+        const questionBank = {
+            level1: [
+                {
+                    category: "الإعراب",
+                    question: "ما إعراب كلمة <span class='highlight-word'>الطالب</span> في الجملة: 'جاء <span class='underline-important'>الطالبُ</span> مبكراً'؟",
+                    answers: ["فاعل مرفوع وعلامة رفعه الضمة", "مفعول به منصوب", "مبتدأ مرفوع"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "ما ضد كلمة <span class='highlight-word'>الجهل</span>؟",
+                    answers: ["العلم", "الحكمة", "الفهم"],
+                    correct: 0
+                },
+                {
+                    category: "الصور البيانية",
+                    question: "في قول الشاعر: '<span class='poem-text'>أنا البحر في أحشائه الدر كامن</span>' ما نوع الصورة البيانية؟",
+                    answers: ["استعارة تصريحية", "تشبيه بليغ", "كناية"],
+                    correct: 0
+                },
+                {
+                    category: "تصريف الأفعال",
+                    question: "ما الفعل الماضي من كلمة <span class='highlight-word'>يكتب</span>؟",
+                    answers: ["كتب", "كاتب", "مكتوب"],
+                    correct: 0
+                },
+                {
+                    category: "البناء اللغوي",
+                    question: "الجملة '<span class='underline-important'>العلم نور</span>' هي جملة:",
+                    answers: ["اسمية", "فعلية", "شرطية"],
+                    correct: 0
+                },
+                {
+                    category: "استخراج المفردات",
+                    question: "كلمة <span class='highlight-word'>المدرسة</span> هي:",
+                    answers: ["اسم مكان", "اسم زمان", "اسم آلة"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "في الجملة 'قرأتُ كتاباً'، ما نوع <span class='underline-important'>التنوين</span> في كلمة 'كتاباً'؟",
+                    answers: ["تنوين نصب", "تنوين رفع", "تنوين جر"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من قائل البيت: '<span class='poem-text'>الأم مدرسة إذا أعددتها *** أعددت شعباً طيب الأعراق</span>'؟",
+                    answers: ["حافظ إبراهيم", "أحمد شوقي", "إيليا أبو ماضي"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "ما مرادف كلمة <span class='highlight-word'>الوطن</span>؟",
+                    answers: ["الديار", "السماء", "الأرض"],
+                    correct: 0
+                },
+                {
+                    category: "الإملاء",
+                    question: "أي كلمة مكتوبة بشكل صحيح؟",
+                    answers: ["الرحمن", "الرحمان", "الرحمآن"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "ما علامة جزم الفعل <span class='highlight-word'>يلعبوا</span>؟",
+                    answers: ["حذف النون", "السكون", "حذف حرف العلة"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "في قولنا '<span class='underline-important'>رأيت أسداً في المعركة</span>' والمقصود الشجاع، هذه:",
+                    answers: ["استعارة مكنية", "تشبيه", "كناية"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف",
+                    question: "وزن كلمة <span class='highlight-word'>مكتوب</span> هو:",
+                    answers: ["مفعول", "فاعل", "مفعل"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "ضد كلمة <span class='highlight-word'>الصدق</span> هو:",
+                    answers: ["الكذب", "النفاق", "الخداع"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب",
+                    question: "في الجملة 'يا <span class='underline-important'>محمدُ</span> اجتهد'، ما إعراب كلمة 'محمد'؟",
+                    answers: ["منادى مبني على الضم", "فاعل مرفوع", "مفعول به"],
+                    correct: 0
+                }
+            ],
+            level2: [
+                {
+                    category: "الإعراب المتقدم",
+                    question: "ما إعراب <span class='highlight-word'>المجتهدين</span> في: 'إن <span class='underline-important'>المجتهدين</span> ناجحون'؟",
+                    answers: ["اسم إن منصوب وعلامة نصبه الياء", "خبر إن مرفوع", "فاعل مرفوع"],
+                    correct: 0
+                },
+                {
+                    category: "الصور البيانية",
+                    question: "قال الشاعر: '<span class='poem-text'>بلادي وإن جارت علي عزيزة *** وأهلي وإن ضنوا علي كرام</span>' نوع المحسن البديعي:",
+                    answers: ["طباق", "جناس", "سجع"],
+                    correct: 0
+                },
+                {
+                    category: "تصريف الأفعال",
+                    question: "الفعل <span class='highlight-word'>استخرج</span> على وزن:",
+                    answers: ["استفعل", "افتعل", "تفاعل"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "في قولنا: '<span class='underline-important'>كثير الرماد</span>' كناية عن:",
+                    answers: ["الكرم", "الفقر", "الحزن"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "الفعل <span class='highlight-word'>يجري</span> فعل:",
+                    answers: ["معتل ناقص", "معتل مثال", "صحيح"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من خصائص الشعر <span class='underline-important'>الجاهلي</span>:",
+                    answers: ["الصدق في التعبير والبدء بالوقوف على الأطلال", "التكلف والصنعة", "الإكثار من المحسنات البديعية"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "ما جمع كلمة <span class='highlight-word'>منهاج</span>؟",
+                    answers: ["مناهج", "منهاجات", "مناهيج"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب",
+                    question: "في قوله تعالى: '<span class='poem-text'>إنما المؤمنون إخوة</span>' ما إعراب <span class='underline-important'>إخوة</span>؟",
+                    answers: ["خبر المبتدأ مرفوع", "خبر إن منصوب", "نعت مرفوع"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف",
+                    question: "اسم الفاعل من الفعل <span class='highlight-word'>استقبل</span> هو:",
+                    answers: ["مستقبِل", "مستقبَل", "قابل"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "قال تعالى: '<span class='poem-text'>واخفض لهما جناح الذل من الرحمة</span>' نوع الصورة البيانية:",
+                    answers: ["استعارة مكنية", "تشبيه تمثيلي", "كناية"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "الأفعال الخمسة تُرفع بـ:",
+                    answers: ["ثبوت النون", "الضمة", "الواو"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "ضد كلمة <span class='highlight-word'>الرخاء</span>:",
+                    answers: ["الشدة", "الضيق", "الفقر"],
+                    correct: 0
+                },
+                {
+                    category: "الإملاء",
+                    question: "الكلمة الصحيحة إملائياً:",
+                    answers: ["هذا", "هاذا", "هذة"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من أغراض الشعر <span class='underline-important'>الوصف</span>، ومثاله:",
+                    answers: ["وصف الطبيعة والجمال", "مدح الملوك", "رثاء الميت"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل",
+                    question: "في قول الشاعر: '<span class='poem-text'>وما نيل المطالب بالتمني *** ولكن تؤخذ الدنيا غلابا</span>' الفكرة الأساسية:",
+                    answers: ["النجاح يحتاج إلى العمل والجد", "الأماني تحقق الأحلام", "الدنيا سهلة المنال"],
+                    correct: 0
+                }
+            ],
+            level3: [
+                {
+                    category: "الإعراب المركب",
+                    question: "أعرب: '<span class='underline-important'>كلا الطالبين</span> مجتهد'، ما إعراب 'كلا'؟",
+                    answers: ["مبتدأ مرفوع وعلامة رفعه الألف", "خبر مرفوع", "نعت مرفوع"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة المتقدمة",
+                    question: "في قوله تعالى: '<span class='poem-text'>فمن شاء فليؤمن ومن شاء فليكفر</span>' المحسن البديعي:",
+                    answers: ["مقابلة", "طباق", "جناس"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف المتقدم",
+                    question: "صيغة المبالغة من الفعل <span class='highlight-word'>علِم</span> هي:",
+                    answers: ["عليم", "عالم", "معلوم"],
+                    correct: 0
+                },
+                {
+                    category: "النحو المتقدم",
+                    question: "في الجملة: 'لم <span class='underline-important'>يحضرا</span> الدرس'، علامة جزم الفعل:",
+                    answers: ["حذف النون", "السكون", "الفتحة"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل الأدبي",
+                    question: "قال المتنبي: '<span class='poem-text'>على قدر أهل العزم تأتي العزائم *** وتأتي على قدر الكرام المكارم</span>' العاطفة السائدة:",
+                    answers: ["الإعجاب والتقدير", "الحزن والأسى", "الفرح والسرور"],
+                    correct: 0
+                },
+                {
+                    category: "الإملاء المتقدم",
+                    question: "سبب كتابة الهمزة على السطر في كلمة <span class='highlight-word'>جزء</span>:",
+                    answers: ["لأنها مفتوحة وما قبلها ساكن", "لأنها على واو", "لأنها متطرفة"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "معنى <span class='highlight-word'>الصعيد</span> في قوله تعالى: 'فتيمموا صعيداً طيباً':",
+                    answers: ["التراب الطاهر", "الجبل", "الوادي"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "الفرق بين التشبيه والاستعارة أن الاستعارة:",
+                    answers: ["تحذف أحد طرفي التشبيه", "تذكر طرفي التشبيه", "تستخدم أداة التشبيه"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من شعراء المهجر الشمالي:",
+                    answers: ["إيليا أبو ماضي", "أحمد شوقي", "محمود درويش"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "الاسم الممدود هو الذي ينتهي بـ:",
+                    answers: ["همزة قبلها ألف زائدة", "ياء مشددة", "واو ساكنة"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل",
+                    question: "في قول الشاعر: '<span class='poem-text'>سلامٌ من صبا بردى أرق *** ودمعٌ لا يكفكف يا دمشق</span>' الغرض الشعري:",
+                    answers: ["الحنين للوطن", "الفخر بالنفس", "الغزل"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف",
+                    question: "اسم المفعول من الفعل <span class='highlight-word'>اختار</span> هو:",
+                    answers: ["مُختار", "خائر", "مِختار"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "قال الشاعر: '<span class='poem-text'>تحية كالشمس في إشراقها</span>' نوع التشبيه:",
+                    answers: ["تشبيه مرسل مجمل", "تشبيه بليغ", "تشبيه مؤكد مفصل"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب",
+                    question: "في الجملة: 'ما جاء <span class='underline-important'>إلا</span> محمدٌ'، ما نوع الأداة 'إلا'؟",
+                    answers: ["أداة استثناء", "أداة نفي", "أداة شرط"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "الأسماء الخمسة تُرفع بـ:",
+                    answers: ["الواو", "الضمة", "الألف"],
+                    correct: 0
+                }
+            ],
+            level4: [
+                {
+                    category: "تحليل نص",
+                    question: "قال الشاعر: '<span class='poem-text'>إذا الشعب يوماً أراد الحياة *** فلا بد أن يستجيب القدر</span>' المعنى الضمني:",
+                    answers: ["الإرادة القوية تحقق المستحيل", "القدر يتحكم في كل شيء", "الشعوب ضعيفة أمام القدر"],
+                    correct: 0
+                },
+                {
+                    category: "النحو المعقد",
+                    question: "في قوله تعالى: '<span class='poem-text'>ما هذا بشراً</span>' ما نوع 'ما'؟",
+                    answers: ["ما الحجازية (تعمل عمل ليس)", "ما النافية", "ما الاستفهامية"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة العليا",
+                    question: "قال الشاعر: '<span class='poem-text'>يا من يعز علينا أن نفارقهم *** وجداننا كل شيء بعدكم عدم</span>' المحسن البديعي في 'شيء - عدم':",
+                    answers: ["طباق إيجابي", "مقابلة", "جناس"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب والنقد",
+                    question: "من خصائص مدرسة <span class='underline-important'>الديوان</span> الشعرية:",
+                    answers: ["الوحدة العضوية والموضوعية", "التقليد والمحاكاة", "الالتزام بالعمود الشعري"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب المعقد",
+                    question: "في الجملة: 'أصبح الجو <span class='underline-important'>بارداً</span>'، ما إعراب 'بارداً'؟",
+                    answers: ["خبر أصبح منصوب", "حال منصوبة", "نعت منصوب"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف المتقدم",
+                    question: "الفعل <span class='highlight-word'>اقترب</span> من الأفعال:",
+                    answers: ["المزيدة بحرفين", "المزيدة بحرف واحد", "الثلاثية المجردة"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "في قولنا: '<span class='underline-important'>فلان نظيف اليد</span>' كناية عن:",
+                    answers: ["العفة والأمانة", "النظافة", "الكرم"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل الأدبي",
+                    question: "قال أحمد شوقي: '<span class='poem-text'>قم للمعلم وفه التبجيلا *** كاد المعلم أن يكون رسولا</span>' الأسلوب المستخدم:",
+                    answers: ["أمر للحث والتعظيم", "نهي للتحذير", "استفهام للتعجب"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "الفعل الذي ينصب مفعولين ليس أصلهما المبتدأ والخبر:",
+                    answers: ["أعطى", "ظن", "علم"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات",
+                    question: "معنى <span class='highlight-word'>الصرح</span> في قوله تعالى: 'فأوقد لي يا هامان على الطين فاجعل لي صرحاً':",
+                    answers: ["البناء العالي", "القصر", "البيت"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "في قوله تعالى: '<span class='poem-text'>وله الجوار المنشآت في البحر كالأعلام</span>' التشبيه:",
+                    answers: ["تشبيه السفن بالجبال", "تشبيه البحر بالجبل", "تشبيه الجوار بالعلم"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من رواد الشعر الحر في الأدب العربي:",
+                    answers: ["نازك الملائكة وبدر شاكر السياب", "أحمد شوقي وحافظ إبراهيم", "المتنبي والبحتري"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب",
+                    question: "في قوله تعالى: '<span class='poem-text'>فصبر جميل</span>'، ما إعراب 'صبر'؟",
+                    answers: ["مبتدأ مرفوع والخبر محذوف", "خبر مرفوع", "فاعل مرفوع"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف",
+                    question: "الفعل المضارع من <span class='highlight-word'>استفاد</span> هو:",
+                    answers: ["يستفيد", "يستفاد", "استفد"],
+                    correct: 0
+                },
+                {
+                    category: "النحو",
+                    question: "في قولنا: 'يا <span class='underline-important'>قومنا</span>'، ما إعراب 'قوم'؟",
+                    answers: ["منادى منصوب بفتحة مقدرة منع من ظهورها اشتغال المحل بحركة المناسبة", "منادى مبني على الضم", "منادى مرفوع"],
+                    correct: 0
+                }
+            ],
+            level5: [
+                {
+                    category: "التحليل الشامل",
+                    question: "في قصيدة أبو القاسم الشابي '<span class='poem-text'>إذا الشعب يوماً أراد الحياة</span>'، البحر الشعري المستخدم:",
+                    answers: ["المتقارب", "الطويل", "الكامل"],
+                    correct: 0
+                },
+                {
+                    category: "النحو المعقد",
+                    question: "في قولنا: 'ظننتُ زيداً <span class='underline-important'>قائماً</span>'، ما إعراب 'قائماً'؟",
+                    answers: ["مفعول به ثان منصوب", "مفعول به أول منصوب", "حال منصوبة"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة الشاملة",
+                    question: "قال المتنبي: '<span class='poem-text'>أنام ملء جفوني عن شواردها *** ويسهر الخلق جراها ويختصم</span>' نوع الصورة:",
+                    answers: ["استعارة مكنية", "كناية", "تشبيه ضمني"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب والنقد",
+                    question: "من خصائص الأدب في العصر <span class='underline-important'>الأموي</span>:",
+                    answers: ["ازدهار الشعر السياسي والأحزاب", "الاهتمام بالوصف فقط", "ضعف اللغة"],
+                    correct: 0
+                },
+                {
+                    category: "الإعراب الشامل",
+                    question: "في قوله تعالى: '<span class='poem-text'>إياك نعبد وإياك نستعين</span>'، ما إعراب 'إياك' الأولى؟",
+                    answers: ["ضمير منفصل مبني في محل نصب مفعول به مقدم", "مفعول به منصوب", "ضمير متصل"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف الشامل",
+                    question: "وزن كلمة <span class='highlight-word'>استخراج</span>:",
+                    answers: ["استفعال", "افتعال", "تفاعل"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة",
+                    question: "في قول الشاعر: '<span class='poem-text'>ولست أبالي بعد فقدي أحبتي *** أحلَّ علي الموت أم حلَّ واقفا</span>' المحسن البديعي:",
+                    answers: ["مقابلة", "طباق", "جناس"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل النقدي",
+                    question: "قال محمود درويش: '<span class='poem-text'>سجل أنا عربي</span>'، النص ينتمي إلى:",
+                    answers: ["شعر المقاومة", "الشعر الرومانسي", "الشعر الكلاسيكي"],
+                    correct: 0
+                },
+                {
+                    category: "النحو المتقدم",
+                    question: "الفعل الذي ينصب ثلاثة مفاعيل:",
+                    answers: ["أعلم وأرى", "أعطى ومنح", "ظن وحسب"],
+                    correct: 0
+                },
+                {
+                    category: "المفردات المتقدمة",
+                    question: "معنى <span class='highlight-word'>الكِفاح</span> في قوله: 'الكفاح المسلح':",
+                    answers: ["النضال والجهاد", "الحرب", "الصراع"],
+                    correct: 0
+                },
+                {
+                    category: "الأدب",
+                    question: "من مؤلفات طه حسين:",
+                    answers: ["الأيام", "زينب", "عودة الروح"],
+                    correct: 0
+                },
+                {
+                    category: "البلاغة المعقدة",
+                    question: "في قوله تعالى: '<span class='poem-text'>فاصبر صبراً جميلاً</span>' نوع المفعول المطلق:",
+                    answers: ["مفعول مطلق مبين للنوع", "مفعول مطلق مؤكد للفعل", "مفعول مطلق مبين للعدد"],
+                    correct: 0
+                },
+                {
+                    category: "التحليل",
+                    question: "قال الشاعر: '<span class='poem-text'>وطني لو شُغلت بالخلد عنه *** نازعتني إليه في الخلد نفسي</span>' العاطفة:",
+                    answers: ["حب الوطن والانتماء", "الفخر بالنفس", "الحنين للماضي"],
+                    correct: 0
+                },
+                {
+                    category: "الصرف",
+                    question: "اسم الزمان من الفعل <span class='highlight-word'>اجتمع</span>:",
+                    answers: ["مُجتَمَع", "اجتماع", "مجتمِع"],
+                    correct: 0
+                },
+                {
+                    category: "النحو الشامل",
+                    question: "في قولنا: '<span class='underline-important'>حبذا</span> العلمُ'، ما إعراب 'العلم'؟",
+                    answers: ["مبتدأ مؤخر مرفوع", "فاعل مرفوع", "خبر مرفوع"],
+                    correct: 0
+                }
+            ]
+        };
+
+        // Motivational messages
+        const motivationalMessages = {
+            excellent: [
+                "ممتاز يا بطل! 🌟 ستكون مهندساً عظيماً!",
+                "رائع! 🎯 مستقبلك كطبيب بارع ينتظرك!",
+                "أحسنت! ✈️ ستكون طياراً ماهراً!",
+                "مذهل! ⚖️ ستصبح قاضياً عادلاً!",
+                "عظيم! 🎓 ستكون أستاذاً متميزاً!",
+                "ممتاز! 🏛️ مستقبلك كمحامٍ بارع!",
+                "رائع جداً! 🚢 ستكون قائد باخرة ماهراً!",
+                "إبداع! 🏆 ستصبح سياسياً محنكاً!",
+                "فخر لنا! 💡 ستكون عالماً مبدعاً!",
+                "نجم ساطع! ⭐ مستقبلك زاهر بإذن الله!"
+            ],
+            good: [
+                "جيد جداً! 👍 استمر في التقدم!",
+                "أحسنت! 📚 أنت على الطريق الصحيح!",
+                "ممتاز! 💪 واصل الجهد!",
+                "رائع! 🎯 تقدمك ملحوظ!",
+                "جيد! ✨ قريب من التميز!"
+            ],
+            average: [
+                "لا بأس! 📖 بإمكانك الأفضل!",
+                "جيد! 💭 راجع دروسك وحاول مرة أخرى!",
+                "محاولة جيدة! 📝 المراجعة ستساعدك!",
+                "حاول أكثر! 🎓 أنت قادر على التحسن!"
+            ]
+        };
+
+        // State Management
+        let currentUser = null;
+        let isTeacher = false;
+        let currentLevel = 1;
+        let currentQuestionIndex = 0;
+        let currentQuestions = [];
+        let quizScore = 0;
+        let selectedAnswer = null;
+        let answerSubmitted = false;
+
+        // In-memory storage (compatible with iframe)
+        const appStorage = {
+            allStudents: {},
+            lastSync: null
+        };
+
+        // Storage functions
+        function saveToStorage(key, value) {
+            appStorage[key] = value;
+            appStorage.lastSync = new Date().toISOString();
+
+            // Auto-save to teacher's view in real-time
+            if (key === 'allStudents') {
+                updateTeacherDashboardRealtime();
             }
         }
 
-        // دوال التنقل
-        function showMainMenu() {
-            hideAllScreens();
-            document.getElementById('mainMenu').classList.remove('hidden');
-            if (currentPlayer) {
-                gameConnection.setPlayerOffline(currentPlayer);
-            }
+        function getFromStorage(key) {
+            return appStorage[key] || null;
         }
 
-        function showPlayerLogin() {
-            hideAllScreens();
-            document.getElementById('playerLogin').classList.remove('hidden');
+        function getAllStudents() {
+            return getFromStorage('allStudents') || {};
+        }
+
+        function saveStudent(studentData) {
+            const allStudents = getAllStudents();
+            allStudents[studentData.name] = studentData;
+            saveToStorage('allStudents', allStudents);
+        }
+
+        // Login functions
+        function startAsStudent() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('studentNameScreen').classList.remove('hidden');
         }
 
         function showTeacherLogin() {
-            hideAllScreens();
-            document.getElementById('teacherLogin').classList.remove('hidden');
+            document.getElementById('teacherLoginModal').classList.remove('hidden');
         }
 
-        function showLevelSelection() {
-            hideAllScreens();
-            document.getElementById('levelSelection').classList.remove('hidden');
-            updatePlayerInfo();
-            updatePlayerAvatar();
-            updateDragonBalls();
-            updateLevelAccess();
-            
-            if (currentPlayer) {
-                gameConnection.updatePlayerActivity(currentPlayer, 'في قائمة المستويات');
-            }
+        function closeTeacherLogin() {
+            document.getElementById('teacherLoginModal').classList.add('hidden');
+            document.getElementById('teacherPassword').value = '';
         }
 
-        function hideAllScreens() {
-            const screens = ['mainMenu', 'playerLogin', 'teacherLogin', 'teacherDashboard', 'levelSelection', 'gameScreen', 'gameEnd'];
-            screens.forEach(screen => {
-                document.getElementById(screen).classList.add('hidden');
-            });
-        }
-
-        // دخول التلميذ
-        function startGame() {
-            const name = document.getElementById('playerName').value.trim();
-            if (!name) {
-                showAlert('الرجاء إدخال اسم التلميذ');
-                return;
-            }
-            
-            currentPlayer = name;
-            gameConnection.setPlayerOnline(name, 'دخل للتو إلى اللعبة');
-            gameConnection.getPlayer(name);
-            
-            showLevelSelection();
-        }
-
-        // دخول الأستاذ
-        function teacherLogin() {
+        function loginAsTeacher() {
             const password = document.getElementById('teacherPassword').value;
-            if (password === '123456') {
+            if (password === '1234') {
                 isTeacher = true;
+                document.getElementById('teacherLoginModal').classList.add('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
                 showTeacherDashboard();
             } else {
-                showAlert('الرقم السري غير صحيح');
+                showCustomAlert('كلمة السر خاطئة!', 'error');
             }
         }
 
-        function logout() {
-            isTeacher = false;
-            document.getElementById('teacherPassword').value = '';
+        function saveStudentName() {
+            const name = document.getElementById('studentNameInput').value.trim();
+            if (!name) {
+                showCustomAlert('الرجاء إدخال اسمك!', 'warning');
+                return;
+            }
+
+            currentUser = name;
+            let studentData = getAllStudents()[name];
+
+            if (!studentData) {
+                studentData = {
+                    name: name,
+                    totalScore: 0,
+                    levels: {
+                        1: { completed: false, score: 0, unlocked: true },
+                        2: { completed: false, score: 0, unlocked: true },
+                        3: { completed: false, score: 0, unlocked: true },
+                        4: { completed: false, score: 0, unlocked: false },
+                        5: { completed: false, score: 0, unlocked: false }
+                    },
+                    lastAttempt: new Date().toISOString()
+                };
+                saveStudent(studentData);
+            }
+
+            document.getElementById('studentNameScreen').classList.add('hidden');
             showMainMenu();
         }
 
-        // لوحة تحكم الأستاذ
-        function showTeacherDashboard() {
-            hideAllScreens();
-            document.getElementById('teacherDashboard').classList.remove('hidden');
-            gameConnection.updateTeacherDashboardRealTime();
+        function logout() {
+            currentUser = null;
+            isTeacher = false;
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        function deleteStudent(name) {
-            showConfirmDialog(`هل أنت متأكد من حذف بيانات ${name}؟`, function() {
-                gameConnection.deletePlayer(name);
-                gameConnection.updateTeacherDashboardRealTime();
+        // Main Menu
+        function showMainMenu() {
+            const studentData = getAllStudents()[currentUser];
+            document.getElementById('studentNameDisplay').textContent = currentUser;
+            document.getElementById('totalScore').textContent = studentData.totalScore;
+
+            const levelsGrid = document.getElementById('levelsGrid');
+            levelsGrid.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const level = studentData.levels[i];
+                const card = document.createElement('div');
+                card.className = `level-card neon-border${level.unlocked ? '-blue' : ''} bg-gray-900 bg-opacity-90 rounded-xl p-6 ${level.unlocked ? 'cursor-pointer' : 'opacity-50'}`;
+
+                const lockIcon = level.unlocked ? '' : '🔒 ';
+                const scoreText = level.completed ? `النتيجة: ${level.score}/100` : 'لم يُنجز بعد';
+                const badge = level.score >= 90 ? '⭐' : level.score >= 70 ? '👍' : '';
+
+                card.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">${lockIcon}📚</div>
+                        <h3 class="text-2xl font-bold mb-2 neon-text">المستوى ${i}</h3>
+                        <p class="text-gray-400 mb-2">${scoreText} ${badge}</p>
+                        ${level.unlocked ?
+                            `<button onclick="startLevel(${i})" class="btn-primary text-gray-900 font-bold py-2 px-6 rounded-lg mt-2">
+                                ${level.completed ? 'أعد المحاولة' : 'ابدأ الآن'}
+                            </button>` :
+                            `<div class="text-sm text-gray-500 mt-2">يُفتح بعد تجاوز المستويات الثلاثة الأولى بنسبة 90%</div>`
+                        }
+                    </div>
+                `;
+
+                levelsGrid.appendChild(card);
+            }
+
+            document.getElementById('mainMenu').classList.remove('hidden');
+        }
+
+        // Start Level
+        function startLevel(level) {
+            const studentData = getAllStudents()[currentUser];
+            if (!studentData.levels[level].unlocked) {
+                showCustomAlert('هذا المستوى مقفل! أكمل المستويات السابقة بامتياز لفتحه.', 'warning');
+                return;
+            }
+
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            quizScore = 0;
+
+            // Shuffle questions
+            const levelKey = `level${level}`;
+            const allQuestions = [...questionBank[levelKey]];
+            currentQuestions = shuffleArray(allQuestions).slice(0, 10);
+
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+
+            showQuestion();
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Show Question
+        function showQuestion() {
+            answerSubmitted = false;
+            selectedAnswer = null;
+
+            const question = currentQuestions[currentQuestionIndex];
+
+            document.getElementById('currentLevelDisplay').textContent = currentLevel;
+            document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestionsNum').textContent = currentQuestions.length;
+            document.getElementById('quizScore').textContent = quizScore;
+
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            document.getElementById('questionCategory').textContent = '📌 ' + question.category;
+            document.getElementById('questionText').innerHTML = question.question;
+
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+
+            // Shuffle answers
+            const answers = question.answers.map((ans, idx) => ({ text: ans, originalIndex: idx }));
+            const shuffledAnswers = shuffleArray(answers);
+
+            shuffledAnswers.forEach((answer, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option neon-border bg-gray-800 p-4 rounded-lg';
+                answerDiv.innerHTML = `
+                    <div class="text-lg">${String.fromCharCode(65 + index)}) ${answer.text}</div>
+                `;
+                answerDiv.onclick = () => selectAnswer(answer.originalIndex, answerDiv);
+                answersContainer.appendChild(answerDiv);
             });
+
+            // Store correct answer
+            currentQuestions[currentQuestionIndex].correctIndex = question.correct;
         }
 
-        // تحديث صورة اللاعب حسب المستوى
-        function updatePlayerAvatar() {
-            const player = gameConnection.getPlayer(currentPlayer);
-            const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
-            
-            const avatar = document.getElementById('playerAvatar');
-            const monsterName = document.getElementById('monsterName');
-            
-            avatar.innerHTML = `${monsterInfo.emoji}<div class="level-badge" id="levelBadge">${player.currentLevel}</div>`;
-            monsterName.textContent = `${monsterInfo.name} - ${monsterInfo.description}`;
-            avatar.title = `${monsterInfo.name}: ${monsterInfo.description}`;
+        function selectAnswer(answerIndex, element) {
+            if (answerSubmitted) return;
+
+            // Remove previous selection
+            document.querySelectorAll('.answer-option').forEach(el => {
+                el.classList.remove('neon-border-gold');
+            });
+
+            // Mark current selection
+            element.classList.add('neon-border-gold');
+            selectedAnswer = answerIndex;
+
+            // Submit answer after a short delay
+            setTimeout(() => {
+                submitAnswer(element);
+            }, 500);
         }
 
-        // إدارة المستويات
-        function updateLevelAccess() {
-            const player = gameConnection.getPlayer(currentPlayer);
-            
-            // تحديث حالة كل مستوى حسب المستويات المكتملة
-            for (let i = 4; i <= 7; i++) {
-                const levelElement = document.getElementById(`level${i}`);
-                const lockElement = document.getElementById(`level${i}Lock`);
-                const requiredLevels = i - 1;
-                
-                if (player.currentLevel >= i) {
-                    levelElement.classList.remove('level-locked');
-                    levelElement.classList.add('level-unlocked');
-                    lockElement.textContent = '🔓 متاح';
-                    lockElement.className = 'mt-2 text-green-400';
-                } else {
-                    levelElement.classList.add('level-locked');
-                    levelElement.classList.remove('level-unlocked');
-                    lockElement.textContent = `🔒 يحتاج إكمال ${requiredLevels} مستويات`;
-                    lockElement.className = 'mt-2 text-red-400';
+        function submitAnswer(selectedElement) {
+            if (answerSubmitted) return;
+            answerSubmitted = true;
+
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === question.correctIndex;
+
+            if (isCorrect) {
+                selectedElement.classList.add('answer-correct');
+                selectedElement.classList.remove('neon-border-gold');
+                quizScore += 10;
+                document.getElementById('quizScore').textContent = quizScore;
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.8 }
+                });
+            } else {
+                selectedElement.classList.add('answer-wrong');
+                selectedElement.classList.remove('neon-border-gold');
+
+                // Highlight correct answer
+                const allAnswers = document.querySelectorAll('.answer-option');
+                let correctAnswerElement = null;
+
+                // Find the correct answer element
+                const answersInOrder = Array.from(allAnswers);
+                const correctAnswerText = question.answers[question.correctIndex];
+                answersInOrder.forEach(el => {
+                    if (el.textContent.includes(correctAnswerText)) {
+                        correctAnswerElement = el;
+                    }
+                });
+
+                if (correctAnswerElement) {
+                    setTimeout(() => {
+                        correctAnswerElement.classList.add('answer-correct');
+                    }, 300);
                 }
             }
-        }
 
-        function selectLevel(level) {
-            const player = gameConnection.getPlayer(currentPlayer);
-            
-            // فحص إمكانية الوصول للمستوى
-            if (level > player.currentLevel) {
-                showAlert(`يجب إكمال المستوى ${level - 1} أولاً لفتح هذا المستوى`);
-                return;
-            }
-            
-            currentLevel = level;
-            currentQuestion = 0;
-            score = 0;
-            gameStartTime = Date.now();
-            
-            // تحديد الوقت حسب المستوى
-            const timeSettings = {
-                1: 45, 2: 60, 3: 90, 4: 120, 5: 180, 6: 240, 7: 300
-            };
-            timeLeft = timeSettings[level] || 60;
-            
-            questions = [...questionBank[level]].sort(() => Math.random() - 0.5);
-            
-            // تحديث النشاط
-            gameConnection.updatePlayerActivity(
-                currentPlayer, 
-                `يلعب المستوى ${level}`, 
-                { level: level, score: 0 }
-            );
-            
-            startGameScreen();
-        }
-
-        // التحدي بين اللاعبين
-        function showChallengeModal() {
-            const onlinePlayersArray = Array.from(gameConnection.data.onlinePlayers.entries())
-                .filter(([name, info]) => name !== currentPlayer);
-            
-            if (onlinePlayersArray.length === 0) {
-                showAlert('لا يوجد لاعبون آخرون متصلون حالياً');
-                return;
-            }
-            
-            const modal = document.getElementById('challengeModal');
-            const playersList = document.getElementById('onlinePlayersList');
-            
-            playersList.innerHTML = '';
-            onlinePlayersArray.forEach(([playerName, info]) => {
-                const player = gameConnection.getPlayer(playerName);
-                const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
-                
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between p-3 bg-gray-700 rounded mb-2';
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                            ${monsterInfo.emoji}
-                        </div>
-                        <div>
-                            <div class="font-bold">${playerName}</div>
-                            <div class="text-xs text-gray-400">${info.activity}</div>
-                            <div class="text-xs text-yellow-400">${monsterInfo.name}</div>
-                        </div>
-                    </div>
-                    <button onclick="sendChallenge('${playerName}')" class="challenge-button text-white px-3 py-1 rounded text-sm">
-                        ⚔️ تحدي
-                    </button>
-                `;
-                playersList.appendChild(div);
-            });
-            
-            modal.classList.remove('hidden');
-        }
-
-        function closeChallengeModal() {
-            document.getElementById('challengeModal').classList.add('hidden');
-        }
-
-        function sendChallenge(opponent) {
-            const level = parseInt(document.getElementById('challengeLevel').value);
-            
-            const challengeId = gameConnection.createChallenge(currentPlayer, opponent, level);
-            currentChallenge = challengeId;
-            
-            document.getElementById('challengeStatus').classList.remove('hidden');
-            document.getElementById('challengeMessage').innerHTML = `
-                <div class="text-yellow-400 font-bold">تم إرسال تحدي إلى ${opponent} 🔥</div>
-                <div class="text-sm mt-2">المستوى: ${level} | في انتظار الموافقة...</div>
-            `;
-            
-            closeChallengeModal();
-            
-            // محاكاة موافقة اللاعب الآخر
+            // Move to next question
             setTimeout(() => {
-                acceptChallenge(challengeId);
-            }, 3000);
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuestions.length) {
+                    showQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 2000);
         }
 
-        function acceptChallenge(challengeId) {
-            gameConnection.acceptChallenge(challengeId);
-            
-            document.getElementById('challengeMessage').innerHTML = `
-                <div class="text-green-400 font-bold">تم قبول التحدي! ⚔️</div>
-                <button onclick="startChallengeGame()" class="challenge-accept text-white px-4 py-2 rounded mt-2">
-                    🚀 ابدأ المعركة
-                </button>
-            `;
+        function finishQuiz() {
+            const studentData = getAllStudents()[currentUser];
+            studentData.levels[currentLevel].completed = true;
+            studentData.levels[currentLevel].score = quizScore;
+            studentData.lastAttempt = new Date().toISOString();
+
+            // Calculate total score
+            let total = 0;
+            Object.values(studentData.levels).forEach(level => {
+                if (level.completed) total += level.score;
+            });
+            studentData.totalScore = total;
+
+            // Check if levels 4 and 5 should be unlocked
+            const level1Score = studentData.levels[1].score;
+            const level2Score = studentData.levels[2].score;
+            const level3Score = studentData.levels[3].score;
+
+            if (level1Score >= 90 && level2Score >= 90 && level3Score >= 90) {
+                studentData.levels[4].unlocked = true;
+                studentData.levels[5].unlocked = true;
+            }
+
+            saveStudent(studentData);
+
+            // Show result
+            showResult(quizScore);
         }
 
-        function startChallengeGame() {
-            const challenge = gameConnection.data.challenges[currentChallenge];
-            currentLevel = challenge.level;
-            selectLevel(currentLevel);
-        }
+        function showResult(score) {
+            let emoji, title, message, motivational;
 
-        // عرض اللاعبين المتصلين
-        function showOnlinePlayersModal() {
-            const modal = document.getElementById('onlinePlayersModal');
-            const grid = document.getElementById('onlinePlayersGrid');
-            
-            grid.innerHTML = '';
-            
-            const onlinePlayersArray = Array.from(gameConnection.data.onlinePlayers.entries());
-            
-            if (onlinePlayersArray.length === 0) {
-                grid.innerHTML = '<div class="col-span-4 text-center text-gray-400">لا يوجد لاعبون متصلون</div>';
+            if (score >= 90) {
+                emoji = '🏆';
+                title = 'ممتاز!';
+                message = 'أداء رائع جداً!';
+                motivational = motivationalMessages.excellent[Math.floor(Math.random() * motivationalMessages.excellent.length)];
+            } else if (score >= 70) {
+                emoji = '👍';
+                title = 'جيد جداً!';
+                message = 'أداء جيد!';
+                motivational = motivationalMessages.good[Math.floor(Math.random() * motivationalMessages.good.length)];
             } else {
-                onlinePlayersArray.forEach(([playerName, info]) => {
-                    const player = gameConnection.getPlayer(playerName);
-                    const monsterInfo = levelMonsters[player.currentLevel] || levelMonsters[1];
-                    
-                    const div = document.createElement('div');
-                    div.className = `bg-gray-700 p-4 rounded text-center transition-all ${
-                        info.isPlaying ? 'real-time-pulse border-2 border-green-400' : ''
-                    }`;
-                    div.innerHTML = `
-                        <div class="w-16 h-16 mx-auto rounded-full bg-gray-600 flex items-center justify-center text-3xl mb-2 border-2 border-yellow-400 relative">
-                            ${monsterInfo.emoji}
-                            <div class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                                ${player.currentLevel}
-                            </div>
-                        </div>
-                        <div class="font-bold">${playerName}</div>
-                        <div class="text-xs text-yellow-400 mt-1">${monsterInfo.name}</div>
-                        <div class="text-xs ${info.isPlaying ? 'text-green-400' : 'text-gray-400'} mt-1">${info.activity}</div>
-                        <div class="text-xs text-blue-400">${player.dragonBalls}/7 🐉</div>
-                        ${playerName !== currentPlayer ? `
-                            <button onclick="sendQuickChallenge('${playerName}')" class="mt-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
-                                تحدي سريع
-                            </button>
-                        ` : '<div class="text-green-400 text-xs mt-2">🟢 أنت</div>'}
-                    `;
-                    grid.appendChild(div);
+                emoji = '📚';
+                title = 'حاول مرة أخرى!';
+                message = 'راجع دروسك وحاول مرة أخرى';
+                motivational = motivationalMessages.average[Math.floor(Math.random() * motivationalMessages.average.length)];
+            }
+
+            document.getElementById('resultEmoji').textContent = emoji;
+            document.getElementById('resultTitle').textContent = title;
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('motivationalMessage').textContent = motivational;
+
+            document.getElementById('resultModal').classList.remove('hidden');
+
+            if (score >= 70) {
+                confetti({
+                    particleCount: 200,
+                    spread: 100,
+                    origin: { y: 0.6 }
                 });
             }
-            
-            modal.classList.remove('hidden');
         }
 
-        function closeOnlinePlayersModal() {
-            document.getElementById('onlinePlayersModal').classList.add('hidden');
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+            document.getElementById('quizScreen').classList.add('hidden');
+            showMainMenu();
         }
 
-        function sendQuickChallenge(opponent) {
-            closeOnlinePlayersModal();
-            document.getElementById('challengeLevel').value = currentLevel;
-            sendChallenge(opponent);
-        }
-
-        // بدء شاشة اللعب
-        function startGameScreen() {
-            hideAllScreens();
-            document.getElementById('gameScreen').classList.remove('hidden');
-            
-            // إظهار معلومات التحدي إذا كان موجوداً
-            if (currentChallenge) {
-                const challenge = gameConnection.data.challenges[currentChallenge];
-                document.getElementById('challengeInfo').classList.remove('hidden');
-                document.getElementById('challengeOpponent').textContent = `⚔️ ضد: ${challenge.opponent}`;
-                document.getElementById('myScore').textContent = '0';
-                document.getElementById('opponentScore').textContent = '0';
-            } else {
-                document.getElementById('challengeInfo').classList.add('hidden');
-            }
-            
-            loadQuestion();
-            startTimer();
-        }
-
-        // تحميل السؤال
-        function loadQuestion() {
-            if (currentQuestion >= questions.length) {
-                endGame();
-                return;
-            }
-
-            const question = questions[currentQuestion];
-            document.getElementById('questionText').textContent = question.question;
-            document.getElementById('questionNumber').textContent = `السؤال: ${currentQuestion + 1}/${questions.length}`;
-            document.getElementById('currentScore').textContent = `النقاط: ${score}`;
-            
-            // ترتيب عشوائي للخيارات
-            const shuffledOptions = [...question.options];
-            const correctAnswer = question.options[question.correct];
-            shuffledOptions.sort(() => Math.random() - 0.5);
-            const newCorrectIndex = shuffledOptions.indexOf(correctAnswer);
-            
-            questions[currentQuestion].correct = newCorrectIndex;
-            
-            // عرض الخيارات
-            for (let i = 0; i < 3; i++) {
-                document.getElementById(`option${i}`).textContent = shuffledOptions[i];
-            }
-            
-            document.getElementById('answerResult').classList.add('hidden');
-            document.getElementById('doorsContainer').classList.remove('hidden');
-            
-            questionStartTime = Date.now();
-        }
-
-        // بدء العداد
-        function startTimer() {
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').textContent = `⏱️ ${timeLeft}`;
-                
-                if (timeLeft <= 10) {
-                    document.getElementById('timer').className = 'text-lg font-bold text-red-400';
-                }
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    selectAnswer(-1);
-                }
-            }, 1000);
-        }
-
-        // اختيار الإجابة
-        function selectAnswer(answerIndex) {
-            clearInterval(timer);
-            
-            const answerTime = questionStartTime ? (Date.now() - questionStartTime) / 1000 : 0;
-            const question = questions[currentQuestion];
-            const isCorrect = answerIndex === question.correct;
-            
-            document.getElementById('doorsContainer').classList.add('hidden');
-            document.getElementById('answerResult').classList.remove('hidden');
-            
-            if (answerIndex === -1) {
-                document.getElementById('resultIcon').textContent = '⏰';
-                document.getElementById('resultText').textContent = 'انتهى الوقت!';
-                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-orange-400';
-                document.getElementById('answerTime').textContent = `الوقت المستغرق: انتهى الوقت`;
-                document.getElementById('explanationText').textContent = `الإجابة الصحيحة: ${question.options[question.correct]}`;
-            } else if (isCorrect) {
-                const points = Math.max(10, Math.floor((timeLeft / 10) * currentLevel * 5));
-                score += points;
-                document.getElementById('resultIcon').textContent = '💎';
-                document.getElementById('resultText').textContent = `ممتاز! وجدت الكنز! (+${points} نقطة)`;
-                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-green-400 treasure';
-                document.getElementById('answerTime').textContent = `⚡ وقت رائع: ${answerTime.toFixed(1)} ثانية`;
-                document.getElementById('explanationText').textContent = `شرح: ${question.explanation}`;
-                
-                if (currentChallenge) {
-                    document.getElementById('myScore').textContent = score;
-                    const opponentPoints = Math.floor(Math.random() * points * 1.2);
-                    document.getElementById('opponentScore').textContent = opponentPoints;
-                }
-            } else {
-                document.getElementById('resultIcon').textContent = '👹';
-                document.getElementById('resultText').textContent = 'آسف، ظهر الوحش!';
-                document.getElementById('resultText').className = 'text-2xl font-bold mb-4 text-red-400 monster';
-                document.getElementById('answerTime').textContent = `الوقت المستغرق: ${answerTime.toFixed(1)} ثانية`;
-                document.getElementById('explanationText').textContent = `الإجابة الصحيحة: ${question.options[question.correct]}. شرح: ${question.explanation}`;
-            }
-            
-            document.getElementById('currentScore').textContent = `النقاط: ${score}`;
-            
-            // تحديث النشاط في الوقت الفعلي
-            gameConnection.updatePlayerActivity(
-                currentPlayer, 
-                `يلعب المستوى ${currentLevel}`, 
-                { 
-                    level: currentLevel, 
-                    score: score, 
-                    question: `${currentQuestion + 1}/${questions.length}` 
-                }
-            );
-        }
-
-        // السؤال التالي
-        function nextQuestion() {
-            currentQuestion++;
-            
-            const timeSettings = {
-                1: 45, 2: 60, 3: 90, 4: 120, 5: 180, 6: 240, 7: 300
-            };
-            timeLeft = timeSettings[currentLevel] || 60;
-            document.getElementById('timer').className = 'text-lg font-bold text-yellow-400';
-            
-            loadQuestion();
-            startTimer();
-        }
-
-        // انتهاء اللعبة
-        function endGame() {
-            clearInterval(timer);
-            hideAllScreens();
-            document.getElementById('gameEnd').classList.remove('hidden');
-            
-            const player = gameConnection.getPlayer(currentPlayer);
-            const gameDuration = Date.now() - gameStartTime;
-            
-            // تحديث بيانات اللاعب
-            player.totalScore = Math.max(player.totalScore, player.totalScore + score);
-            player.gamesPlayed++;
-            
-            // إضافة كرة دراغون بول وتطوير الوحش
-            let gotDragonBall = false;
-            const requiredScore = currentLevel * 60;
-            
-            if (score >= requiredScore && !player.levelsCompleted.includes(currentLevel)) {
-                const oldLevel = player.currentLevel;
-                player.dragonBalls = Math.min(player.dragonBalls + 1, 7);
-                player.levelsCompleted.push(currentLevel);
-                player.currentLevel = Math.max(player.currentLevel, currentLevel + 1);
-                gotDragonBall = true;
-                
-                document.getElementById('dragonBallReward').classList.remove('hidden');
-                
-                // إظهار تطور الوحش
-                if (player.currentLevel > oldLevel) {
-                    const newMonster = levelMonsters[player.currentLevel] || levelMonsters[7];
-                    document.getElementById('monsterEvolution').classList.remove('hidden');
-                    document.getElementById('newMonster').textContent = newMonster.emoji;
-                    document.getElementById('newMonsterName').textContent = newMonster.name;
-                    
-                    gameConnection.recordAchievement(
-                        currentPlayer, 
-                        `🧬 تطور إلى ${newMonster.name}!`, 
-                        `وصل للمستوى ${player.currentLevel}`
-                    );
-                }
-                
-                // فحص فتح مستوى جديد
-                if (player.currentLevel <= 7) {
-                    document.getElementById('newLevelUnlocked').classList.remove('hidden');
-                    document.getElementById('newLevelUnlocked').textContent = `🎉 فُتح المستوى ${player.currentLevel}!`;
-                    
-                    gameConnection.recordAchievement(
-                        currentPlayer, 
-                        `🔓 فتح المستوى ${player.currentLevel}!`, 
-                        `أكمل ${currentLevel} بنجاح`
-                    );
-                }
-                
-                gameConnection.recordAchievement(
-                    currentPlayer, 
-                    `🐉 حصل على كرة دراغون (${player.dragonBalls}/7)!`, 
-                    `أكمل المستوى ${currentLevel} بنقاط ${score}`
-                );
-            }
-            
-            // رسالة تشجيعية عند جمع 7 كرات
-            if (player.dragonBalls === 7) {
-                document.getElementById('encouragementMessage').classList.remove('hidden');
-                const careers = ['طبيب', 'مهندس', 'عالم رياضيات', 'مخترع', 'أستاذ جامعي', 'مبرمج'];
-                const randomCareer = careers[Math.floor(Math.random() * careers.length)];
-                document.getElementById('careerMessage').textContent = 
-                    `🏆 جمعت جميع كرات الدراغون! أنت عبقري الرياضيات! ستصبح ${randomCareer} عظيم! 🏆`;
-                
-                gameConnection.recordAchievement(
-                    currentPlayer, 
-                    `🌟 سيد الرياضيات الأعظم!`, 
-                    `جمع جميع الكرات السبع`
-                );
-            }
-            
-            // نتيجة التحدي
-            if (currentChallenge) {
-                const myFinalScore = score;
-                const opponentScore = parseInt(document.getElementById('opponentScore').textContent) || 0;
-                
-                document.getElementById('challengeResult').classList.remove('hidden');
-                
-                if (myFinalScore > opponentScore) {
-                    document.getElementById('challengeOutcome').textContent = '🏆 فزت في التحدي!';
-                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-green-400';
-                    document.getElementById('challengeDetails').textContent = `نقاطك: ${myFinalScore} | نقاط الخصم: ${opponentScore}`;
-                    player.challengesWon++;
-                    
-                    gameConnection.recordAchievement(
-                        currentPlayer, 
-                        `⚔️ انتصر في التحدي!`, 
-                        `هزم خصمه ${opponentScore} مقابل ${myFinalScore}`
-                    );
-                } else if (myFinalScore < opponentScore) {
-                    document.getElementById('challengeOutcome').textContent = '😔 خسرت التحدي';
-                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-red-400';
-                    document.getElementById('challengeDetails').textContent = `نقاطك: ${myFinalScore} | نقاط الخصم: ${opponentScore}`;
-                    player.challengesLost++;
-                } else {
-                    document.getElementById('challengeOutcome').textContent = '🤝 تعادل!';
-                    document.getElementById('challengeOutcome').className = 'text-xl font-bold mb-2 text-yellow-400';
-                    document.getElementById('challengeDetails').textContent = `نفس النقاط: ${myFinalScore}`;
-                }
-                
-                currentChallenge = null;
-            }
-            
-            document.getElementById('finalScore').textContent = `نقاطك في هذه اللعبة: ${score}`;
-            
-            // تحديث النشاط
-            gameConnection.updatePlayerActivity(currentPlayer, 'انتهى من اللعب', { 
-                level: currentLevel, 
-                finalScore: score,
-                totalScore: player.totalScore
+        function returnToMenu() {
+            showCustomConfirm('هل تريد العودة للقائمة؟ سيتم فقدان التقدم الحالي.', () => {
+                document.getElementById('quizScreen').classList.add('hidden');
+                showMainMenu();
             });
-            
-            gameConnection.updatePlayer(currentPlayer, player);
         }
 
-        // تحديث معلومات اللاعب
-        function updatePlayerInfo() {
-            const player = gameConnection.getPlayer(currentPlayer);
-            document.getElementById('playerInfo').textContent = 
-                `النقاط الإجمالية: ${player.totalScore} | ألعاب مكتملة: ${player.gamesPlayed}`;
-        }
-
-        // تحديث كرات الدراغون
-        function updateDragonBalls() {
-            const container = document.getElementById('dragonBalls');
-            container.innerHTML = '';
-            
-            const player = gameConnection.getPlayer(currentPlayer);
-            for (let i = 0; i < 7; i++) {
-                const ball = document.createElement('div');
-                ball.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2';
-                
-                if (i < player.dragonBalls) {
-                    ball.className += ' bg-orange-500 text-white dragonball border-yellow-400';
-                    ball.textContent = `⭐${i + 1}`;
-                } else {
-                    ball.className += ' bg-gray-600 text-gray-400 border-gray-500';
-                    ball.textContent = '?';
-                }
-                
-                container.appendChild(ball);
+        // Real-time update for teacher dashboard
+        function updateTeacherDashboardRealtime() {
+            // Only update if teacher dashboard is visible
+            if (!document.getElementById('teacherDashboard').classList.contains('hidden')) {
+                updateTeacherStats();
             }
         }
 
-        // دوال مساعدة للحوارات
-        function showAlert(message) {
+        // Teacher Dashboard
+        function showTeacherDashboard() {
+            updateTeacherStats();
+            document.getElementById('teacherDashboard').classList.remove('hidden');
+        }
+
+        // Export data function for teacher
+        function exportStudentData() {
+            const allStudents = getAllStudents();
+            const dataStr = JSON.stringify(allStudents, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'student_results_' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function updateTeacherStats() {
+            const allStudents = getAllStudents();
+            const studentsArray = Object.values(allStudents);
+
+            document.getElementById('totalStudents').textContent = studentsArray.length;
+
+            if (studentsArray.length > 0) {
+                const totalScore = studentsArray.reduce((sum, student) => sum + student.totalScore, 0);
+                const avgScore = Math.round(totalScore / studentsArray.length);
+                document.getElementById('avgScore').textContent = avgScore;
+
+                const excellentCount = studentsArray.filter(student => {
+                    const completedLevels = Object.values(student.levels).filter(l => l.completed);
+                    const avgLevelScore = completedLevels.length > 0 ?
+                        completedLevels.reduce((sum, l) => sum + l.score, 0) / completedLevels.length : 0;
+                    return avgLevelScore >= 90;
+                }).length;
+                document.getElementById('excellentStudents').textContent = excellentCount;
+            }
+
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+
+            studentsArray.forEach(student => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700 hover:bg-gray-800';
+
+                const lastAttempt = new Date(student.lastAttempt).toLocaleDateString('ar-DZ');
+
+                row.innerHTML = `
+                    <td class="p-4">${student.name}</td>
+                    <td class="text-center p-4 font-bold text-yellow-400">${student.totalScore}</td>
+                    <td class="text-center p-4">${student.levels[1].completed ? student.levels[1].score : '-'}</td>
+                    <td class="text-center p-4">${student.levels[2].completed ? student.levels[2].score : '-'}</td>
+                    <td class="text-center p-4">${student.levels[3].completed ? student.levels[3].score : '-'}</td>
+                    <td class="text-center p-4">${student.levels[4].completed ? student.levels[4].score : '-'}</td>
+                    <td class="text-center p-4">${student.levels[5].completed ? student.levels[5].score : '-'}</td>
+                    <td class="text-center p-4 text-sm text-gray-400">${lastAttempt}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('teacherDashboard').classList.remove('hidden');
+        }
+
+        // Custom alert/confirm functions (no built-in dialogs)
+        function showCustomAlert(message, type = 'info') {
             const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4';
+
+            const bgColor = type === 'error' ? 'bg-red-900' : type === 'warning' ? 'bg-yellow-900' : 'bg-blue-900';
+
             modal.innerHTML = `
-                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-                    <p class="text-center mb-4">${message}</p>
-                    <button onclick="this.closest('.fixed').remove()" class="w-full bg-primary hover:bg-purple-700 text-white py-2 px-4 rounded">
+                <div class="neon-border ${bgColor} bg-opacity-90 rounded-2xl p-8 max-w-md w-full text-center">
+                    <p class="text-xl mb-6">${message}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="btn-primary text-gray-900 font-bold py-3 px-8 rounded-lg">
                         حسناً
                     </button>
                 </div>
             `;
+
             document.body.appendChild(modal);
         }
 
-        function showConfirmDialog(message, onConfirm) {
+        function showCustomConfirm(message, onConfirm) {
             const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4';
+
             modal.innerHTML = `
-                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-                    <p class="text-center mb-4">${message}</p>
-                    <div class="flex justify-center space-x-3">
-                        <button class="cancel-btn px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
-                            إلغاء
+                <div class="neon-border bg-gray-900 rounded-2xl p-8 max-w-md w-full text-center">
+                    <p class="text-xl mb-6">${message}</p>
+                    <div class="flex gap-4 justify-center">
+                        <button onclick="this.closest('.fixed').remove(); (${onConfirm})()" class="bg-green-600 hover:bg-green-700 font-bold py-3 px-8 rounded-lg transition">
+                            نعم
                         </button>
-                        <button class="confirm-btn px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
-                            تأكيد
+                        <button onclick="this.closest('.fixed').remove()" class="bg-gray-700 hover:bg-gray-600 font-bold py-3 px-8 rounded-lg transition">
+                            لا
                         </button>
                     </div>
                 </div>
             `;
-            document.body.appendChild(modal);
-            
-            modal.querySelector('.cancel-btn').onclick = function() {
-                document.body.removeChild(modal);
-            };
-            
-            modal.querySelector('.confirm-btn').onclick = function() {
-                document.body.removeChild(modal);
-                onConfirm();
-            };
-        }
 
-        // تهيئة اللعبة
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-            
-            // إضافة بعض اللاعبين للتجربة
-            ['أحمد المتفوق', 'فاطمة الذكية', 'محمد العبقري', 'عائشة النجمة', 'سارة المبدعة', 'يوسف الأسطورة'].forEach((name, index) => {
-                const player = gameConnection.getPlayer(name);
-                player.totalScore = Math.floor(Math.random() * 1000) + 200;
-                player.dragonBalls = Math.floor(Math.random() * 7) + 0;
-                player.currentLevel = Math.min(7, Math.floor(Math.random() * 6) + 1);
-                player.gamesPlayed = Math.floor(Math.random() * 30) + 1;
-                
-                // محاكاة اتصال عشوائي (70% احتمال الاتصال)
-                if (Math.random() > 0.3) {
-                    gameConnection.setPlayerOnline(name, [
-                        'في القائمة الرئيسية', 
-                        `يلعب المستوى ${player.currentLevel}`, 
-                        'يتصفح المستويات',
-                        'في تحدي مع لاعب آخر',
-                        'يحاول حل الأسئلة'
-                    ][Math.floor(Math.random() * 5)]);
-                }
-            });
-            
-            // دعم الوضع المظلم
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.classList.add('dark');
-            }
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                if (event.matches) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            });
-        });
+            document.body.appendChild(modal);
+        }
     </script>
 </body>
 </html>
